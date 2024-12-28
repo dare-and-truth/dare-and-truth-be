@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: DareAndTruth
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/dare_and_truth}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PW:postgresql}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8080
+
