@@ -1,11 +1,12 @@
 package PNV.DareAndTruth.mapper;
 
-import PNV.DareAndTruth.dto.request.auth.SignUpRequest;
-import PNV.DareAndTruth.dto.request.user.UpdateUserRequest;
-import PNV.DareAndTruth.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
+
+import PNV.DareAndTruth.dto.request.auth.SignUpRequest;
+import PNV.DareAndTruth.dto.request.user.UpdateUserRequest;
+import PNV.DareAndTruth.entity.User;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface UserMapper {

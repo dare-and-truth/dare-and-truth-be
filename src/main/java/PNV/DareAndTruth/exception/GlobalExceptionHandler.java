@@ -1,12 +1,13 @@
 package PNV.DareAndTruth.exception;
 
-import PNV.DareAndTruth.dto.response.ApiResponse;
-import PNV.DareAndTruth.dto.response.ApiStatus;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import PNV.DareAndTruth.dto.response.ApiResponse;
+import PNV.DareAndTruth.dto.response.ApiStatus;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -33,7 +34,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Void>> handleValidationException(MethodArgumentNotValidException exception) {
-        String enumService = exception.getFieldError() != null ? exception.getFieldError().getDefaultMessage() : "";
+        String enumService =
+                exception.getFieldError() != null ? exception.getFieldError().getDefaultMessage() : "";
         ErrorCode errorCode;
         try {
             errorCode = ErrorCode.valueOf(enumService);

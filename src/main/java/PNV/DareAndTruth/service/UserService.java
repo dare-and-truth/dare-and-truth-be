@@ -1,5 +1,11 @@
 package PNV.DareAndTruth.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+
 import PNV.DareAndTruth.dto.request.auth.SignUpRequest;
 import PNV.DareAndTruth.dto.request.user.UpdateUserRequest;
 import PNV.DareAndTruth.entity.User;
@@ -13,11 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Getter
 @Setter

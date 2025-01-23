@@ -1,9 +1,9 @@
 package PNV.DareAndTruth.entity;
 
 import jakarta.persistence.*;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter

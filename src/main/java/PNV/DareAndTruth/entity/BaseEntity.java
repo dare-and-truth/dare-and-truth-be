@@ -1,12 +1,13 @@
 package PNV.DareAndTruth.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
+
+import jakarta.persistence.*;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -30,8 +31,6 @@ public abstract class BaseEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "BaseEntity {" +
-                "id = " + id +
-                "}";
+        return "BaseEntity {" + "id = " + id + "}";
     }
 }
