@@ -15,7 +15,6 @@ public class UpdateUserRequest {
             message = "EMAIL_INVALID")
     String email;
 
-    @NotBlank
     @Size(min = 3, message = "USERNAME_INVALID")
     String username;
 
