@@ -1,4 +1,5 @@
 spring:
+  output.ansi.enabled: ALWAYS
   application:
     name: DareAndTruth
   datasource:
@@ -14,3 +15,12 @@ spring:
 server:
   port: 8080
 
+fe-server:
+  url: ${FE_URL:http://localhost:3000}
+
+openapi:
+  service:
+    api-docs: DareAndTruth-service
+    title: Dare&Truth API Documentation
+    version: v0.0.1
+    server: http://localhost:8080
