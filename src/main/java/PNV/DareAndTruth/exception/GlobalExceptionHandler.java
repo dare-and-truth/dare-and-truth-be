@@ -6,8 +6,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import PNV.DareAndTruth.dto.response.AppApiResponse;
 import PNV.DareAndTruth.dto.response.ApiStatus;
+import PNV.DareAndTruth.dto.response.AppApiResponse;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
                 .status(ApiStatus.FAIL)
                 .message(errorCode.getMessage())
                 .build();
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(appApiResponse);
+        return ResponseEntity.status(exception.getHttpStatus()).body(appApiResponse);
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
