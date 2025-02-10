@@ -101,7 +101,7 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid refresh token"));
         }
 
-        String newAccessToken = jwtTokenProvider.createToken(user.getEmail(), user.getIsAdmin() ? "admin" : "user", false);
+        String newAccessToken = jwtTokenProvider.createToken(user.getEmail(), Boolean.TRUE.equals(user.getIsAdmin()) ? "admin" : "user", false);
 
         Map<String, Object> response = new HashMap<>();
         response.put("access_token", newAccessToken);

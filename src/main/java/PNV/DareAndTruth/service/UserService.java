@@ -101,7 +101,7 @@ public class UserService {
             throw new AppException(ErrorCode.PASSWORD_INCORRECT);
         }
 
-        String role = user.getIsAdmin() ? "admin" : "user";
+        String role = Boolean.TRUE.equals(user.getIsAdmin()) ? "admin" : "user";
 
         String accessToken = jwtTokenProvider.createToken(user.getEmail(), role, false);
         String refreshToken = jwtTokenProvider.createToken(user.getEmail(), role, true);

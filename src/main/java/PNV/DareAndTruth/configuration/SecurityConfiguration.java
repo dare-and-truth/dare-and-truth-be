@@ -1,6 +1,5 @@
 package PNV.DareAndTruth.configuration;
 
-import PNV.DareAndTruth.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,8 +15,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.util.List;
-
 @EnableWebSecurity
 @Configuration
 public class SecurityConfiguration {
@@ -25,17 +22,9 @@ public class SecurityConfiguration {
     @Value("${fe-server.url}")
     private String FE_SERVER_URL;
 
-    @Value("${admin-protected-apis}")
-    private String  adminProtectedApis;
-
-    @Bean
-    public List<String> adminProtectedApis() {
-        return List.of(adminProtectedApis.split(","));
-    }
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter, CustomUserDetailsService userDetailsService) {
+    public SecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
@@ -67,7 +56,7 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/auth/sign-up", "/auth/sign-in", "/auth/refresh-token").permitAll()
-                        .requestMatchers(adminProtectedApis().toArray(new String[0])).hasRole("ADMIN")
+                        .requestMatchers("/admin/**","/users").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
