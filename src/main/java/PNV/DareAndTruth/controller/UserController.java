@@ -1,7 +1,6 @@
 package PNV.DareAndTruth.controller;
 
 import java.util.List;
-import java.util.UUID;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -36,6 +35,7 @@ public class UserController {
                             schema = @Schema(implementation = User.class))),
             @ApiResponse(responseCode = "500", description = "Internal server error")
     })
+
     @GetMapping
     public ResponseEntity<AppApiResponse<List<User>>> getAllUsers() {
         List<User> allUsers = userService.getAllUsers();

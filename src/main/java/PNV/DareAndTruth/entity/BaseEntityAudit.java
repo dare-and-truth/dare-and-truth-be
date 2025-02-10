@@ -1,6 +1,7 @@
 package PNV.DareAndTruth.entity;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Objects;
 
@@ -14,6 +15,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.GrantedAuthority;
 
 @Getter
 @Setter
@@ -56,4 +58,6 @@ public abstract class BaseEntityAudit extends BaseEntity implements Serializable
                 + updatedAt + "}"
                 + super.toString();
     }
+
+    public abstract Collection<? extends GrantedAuthority> getAuthorities();
 }
