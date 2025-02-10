@@ -1,14 +1,15 @@
 package PNV.DareAndTruth.entity;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import jakarta.persistence.*;
 
-import lombok.*;
-import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.Collection;
-import java.util.Collections;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Entity
 @Getter

@@ -39,6 +39,7 @@ public class SecurityConfiguration {
         corsConfiguration.addAllowedOrigin(FE_SERVER_URL);
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
@@ -46,19 +47,21 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/auth/sign-up", "/auth/sign-in", "/auth/refresh-token").permitAll()
-                        .requestMatchers("/admin/**","/users").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                )
+        http.csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(
+                        authz -> authz.requestMatchers("/auth/sign-up", "/auth/sign-in", "/auth/refresh-token")
+                                .permitAll()
+                                .requestMatchers("/admin/**", "/users")
+                                .hasRole("ADMIN")
+                                .anyRequest()
+                                .authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

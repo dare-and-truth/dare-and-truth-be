@@ -1,9 +1,11 @@
 package PNV.DareAndTruth.security;
 
-import io.jsonwebtoken.*;
-import org.springframework.stereotype.Component;
-import javax.crypto.SecretKey;
 import java.util.Date;
+import javax.crypto.SecretKey;
+
+import org.springframework.stereotype.Component;
+
+import io.jsonwebtoken.*;
 
 @Component
 public class JwtUtil {
@@ -21,10 +23,7 @@ public class JwtUtil {
 
     private Claims extractAllClaims(String token) {
         try {
-            return Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token)
-                    .getBody();
+            return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
         } catch (ExpiredJwtException e) {
             throw new RuntimeException("Token expired!", e);
         } catch (MalformedJwtException | SignatureException e) {

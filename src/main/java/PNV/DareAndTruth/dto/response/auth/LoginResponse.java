@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LoginResponse {
-     String accessToken;
-     String refreshToken;
-     Object user;
+    String accessToken;
+    String refreshToken;
+    Object user;
 }

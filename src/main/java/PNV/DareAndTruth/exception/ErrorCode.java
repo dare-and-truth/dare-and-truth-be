@@ -17,9 +17,8 @@ public enum ErrorCode {
     EMAIL_REQUIRED(1008, "Email is required"),
     USERNAME_REQUIRED(1009, "Username is required"),
     PASSWORD_REQUIRED(1010, "Password is required"),
-    EMAIL_NOT_FOUND(1011,"Email is not found. Please sign up." ),
-    EMAIL_OR_PASSWORD_INCORRECT(1012, "Email or password is incorrect"),
-    PASSWORD_INCORRECT(1013, "Password is incorrect");
+    EMAIL_NOT_FOUND(1011, "Email is not found. Please sign up."),
+    PASSWORD_INCORRECT(1012, "Password is incorrect");
 
     int errorCode;
     String message;
