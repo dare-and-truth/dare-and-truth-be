@@ -18,7 +18,10 @@ public enum ErrorCode {
     USERNAME_REQUIRED(1009, "Username is required"),
     PASSWORD_REQUIRED(1010, "Password is required"),
     EMAIL_NOT_FOUND(1011, "Email is not found. Please sign up."),
-    PASSWORD_INCORRECT(1012, "Password is incorrect");
+    PASSWORD_INCORRECT(1012, "Password is incorrect"),
+    INVALID_REFRESH_TOKEN(1013, "Invalid refresh token"),
+    REFRESH_TOKEN_REQUIRED(1014, "Refresh token is required"),
+    TOKEN_ALREADY_INVALID(1015, "Token has been disabled!");
 
     int errorCode;
     String message;

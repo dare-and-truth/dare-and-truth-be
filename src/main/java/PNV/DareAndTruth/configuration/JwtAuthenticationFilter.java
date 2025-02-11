@@ -14,20 +14,20 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import PNV.DareAndTruth.security.JwtTokenProvider;
-import PNV.DareAndTruth.security.JwtUtil;
 import PNV.DareAndTruth.service.CustomUserDetailsService;
+import PNV.DareAndTruth.service.JwtService;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 @Component
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtUtil jwtUtil;
-    private final CustomUserDetailsService customUserDetailsService;
 
-    public JwtAuthenticationFilter(JwtUtil jwtUtil, CustomUserDetailsService customUserDetailsService) {
-        this.jwtUtil = jwtUtil;
-        this.customUserDetailsService = customUserDetailsService;
-    }
+    final JwtService jwtService;
+    final CustomUserDetailsService customUserDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -42,16 +42,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = authHeader.substring(7);
 
-        if (JwtTokenProvider.isTokenInvalid(token)) {
+        if (JwtService.isTokenInvalid(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("Token has been disabled. Please log in again!");
             return;
         }
 
-        String email = jwtUtil.extractEmail(token);
+        String email = jwtService.extractEmail(token);
 
-        // Bỏ qua nếu là refresh_token
-        if (jwtUtil.isRefreshToken(token)) {
+        if (jwtService.isRefreshToken(token)) {
             chain.doFilter(request, response);
             return;
         }
@@ -59,7 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = customUserDetailsService.loadUserByEmail(email);
 
-            if (jwtUtil.validateToken(token)) {
+            if (jwtService.validateToken(token)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
@@ -68,13 +67,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         chain.doFilter(request, response);
-    }
-
-    private String extractToken(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        if (header != null && header.startsWith("Bearer ")) {
-            return header.substring(7);
-        }
-        return null;
     }
 }

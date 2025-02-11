@@ -1,25 +1,18 @@
 package PNV.DareAndTruth.controller;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import jakarta.validation.Valid;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import PNV.DareAndTruth.dto.request.auth.LoginRequest;
 import PNV.DareAndTruth.dto.request.auth.SignUpRequest;
+import PNV.DareAndTruth.dto.request.auth.SigninRequest;
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
-import PNV.DareAndTruth.dto.response.auth.LoginResponse;
-import PNV.DareAndTruth.entity.User;
-import PNV.DareAndTruth.exception.AppException;
-import PNV.DareAndTruth.exception.ErrorCode;
-import PNV.DareAndTruth.repository.UserRepository;
-import PNV.DareAndTruth.security.JwtTokenProvider;
-import PNV.DareAndTruth.security.JwtUtil;
+import PNV.DareAndTruth.dto.response.auth.SigninResponse;
+import PNV.DareAndTruth.service.AuthService;
 import PNV.DareAndTruth.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -35,11 +28,8 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthController {
-
     UserService userService;
-    JwtTokenProvider jwtTokenProvider;
-    JwtUtil jwtUtil;
-    UserRepository userRepository;
+    AuthService authService;
 
     @Operation(summary = "Sign up new account", description = "Create a new account by providing valid user details.")
     @ApiResponses(
@@ -85,103 +75,77 @@ public class AuthController {
     @Operation(summary = "Sign in", description = "Authenticate user and return access and refresh tokens.")
     @ApiResponses(
             value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Sign In successful",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Sign In successful",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
                                             @ExampleObject(
                                                     value =
                                                             "{\"code\": 1000, \"status\": \"success\", \"message\": \"Sign In successful. Welcome back!\", \"data\": {\"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\", \"refresh_token\": \"dGhpcyBpcyBhIHNhbXBsZSB0b2tlbg==\", \"user\": {\"id\": \"12345\", \"username\": \"john_doe\"}}}")
-                                    })),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "Unauthorized",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples = {
+                                        })),
+                @ApiResponse(
+                        responseCode = "401",
+                        description = "Unauthorized",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
                                             @ExampleObject(
                                                     value =
                                                             "{\"code\": 1001, \"status\": \"fail\", \"message\": \"Invalid credentials\"}")
-                                    })),
-                    @ApiResponse(
-                            responseCode = "500",
-                            description = "Internal server error",
-                            content = @Content(mediaType = "application/json"))
+                                        })),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal server error",
+                        content = @Content(mediaType = "application/json"))
             })
     @PostMapping("/sign-in")
-    public ResponseEntity<AppApiResponse<Object>> login(@RequestBody LoginRequest request) {
-        var authResult = userService.authenticateUser(request);
-
-        String accessToken = (String) authResult.get("access_token");
-        String refreshToken = (String) authResult.get("refresh_token");
-        Object userInfo = authResult.get("user");
-
+    public ResponseEntity<AppApiResponse<Object>> login(@RequestBody @Valid SigninRequest request) {
+        SigninResponse signinResponse = authService.authenticateUser(request);
         return ResponseEntity.ok(AppApiResponse.builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
                 .message("Sign In successful. Welcome back!")
-                .data(new LoginResponse(accessToken, refreshToken, userInfo))
+                .data(signinResponse)
                 .build());
     }
 
     @Operation(summary = "Refresh Token", description = "Generate a new access token using a valid refresh token.")
     @ApiResponses(
             value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Token refreshed successfully",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Token refreshed successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
                                             @ExampleObject(
                                                     value =
                                                             "{\"code\": 1000, \"status\": \"success\", \"message\": \"Refresh token successfully\", \"data\": {\"access_token\": \"new_access_token\", \"refresh_token\": \"same_refresh_token\"}}")
-                                    })),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Invalid refresh token",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples = {
+                                        })),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Invalid refresh token",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
                                             @ExampleObject(
                                                     value =
                                                             "{\"code\": 1002, \"status\": \"fail\", \"message\": \"Invalid refresh token\"}")
-                                    })),
-                    @ApiResponse(
-                            responseCode = "500",
-                            description = "Internal server error",
-                            content = @Content(mediaType = "application/json"))
+                                        })),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal server error",
+                        content = @Content(mediaType = "application/json"))
             })
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
-        String refreshToken = request.get("refresh_token");
-        if (refreshToken == null) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Refresh token is required"));
-        }
-
-        String email = jwtUtil.extractEmail(refreshToken);
-        User user = userRepository
-                .findByEmail(email)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
-
-        if (!refreshToken.equals(user.getRefreshToken()) || !jwtUtil.isRefreshToken(refreshToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid refresh token"));
-        }
-
-        String newAccessToken = jwtTokenProvider.createToken(
-                user.getEmail(), Boolean.TRUE.equals(user.getIsAdmin()) ? "admin" : "user", false);
-
-        Map<String, Object> response = new HashMap<>();
-        response.put("access_token", newAccessToken);
-        response.put("refresh_token", refreshToken);
-        response.put("user", Map.of("id", user.getId(), "username", user.getUsername()));
-
+        Map<String, Object> response = authService.refreshToken(request.get("refresh_token"));
         return ResponseEntity.ok(AppApiResponse.builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
@@ -193,52 +157,36 @@ public class AuthController {
     @Operation(summary = "Logout", description = "Invalidate the user's authentication token and refresh token.")
     @ApiResponses(
             value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Logout successfully",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Logout successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
                                             @ExampleObject(
                                                     value =
                                                             "{\"code\": 1000, \"status\": \"success\", \"message\": \"Logout successfully\"}")
-                                    })),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Token already invalid",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples = {
+                                        })),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Token already invalid",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
                                             @ExampleObject(
                                                     value =
                                                             "{\"code\": 1003, \"status\": \"fail\", \"message\": \"Token has been disabled!\"}")
-                                    })),
-                    @ApiResponse(
-                            responseCode = "500",
-                            description = "Internal server error",
-                            content = @Content(mediaType = "application/json"))
+                                        })),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal server error",
+                        content = @Content(mediaType = "application/json"))
             })
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
-        if (token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        }
-
-        if (jwtTokenProvider.isTokenInvalid(token)) {
-            return ResponseEntity.badRequest().body("Token has been disabled!");
-        }
-
-        String email = jwtTokenProvider.extractEmail(token);
-
-        jwtTokenProvider.invalidateToken(token);
-
-        userRepository.findByEmail(email).ifPresent(user -> {
-            user.setRefreshToken(null);
-            userRepository.save(user);
-        });
-
+        authService.logoutUser(token);
         return ResponseEntity.ok(AppApiResponse.builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)

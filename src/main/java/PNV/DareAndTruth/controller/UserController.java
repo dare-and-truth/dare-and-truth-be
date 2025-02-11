@@ -2,7 +2,6 @@ package PNV.DareAndTruth.controller;
 
 import java.util.List;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
