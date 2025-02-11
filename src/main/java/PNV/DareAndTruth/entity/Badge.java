@@ -19,24 +19,32 @@ import java.time.LocalDate;
 @Check(constraints = "start_day < end_day")
 public class Badge extends BaseEntityAudit{
 
-    @Column(name = "title", nullable = false, length = 100)
-    private String title;
+    @Column(name = "title", nullable = false, length = 100, unique = true)
+    String title;
 
     @Column(name = "image")
-    private String image;
+    String image;
 
     @Column(name = "description", length = 500, nullable = false)
-    private String description;
+    String description;
 
     @Column(name = "required_count", nullable = false)
-    private int requiredCount;
+    int requiredCount;
 
     @Column(name = "points", nullable = false)
-    private int points;
+    int points;
 
     @Column(name = "start_day", nullable = false)
-    private LocalDate startDay;
+    LocalDate startDay;
 
     @Column(name = "end_day", nullable = true)
-    private LocalDate endDay;
+    LocalDate endDay;
+
+    @Column(name = "is_active", columnDefinition = "boolean default true")
+    @Builder.Default
+    Boolean isActive = true;
+
+    @Column(name = "is_deleted", columnDefinition = "boolean default false")
+    @Builder.Default
+    Boolean isDeleted = false;
 }
