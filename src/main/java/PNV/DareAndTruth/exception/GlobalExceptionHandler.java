@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<AppApiResponse<Void>> handleAppException(AppException exception) {
         ErrorCode errorCode = exception.getErrorCode();
         AppApiResponse<Void> appApiResponse = AppApiResponse.<Void>builder()
-                .code(errorCode.getErrorCode())
+                .code(errorCode.getCode())
                 .status(ApiStatus.FAIL)
                 .message(errorCode.getMessage())
                 .build();
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(appApiResponse);
         }
         AppApiResponse<Void> appApiResponse = AppApiResponse.<Void>builder()
-                .code(errorCode.getErrorCode())
+                .code(errorCode.getCode())
                 .status(ApiStatus.FAIL)
                 .message(errorCode.getMessage())
                 .build();

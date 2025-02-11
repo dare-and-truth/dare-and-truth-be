@@ -19,11 +19,11 @@ public enum ErrorCode {
     PASSWORD_REQUIRED(1010, "Password is required"),
     ;
 
-    int errorCode;
+    int code;
     String message;
 
-    ErrorCode(int errorCode, String message) {
-        this.errorCode = errorCode;
+    ErrorCode(int code, String message) {
+        this.code = code;
         this.message = message;
     }
 }
