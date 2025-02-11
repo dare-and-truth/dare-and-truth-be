@@ -23,11 +23,11 @@ public enum ErrorCode {
     REFRESH_TOKEN_REQUIRED(1014, "Refresh token is required"),
     TOKEN_ALREADY_INVALID(1015, "Token has been disabled!");
 
-    int errorCode;
+    int code;
     String message;
 
-    ErrorCode(int errorCode, String message) {
-        this.errorCode = errorCode;
+    ErrorCode(int code, String message) {
+        this.code = code;
         this.message = message;
     }
 }
