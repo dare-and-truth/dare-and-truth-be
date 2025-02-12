@@ -21,7 +21,16 @@ public enum ErrorCode {
     PASSWORD_INCORRECT(1012, "Password is incorrect"),
     INVALID_REFRESH_TOKEN(1013, "Invalid refresh token"),
     REFRESH_TOKEN_REQUIRED(1014, "Refresh token is required"),
-    TOKEN_ALREADY_INVALID(1015, "Token has been disabled!");
+    TOKEN_ALREADY_INVALID(1015, "Token has been disabled!"),
+    BADGE_NOT_FOUND(1016, "Badge not found"),
+    BADGE_TITLE_REQUIRED(1017, "Title is required"),
+    BADGE_IMAGE_REQUIRED(1018, "Image is required"),
+    BADGE_DECS_REQUIRED(1019, "Description is required"),
+    BADGE_CRITERIA_REQUIRED(1020, "Badge Criteria is required"),
+    BADGE_POINT_REQUIRED(1021, "Point is required"),
+    BADGE_START_DAY_REQUIRED(1022, "Start day is required"),
+    BADGE_TITLE_EXISTS(1023, "Badge title already exists"),
+    ;
 
     int code;
     String message;
