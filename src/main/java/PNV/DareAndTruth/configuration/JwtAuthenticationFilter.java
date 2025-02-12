@@ -25,7 +25,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-
     final JwtService jwtService;
     final CustomUserDetailsService customUserDetailsService;
 

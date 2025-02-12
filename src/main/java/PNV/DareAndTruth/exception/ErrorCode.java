@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum ErrorCode {
     UNCATEGORIZED_EXCEPTION(1001, "An unexpected error has occurred"),
-    EMAIL_INVALID(1002, "Please enter a valid email address."),
+    EMAIL_INVALID(1002, "Wrong email format"),
     EMAIL_EXISTS(1003, "Email already exists"),
     USERNAME_INVALID(1004, "Username must be at least 3 characters long"),
     PASSWORD_INVALID(1005, "Password must be at least 8 characters long"),
@@ -21,7 +21,9 @@ public enum ErrorCode {
     PASSWORD_INCORRECT(1012, "Password is incorrect"),
     INVALID_REFRESH_TOKEN(1013, "Invalid refresh token"),
     REFRESH_TOKEN_REQUIRED(1014, "Refresh token is required"),
-    TOKEN_ALREADY_INVALID(1015, "Token has been disabled!");
+    TOKEN_ALREADY_INVALID(1015, "Token has been disabled!"),
+    BADGE_NOT_FOUND(1016, "Badge not found"),
+    ;
 
     int code;
     String message;
