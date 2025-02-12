@@ -20,11 +20,11 @@ public enum ErrorCode {
     BADGE_NOT_FOUND(1015, "Badge not found"),
     ;
 
-    int errorCode;
+    int code;
     String message;
 
-    ErrorCode(int errorCode, String message) {
-        this.errorCode = errorCode;
+    ErrorCode(int code, String message) {
+        this.code = code;
         this.message = message;
     }
 }
