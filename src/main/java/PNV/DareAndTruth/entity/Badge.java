@@ -1,14 +1,16 @@
 package PNV.DareAndTruth.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.Check;
-import org.springframework.security.core.GrantedAuthority;
-
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+
+import jakarta.persistence.*;
+
+import org.hibernate.annotations.Check;
+import org.springframework.security.core.GrantedAuthority;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Entity
 @Getter
@@ -20,7 +22,7 @@ import java.util.List;
 @Table(name = "badge")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Check(constraints = "start_day < end_day")
-public class Badge extends BaseEntityAudit{
+public class Badge extends BaseEntityAudit {
 
     @Column(name = "title", nullable = false, length = 100, unique = true)
     String title;

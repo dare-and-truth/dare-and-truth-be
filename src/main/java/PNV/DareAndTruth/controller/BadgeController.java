@@ -1,5 +1,11 @@
 package PNV.DareAndTruth.controller;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
 import PNV.DareAndTruth.entity.Badge;
@@ -12,11 +18,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/badges")
@@ -26,19 +27,20 @@ public class BadgeController {
     BadgeService badgeService;
 
     @Operation(summary = "Get all badges", description = "Retrieve a list of all available badges")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Badges retrieved successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(
-                                    value = "{\"code\": 1000,\"status\": \"success\",\"message\": \"Badges retrieved successfully\",\"data\": [{\"id\":\"123e4567-e89b-12d3-a456-426614174000\", \"name\":\"Gold Badge\", \"description\":\"Awarded for excellence\", \"createdAt\":\"2025-01-01T12:00:00Z\"}]}"
-                            )
-                    )
-            ),
-            @ApiResponse(responseCode = "500", description = "Internal server error")
-    })
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Badges retrieved successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                "{\"code\": 1000,\"status\": \"success\",\"message\": \"Badges retrieved successfully\",\"data\": [{\"id\":\"123e4567-e89b-12d3-a456-426614174000\", \"name\":\"Gold Badge\", \"description\":\"Awarded for excellence\", \"createdAt\":\"2025-01-01T12:00:00Z\"}]}"))),
+                @ApiResponse(responseCode = "500", description = "Internal server error")
+            })
     @GetMapping
     public ResponseEntity<AppApiResponse<List<Badge>>> getAllBadges() {
         List<Badge> allBadges = badgeService.getAllBadges();
@@ -51,39 +53,37 @@ public class BadgeController {
     }
 
     @Operation(summary = "Get badge by ID", description = "Retrieve a badge by its unique identifier")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Badge retrieved successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(
-                                    value = "{\"code\": 1000,\"status\": \"success\",\"message\": \"Badge retrieved successfully\",\"data\": {\"id\":\"123e4567-e89b-12d3-a456-426614174000\", \"name\":\"Gold Badge\", \"description\":\"Awarded for excellence\", \"createdAt\":\"2025-01-01T12:00:00Z\"}}"
-                            )
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "Badge not found",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(
-                                    value = "{\"code\": 1006,\"status\": \"fail\",\"message\": \"Badge not found\"}"
-                            )
-                    )
-            )
-    })
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Badge retrieved successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                "{\"code\": 1000,\"status\": \"success\",\"message\": \"Badge retrieved successfully\",\"data\": {\"id\":\"123e4567-e89b-12d3-a456-426614174000\", \"name\":\"Gold Badge\", \"description\":\"Awarded for excellence\", \"createdAt\":\"2025-01-01T12:00:00Z\"}}"))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Badge not found",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                "{\"code\": 1006,\"status\": \"fail\",\"message\": \"Badge not found\"}")))
+            })
     @GetMapping("/{id}")
-    public ResponseEntity<AppApiResponse<Badge>> getBadgeById(@PathVariable String id){
+    public ResponseEntity<AppApiResponse<Badge>> getBadgeById(@PathVariable String id) {
         Badge badge = badgeService.getBadgeById(UUID.fromString(id));
-        return ResponseEntity.ok(
-                AppApiResponse.<Badge>builder()
-                        .code(1000)
-                        .status(ApiStatus.SUCCESS)
-                        .message("Badge retrieved successfully")
-                        .data(badge)
-                        .build()
-        );
+        return ResponseEntity.ok(AppApiResponse.<Badge>builder()
+                .code(1000)
+                .status(ApiStatus.SUCCESS)
+                .message("Badge retrieved successfully")
+                .data(badge)
+                .build());
     }
-
 }
