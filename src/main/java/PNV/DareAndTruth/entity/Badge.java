@@ -28,8 +28,8 @@ public class Badge extends BaseEntityAudit{
     @Column(name = "description", length = 500, nullable = false)
     String description;
 
-    @Column(name = "required_count", nullable = false)
-    int requiredCount;
+    @Column(name = "badge_criteria", nullable = false)
+    int badgeCriteria;
 
     @Column(name = "points", nullable = false)
     int points;
@@ -47,4 +47,17 @@ public class Badge extends BaseEntityAudit{
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     @Builder.Default
     Boolean isDeleted = false;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Badge badge = (Badge) o;
+        return this.getId() != null && this.getId().equals(badge.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() != null ? getId().hashCode() : 0;
+    }
 }

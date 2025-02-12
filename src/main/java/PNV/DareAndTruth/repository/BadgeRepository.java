@@ -10,5 +10,4 @@ import java.util.UUID;
 public interface BadgeRepository extends JpaRepository<Badge, UUID> {
     List<Badge> findAllByIsDeletedFalse();
     Optional<Badge> findByIdAndIsDeletedFalse(UUID id);
-    boolean existsByTitle(String title);
 }

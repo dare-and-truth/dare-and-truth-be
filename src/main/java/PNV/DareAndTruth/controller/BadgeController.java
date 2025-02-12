@@ -1,6 +1,5 @@
 package PNV.DareAndTruth.controller;
 
-import PNV.DareAndTruth.dto.request.badge.CreateBadgeRequest;
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
 import PNV.DareAndTruth.entity.Badge;
@@ -12,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/badges")
@@ -19,17 +19,6 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BadgeController {
     BadgeService badgeService;
-
-    @PostMapping
-    public ResponseEntity<AppApiResponse<Object>> createBadge(@RequestBody CreateBadgeRequest request) {
-        badgeService.createBadge(request);
-        return ResponseEntity.status(201)
-                .body(AppApiResponse.builder()
-                        .code(1000)
-                        .status(ApiStatus.SUCCESS)
-                        .message("Create badge successfully")
-                        .build());
-    }
 
     @GetMapping
     public ResponseEntity<AppApiResponse<List<Badge>>> getAllBadges() {
@@ -40,6 +29,19 @@ public class BadgeController {
                 .message("Badges retrieved successfully")
                 .data(allBadges)
                 .build());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<AppApiResponse<Badge>> getBadgeById(@PathVariable String id){
+        Badge badge = badgeService.getBadgeById(UUID.fromString(id));
+        return ResponseEntity.ok(
+                AppApiResponse.<Badge>builder()
+                        .code(1000)
+                        .status(ApiStatus.SUCCESS)
+                        .message("Badge retrieved successfully")
+                        .data(badge)
+                        .build()
+        );
     }
 
 }

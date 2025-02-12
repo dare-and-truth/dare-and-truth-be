@@ -18,13 +18,6 @@ public enum ErrorCode {
     USERNAME_REQUIRED(1009, "Username is required"),
     PASSWORD_REQUIRED(1010, "Password is required"),
     BADGE_NOT_FOUND(1015, "Badge not found"),
-    BADGE_TITLE_REQUIRED(1016,"Title is required"),
-    BADGE_IMAGE_REQUIRED(1017,"Image is required"),
-    BADGE_DECS_REQUIRED(1018,"Description is required"),
-    BADGE_REQUIRED_COUNT_REQUIRED(1019,"Required count is required"),
-    BADGE_POINT_REQUIRED(1020,"Point is required"),
-    BADGE_START_DAY_REQUIRED(1021,"Start day is required"),
-    BADGE_TITLE_EXISTS(1022, "Badge title already exists"),
     ;
 
     int errorCode;
