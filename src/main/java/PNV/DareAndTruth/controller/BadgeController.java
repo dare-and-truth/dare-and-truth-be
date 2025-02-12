@@ -74,7 +74,7 @@ public class BadgeController {
                                         examples =
                                                 @ExampleObject(
                                                         value =
-                                                                "{\"code\": 1006,\"status\": \"fail\",\"message\": \"Badge not found\"}")))
+                                                                "{\"code\": 1016,\"status\": \"fail\",\"message\": \"Badge not found\"}")))
             })
     @GetMapping("/{id}")
     public ResponseEntity<AppApiResponse<Badge>> getBadgeById(@PathVariable String id) {
