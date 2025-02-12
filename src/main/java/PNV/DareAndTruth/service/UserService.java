@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import PNV.DareAndTruth.dto.request.auth.SignUpRequest;
@@ -30,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
+    PasswordEncoder passwordEncoder;
 
     public void createUser(SignUpRequest request) {
         Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
@@ -37,6 +39,10 @@ public class UserService {
             throw new AppException(ErrorCode.EMAIL_EXISTS, HttpStatus.CONFLICT);
         }
         User user = userMapper.signUpRequestToUser(request);
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setIsAdmin(false);
+
         userRepository.save(user);
     }
 

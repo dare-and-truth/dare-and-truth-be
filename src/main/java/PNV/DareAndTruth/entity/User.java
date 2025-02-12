@@ -1,6 +1,12 @@
 package PNV.DareAndTruth.entity;
 
+import java.util.Collection;
+import java.util.Collections;
+
 import jakarta.persistence.*;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -27,6 +33,13 @@ public class User extends BaseEntityAudit {
     @Column(name = "is_admin")
     Boolean isAdmin;
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return isAdmin != null && isAdmin
+                ? Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"))
+                : Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
+    }
+
     @Column(name = "is_active", columnDefinition = "boolean default true")
     @Builder.Default
     Boolean isActive = true;
@@ -34,4 +47,7 @@ public class User extends BaseEntityAudit {
     @Column(name = "is_deleted", columnDefinition = "boolean default false")
     @Builder.Default
     Boolean isDeleted = false;
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
 }
