@@ -1,7 +1,6 @@
 package PNV.DareAndTruth.entity;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 import jakarta.persistence.*;
 
@@ -33,7 +32,6 @@ public class User extends BaseEntityAudit {
     @Column(name = "is_admin")
     Boolean isAdmin;
 
-    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return isAdmin != null && isAdmin
                 ? Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"))
@@ -48,6 +46,35 @@ public class User extends BaseEntityAudit {
     @Builder.Default
     Boolean isDeleted = false;
 
+    @OneToMany(mappedBy = "user")
+    Set<Challenge> challenges = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    Set<Post> posts;
+
     @Column(name = "refresh_token")
-    private String refreshToken;
+    String refreshToken;
+
+   //implement equals and hashCode
+   @Override
+   public boolean equals(Object o) {
+       if (this == o) return true;
+       if (!(o instanceof User that)) return false;
+       if (!super.equals(o)) return false;
+       return Objects.equals(username, that.username)
+               && Objects.equals(email, that.email)
+               && Objects.equals(password, that.password)
+               && Objects.equals(isAdmin, that.isAdmin)
+               && Objects.equals(isActive, that.isActive)
+               && Objects.equals(isDeleted, that.isDeleted)
+               && Objects.equals(challenges, that.challenges)
+               && Objects.equals(posts, that.posts)
+               && Objects.equals(refreshToken, that.refreshToken);
+   }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), username, email, password, isAdmin,
+                isActive, isDeleted, challenges, posts, refreshToken);
+    }
 }

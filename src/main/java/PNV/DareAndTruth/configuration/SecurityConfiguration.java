@@ -59,7 +59,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        authz -> authz.requestMatchers("/auth/sign-up", "/auth/sign-in", "/auth/refresh-token")
+                        authz -> authz.requestMatchers("/auth/sign-up", "/auth/sign-in", "/auth/refresh-token", "/swagger-ui/**", "v3/**")
                                 .permitAll()
                                 .requestMatchers("/admin/**", "/users")
                                 .hasRole("ADMIN")

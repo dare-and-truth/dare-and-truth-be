@@ -23,6 +23,17 @@ public enum ErrorCode {
     REFRESH_TOKEN_REQUIRED(1014, "Refresh token is required"),
     TOKEN_ALREADY_INVALID(1015, "Token has been disabled!"),
     BADGE_NOT_FOUND(1016, "Badge not found"),
+    HASHTAG_REQUIRED(1017, "Hashtag is required"),
+    CONTENT_REQUIRED(1018, "Content is required"),
+    MEDIA_URL_REQUIRED(1019, "Media URL is required"),
+    START_DATE_REQUIRED(1020, "Start date is required "),
+    START_DATE_FUTURE_OR_PRESENT(1021, "Start date must be present or future"),
+    END_DATE_REQUIRED(1022, "End date is required"),
+    END_DATE_FUTURE(1023, "End date must be future"),
+    END_DATE_MUST_BE_AFTER_START_DATE(1024, "End date must be after start date"),
+    END_TIME_MUST_BE_AFTER_START_TIME(1025, "End time must be after start time on the same day"),
+    USER_ID_REQUIRED(1026, "User ID is required"),
+    CHALLENGE_NOT_FOUND(1027, "Challenge does not find")
     ;
 
     int code;

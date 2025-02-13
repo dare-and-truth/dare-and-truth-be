@@ -58,6 +58,4 @@ public abstract class BaseEntityAudit extends BaseEntity implements Serializable
                 + updatedAt + "}"
                 + super.toString();
     }
-
-    public abstract Collection<? extends GrantedAuthority> getAuthorities();
 }
