@@ -1,7 +1,6 @@
 package PNV.DareAndTruth.dto.request.challenge;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.FutureOrPresent;

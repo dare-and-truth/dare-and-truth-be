@@ -35,13 +35,15 @@ public class UserService {
 
     public void createUser(SignUpRequest request) {
         Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
+        // check is admin if it is the first account
+        Boolean isAdmin = userRepository.count() == 0;
         if (existingUser.isPresent()) {
             throw new AppException(ErrorCode.EMAIL_EXISTS, HttpStatus.CONFLICT);
         }
         User user = userMapper.signUpRequestToUser(request);
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setIsAdmin(false);
+        user.setIsAdmin(isAdmin);
 
         userRepository.save(user);
     }
