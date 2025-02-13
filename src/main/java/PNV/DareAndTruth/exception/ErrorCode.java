@@ -33,7 +33,7 @@ public enum ErrorCode {
     INVALID_BADGE_DATE_RANGE(1024, "Start day should be less than end day"),
     BADGE_POINT_INVALID(1024, "Points must be at least 0"),
     BADGE_CRITERIA_INVALID(1024, "Badge criteria must be at least 0"),
-    BADGE_IS_ACTIVE_REQUIRED(1024, "Is active is required"),
+    BADGE_IS_ACTIVE_REQUIRED(1025, "Is active is required"),
     ;
 
     int code;
