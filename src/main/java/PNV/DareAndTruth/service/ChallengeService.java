@@ -1,6 +1,7 @@
 package PNV.DareAndTruth.service;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.transaction.Transactional;
@@ -8,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import PNV.DareAndTruth.dto.projection.challenge.ChallengeSummaryProjection;
 import PNV.DareAndTruth.dto.request.challenge.CreateChallengeRequest;
 import PNV.DareAndTruth.entity.Challenge;
 import PNV.DareAndTruth.entity.User;
@@ -54,5 +56,9 @@ public class ChallengeService {
                 .build();
 
         challengeRepository.save(challenge);
+    }
+
+    public Set<ChallengeSummaryProjection> getChallenges() {
+        return challengeRepository.findAllByIsDeletedFalse();
     }
 }
