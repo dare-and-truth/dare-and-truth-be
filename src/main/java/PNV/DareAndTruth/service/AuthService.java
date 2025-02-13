@@ -39,11 +39,14 @@ public class AuthService {
     UserDetailsService userDetailsService;
     JwtService jwtService;
 
+    static final String ACCESS_TOKEN = "access_token";
+    static final String REFRESH_TOKEN = "refresh_token";
+
     public SigninResponse authenticateUser(SigninRequest request) {
         var authResult = validateUserCredentials(request);
 
-        String accessToken = (String) authResult.get("access_token");
-        String refreshToken = (String) authResult.get("refresh_token");
+        String accessToken = (String) authResult.get(ACCESS_TOKEN);
+        String refreshToken = (String) authResult.get(REFRESH_TOKEN);
         Object userInfo = authResult.get("user");
 
         return new SigninResponse(accessToken, refreshToken, userInfo);
@@ -67,8 +70,8 @@ public class AuthService {
         userRepository.save(user);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("access_token", accessToken);
-        response.put("refresh_token", refreshToken);
+        response.put(ACCESS_TOKEN, accessToken);
+        response.put(REFRESH_TOKEN, refreshToken);
         response.put("user", Map.of("id", user.getId(), "username", user.getUsername()));
 
         return response;
@@ -93,8 +96,8 @@ public class AuthService {
                 user.getEmail(), Boolean.TRUE.equals(user.getIsAdmin()) ? "admin" : "user", false);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("access_token", newAccessToken);
-        response.put("refresh_token", refreshToken);
+        response.put(ACCESS_TOKEN, newAccessToken);
+        response.put(REFRESH_TOKEN, refreshToken);
         response.put("user", Map.of("id", user.getId(), "username", user.getUsername()));
 
         return response;

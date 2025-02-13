@@ -35,7 +35,7 @@ public class BadgeService {
         }
 
         if (request.getEndDay() != null && !request.getStartDay().isBefore(request.getEndDay())) {
-            throw new AppException(ErrorCode.INVALID_BADGE_DATE_RANGE, HttpStatus.BAD_REQUEST);
+            throw new AppException(ErrorCode.END_DATE_MUST_BE_AFTER_START_DATE, HttpStatus.BAD_REQUEST);
         }
 
         Badge badge = badgeMapper.createBadgeRequestToBadge(request);
