@@ -31,6 +31,7 @@ public enum ErrorCode {
     END_DATE_REQUIRED(1022, "End date is required"),
     END_DATE_FUTURE(1023, "End date must be future"),
     END_DATE_MUST_BE_AFTER_START_DATE(1024, "End date must be after start date"),
+    BADGE_IS_ACTIVE_REQUIRED(1025, "Is active is required"),
     USER_ID_REQUIRED(1026, "User ID is required"),
     CHALLENGE_NOT_FOUND(1027, "Challenge does not find"),
     BADGE_TITLE_REQUIRED(1028, "Title is required"),
@@ -40,10 +41,8 @@ public enum ErrorCode {
     BADGE_POINT_REQUIRED(1032, "Point is required"),
     BADGE_START_DAY_REQUIRED(1033, "Start day is required"),
     BADGE_TITLE_EXISTS(1034, "Badge title already exists"),
-    INVALID_BADGE_DATE_RANGE(1035, "Start day should be less than end day"),
     BADGE_POINT_INVALID(1036, "Points must be at least 0"),
     BADGE_CRITERIA_INVALID(1037, "Badge criteria must be at least 0"),
-    BADGE_IS_ACTIVE_REQUIRED(1038, "Is active is required"),
     ;
 
     int code;

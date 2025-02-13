@@ -1,7 +1,6 @@
 package PNV.DareAndTruth.entity;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Objects;
 
 import jakarta.persistence.*;
