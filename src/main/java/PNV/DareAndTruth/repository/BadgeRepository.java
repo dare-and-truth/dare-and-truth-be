@@ -15,5 +15,5 @@ public interface BadgeRepository extends JpaRepository<Badge, UUID> {
 
     List<Badge> findAllByIsDeletedFalse();
 
-    Optional<Object> findByIdAndIsDeletedFalse(UUID id);
+    Optional<Badge> findByIdAndIsDeletedFalse(UUID id);
 }

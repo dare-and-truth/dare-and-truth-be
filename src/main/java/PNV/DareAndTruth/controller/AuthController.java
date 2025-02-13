@@ -136,7 +136,7 @@ public class AuthController {
                                         examples = {
                                             @ExampleObject(
                                                     value =
-                                                            "{\"code\": 1002, \"status\": \"fail\", \"message\": \"Invalid refresh token\"}")
+                                                            "{\"code\": 1013, \"status\": \"fail\", \"message\": \"Invalid refresh token\"}")
                                         })),
                 @ApiResponse(
                         responseCode = "500",
@@ -177,7 +177,7 @@ public class AuthController {
                                         examples = {
                                             @ExampleObject(
                                                     value =
-                                                            "{\"code\": 1003, \"status\": \"fail\", \"message\": \"Token has been disabled!\"}")
+                                                            "{\"code\": 1015, \"status\": \"fail\", \"message\": \"Token has been disabled!\"}")
                                         })),
                 @ApiResponse(
                         responseCode = "500",

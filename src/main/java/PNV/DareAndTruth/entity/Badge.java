@@ -6,7 +6,6 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
-import org.hibernate.annotations.Check;
 import org.springframework.security.core.GrantedAuthority;
 
 import lombok.*;
@@ -21,13 +20,12 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Table(name = "badge")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Check(constraints = "start_day < end_day")
 public class Badge extends BaseEntityAudit {
 
     @Column(name = "title", nullable = false, length = 100, unique = true)
     String title;
 
-    @Column(name = "image")
+    @Column(name = "image", nullable = false)
     String image;
 
     @Column(name = "description", length = 500, nullable = false)

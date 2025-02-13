@@ -1,5 +1,7 @@
 package PNV.DareAndTruth.service;
 
+import static PNV.DareAndTruth.exception.ErrorCode.BADGE_NOT_FOUND;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -32,6 +34,10 @@ public class BadgeService {
             throw new AppException(ErrorCode.BADGE_TITLE_EXISTS, HttpStatus.BAD_REQUEST);
         }
 
+        if (request.getEndDay() != null && !request.getStartDay().isBefore(request.getEndDay())) {
+            throw new AppException(ErrorCode.INVALID_BADGE_DATE_RANGE, HttpStatus.BAD_REQUEST);
+        }
+
         Badge badge = badgeMapper.createBadgeRequestToBadge(request);
         badgeRepository.save(badge);
     }
@@ -41,14 +47,8 @@ public class BadgeService {
     }
 
     public Badge getBadgeById(UUID id) {
-        return (Badge) badgeRepository
+        return badgeRepository
                 .findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new AppException(ErrorCode.BADGE_NOT_FOUND, HttpStatus.NOT_FOUND));
-    }
-
-    public void deleteBadge(UUID id) {
-        Badge badge = getBadgeById(id);
-        badge.setIsDeleted(true);
-        badgeRepository.save(badge);
+                .orElseThrow(() -> new AppException(BADGE_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 }
