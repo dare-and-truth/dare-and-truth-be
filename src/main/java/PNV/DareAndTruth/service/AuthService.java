@@ -45,7 +45,6 @@ public class AuthService {
     public SigninResponse authenticateUser(SigninRequest request) {
         var authResult = validateUserCredentials(request);
 
-
         String accessToken = (String) authResult.get(ACCESS_TOKEN);
         String refreshToken = (String) authResult.get(REFRESH_TOKEN);
         Object userInfo = authResult.get("user");

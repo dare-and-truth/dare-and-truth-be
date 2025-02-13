@@ -61,22 +61,33 @@ public class Challenge extends BaseEntityAudit {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Challenge challenge = (Challenge) o;
-        return Objects.equals(hashtag, challenge.hashtag) &&
-                Objects.equals(content, challenge.content) &&
-                Objects.equals(mediaUrl, challenge.mediaUrl) &&
-                Objects.equals(startDate, challenge.startDate) &&
-                Objects.equals(endDate, challenge.endDate) &&
-                Objects.equals(startTime, challenge.startTime) &&
-                Objects.equals(endTime, challenge.endTime) &&
-                Objects.equals(isRequiredOnTime, challenge.isRequiredOnTime) &&
-                Objects.equals(isActive, challenge.isActive) &&
-                Objects.equals(isDeleted, challenge.isDeleted) &&
-                Objects.equals(user, challenge.user);
+        return Objects.equals(hashtag, challenge.hashtag)
+                && Objects.equals(content, challenge.content)
+                && Objects.equals(mediaUrl, challenge.mediaUrl)
+                && Objects.equals(startDate, challenge.startDate)
+                && Objects.equals(endDate, challenge.endDate)
+                && Objects.equals(startTime, challenge.startTime)
+                && Objects.equals(endTime, challenge.endTime)
+                && Objects.equals(isRequiredOnTime, challenge.isRequiredOnTime)
+                && Objects.equals(isActive, challenge.isActive)
+                && Objects.equals(isDeleted, challenge.isDeleted)
+                && Objects.equals(user, challenge.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), hashtag, content, mediaUrl, startDate, endDate,
-                startTime, endTime, isRequiredOnTime, isActive, isDeleted, user);
+        return Objects.hash(
+                super.hashCode(),
+                hashtag,
+                content,
+                mediaUrl,
+                startDate,
+                endDate,
+                startTime,
+                endTime,
+                isRequiredOnTime,
+                isActive,
+                isDeleted,
+                user);
     }
 }

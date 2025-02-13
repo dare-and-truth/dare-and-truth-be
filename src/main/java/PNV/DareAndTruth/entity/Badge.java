@@ -24,7 +24,7 @@ public class Badge extends BaseEntityAudit {
     @Column(name = "title", nullable = false, length = 100, unique = true)
     String title;
 
-    @Column(name = "image")
+    @Column(name = "image", nullable = false)
     String image;
 
     @Column(name = "description", length = 500, nullable = false)

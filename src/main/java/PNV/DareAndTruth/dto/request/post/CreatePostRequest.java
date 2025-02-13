@@ -1,6 +1,7 @@
 package PNV.DareAndTruth.dto.request.post;
 
 import jakarta.validation.constraints.NotBlank;
+
 import lombok.Getter;
 import lombok.Setter;
 

@@ -1,5 +1,13 @@
 package PNV.DareAndTruth.service;
 
+import java.util.Optional;
+import java.util.UUID;
+
+import jakarta.transaction.Transactional;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
 import PNV.DareAndTruth.dto.request.challenge.CreateChallengeRequest;
 import PNV.DareAndTruth.entity.Challenge;
 import PNV.DareAndTruth.entity.User;
@@ -7,17 +15,11 @@ import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
 import PNV.DareAndTruth.repository.ChallengeRepository;
 import PNV.DareAndTruth.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Getter
@@ -40,8 +42,9 @@ public class ChallengeService {
             throw new AppException(ErrorCode.END_DATE_MUST_BE_AFTER_START_DATE, HttpStatus.BAD_REQUEST);
         }
 
-        if (Boolean.TRUE.equals(request.getIsRequiredOnTime() && request.getStartDate().equals(request.getEndDate())) &&
-                request.getEndTime().isBefore(request.getStartTime())) {
+        if (Boolean.TRUE.equals(
+                        request.getIsRequiredOnTime() && request.getStartDate().equals(request.getEndDate()))
+                && request.getEndTime().isBefore(request.getStartTime())) {
             throw new AppException(ErrorCode.END_TIME_MUST_BE_AFTER_START_TIME, HttpStatus.BAD_REQUEST);
         }
 

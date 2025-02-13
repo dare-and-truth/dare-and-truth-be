@@ -53,5 +53,5 @@ public class GlobalExceptionHandler {
                 .message(errorCode.getMessage())
                 .build();
         return ResponseEntity.badRequest().body(appApiResponse);
-    }    
+    }
 }

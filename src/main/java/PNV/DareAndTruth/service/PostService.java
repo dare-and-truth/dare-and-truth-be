@@ -1,5 +1,13 @@
 package PNV.DareAndTruth.service;
 
+import java.util.Optional;
+import java.util.UUID;
+
+import jakarta.transaction.Transactional;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
 import PNV.DareAndTruth.dto.request.post.CreatePostRequest;
 import PNV.DareAndTruth.entity.Challenge;
 import PNV.DareAndTruth.entity.Post;
@@ -9,17 +17,11 @@ import PNV.DareAndTruth.exception.ErrorCode;
 import PNV.DareAndTruth.repository.ChallengeRepository;
 import PNV.DareAndTruth.repository.PostRepository;
 import PNV.DareAndTruth.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Getter

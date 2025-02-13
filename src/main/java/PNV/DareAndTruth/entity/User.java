@@ -55,26 +55,35 @@ public class User extends BaseEntityAudit {
     @Column(name = "refresh_token")
     String refreshToken;
 
-   //implement equals and hashCode
-   @Override
-   public boolean equals(Object o) {
-       if (this == o) return true;
-       if (!(o instanceof User that)) return false;
-       if (!super.equals(o)) return false;
-       return Objects.equals(username, that.username)
-               && Objects.equals(email, that.email)
-               && Objects.equals(password, that.password)
-               && Objects.equals(isAdmin, that.isAdmin)
-               && Objects.equals(isActive, that.isActive)
-               && Objects.equals(isDeleted, that.isDeleted)
-               && Objects.equals(challenges, that.challenges)
-               && Objects.equals(posts, that.posts)
-               && Objects.equals(refreshToken, that.refreshToken);
-   }
+    // implement equals and hashCode
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User that)) return false;
+        if (!super.equals(o)) return false;
+        return Objects.equals(username, that.username)
+                && Objects.equals(email, that.email)
+                && Objects.equals(password, that.password)
+                && Objects.equals(isAdmin, that.isAdmin)
+                && Objects.equals(isActive, that.isActive)
+                && Objects.equals(isDeleted, that.isDeleted)
+                && Objects.equals(challenges, that.challenges)
+                && Objects.equals(posts, that.posts)
+                && Objects.equals(refreshToken, that.refreshToken);
+    }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), username, email, password, isAdmin,
-                isActive, isDeleted, challenges, posts, refreshToken);
+        return Objects.hash(
+                super.hashCode(),
+                username,
+                email,
+                password,
+                isAdmin,
+                isActive,
+                isDeleted,
+                challenges,
+                posts,
+                refreshToken);
     }
 }

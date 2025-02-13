@@ -41,11 +41,11 @@ public class Post extends BaseEntityAudit {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         Post post = (Post) o;
-        return Objects.equals(content, post.content) &&
-                Objects.equals(mediaUrl, post.mediaUrl) &&
-                Objects.equals(isActive, post.isActive) &&
-                Objects.equals(isDeleted, post.isDeleted) &&
-                Objects.equals(user, post.user);
+        return Objects.equals(content, post.content)
+                && Objects.equals(mediaUrl, post.mediaUrl)
+                && Objects.equals(isActive, post.isActive)
+                && Objects.equals(isDeleted, post.isDeleted)
+                && Objects.equals(user, post.user);
     }
 
     @Override
