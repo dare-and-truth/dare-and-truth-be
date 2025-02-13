@@ -5,12 +5,11 @@ import static PNV.DareAndTruth.exception.ErrorCode.BADGE_NOT_FOUND;
 import java.util.List;
 import java.util.UUID;
 
-import PNV.DareAndTruth.dto.request.badge.UpdateBadgeRequest;
-import PNV.DareAndTruth.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import PNV.DareAndTruth.dto.request.badge.CreateBadgeRequest;
+import PNV.DareAndTruth.dto.request.badge.UpdateBadgeRequest;
 import PNV.DareAndTruth.entity.Badge;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
@@ -55,18 +54,20 @@ public class BadgeService {
     }
 
     public void updateBadge(UUID id, UpdateBadgeRequest request) {
-        Badge badge = badgeRepository.findByIdAndIsDeletedFalse(id)
+        Badge badge = badgeRepository
+                .findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(ErrorCode.BADGE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        if (request.getTitle() != null &&
-                !badge.getTitle().equals(request.getTitle()) &&
-                badgeRepository.existsByTitle(request.getTitle())) {
+        if (request.getTitle() != null
+                && !badge.getTitle().equals(request.getTitle())
+                && badgeRepository.existsByTitle(request.getTitle())) {
             throw new AppException(ErrorCode.BADGE_TITLE_EXISTS, HttpStatus.BAD_REQUEST);
         }
 
-        if (request.getStartDay() != null && request.getEndDay() != null &&
-                !request.getStartDay().isBefore(request.getEndDay())) {
-            throw new AppException(ErrorCode.INVALID_BADGE_DATE_RANGE, HttpStatus.BAD_REQUEST);
+        if (request.getStartDay() != null
+                && request.getEndDay() != null
+                && !request.getStartDay().isBefore(request.getEndDay())) {
+            throw new AppException(ErrorCode.END_DATE_MUST_BE_AFTER_START_DATE, HttpStatus.BAD_REQUEST);
         }
 
         if (request.getTitle() != null) badge.setTitle(request.getTitle());

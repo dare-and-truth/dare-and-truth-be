@@ -28,11 +28,11 @@ public class CreateBadgeRequest {
 
     @NotNull(message = "BADGE_CRITERIA_REQUIRED")
     @Min(value = 1, message = "BADGE_CRITERIA_INVALID")
-    int badgeCriteria;
+    Integer badgeCriteria;
 
     @NotNull(message = "BADGE_POINT_REQUIRED")
     @Min(value = 0, message = "BADGE_POINT_INVALID")
-    int points;
+    Integer points;
 
     @NotNull(message = "BADGE_START_DAY_REQUIRED")
     LocalDate startDay;

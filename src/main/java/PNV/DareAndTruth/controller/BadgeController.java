@@ -3,12 +3,13 @@ package PNV.DareAndTruth.controller;
 import java.util.List;
 import java.util.UUID;
 
-import PNV.DareAndTruth.dto.request.badge.UpdateBadgeRequest;
 import jakarta.validation.Valid;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import PNV.DareAndTruth.dto.request.badge.CreateBadgeRequest;
+import PNV.DareAndTruth.dto.request.badge.UpdateBadgeRequest;
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
 import PNV.DareAndTruth.entity.Badge;
@@ -102,8 +103,34 @@ public class BadgeController {
                                         mediaType = "application/json",
                                         examples =
                                                 @ExampleObject(
-                                                        value =
-                                                                "{\"code\": 1000,\"status\": \"success\",\"message\": \"Badges retrieved successfully\",\"data\": [{\"id\":\"123e4567-e89b-12d3-a456-426614174000\", \"name\":\"Gold Badge\", \"description\":\"Awarded for excellence\", \"createdAt\":\"2025-01-01T12:00:00Z\"}]}"))),
+                                                        value = """
+                                                                  {
+                                                                  "code": 1000,
+                                                                  "status": "success",
+                                                                  "message": "Badges retrieved successfully",
+                                                                  "data": [
+                                                                    {
+                                                                      "id": "847cb87c-307b-4c28-abb2-524d1f711c5a",
+                                                                      "createdBy": null,
+                                                                      "updatedBy": null,
+                                                                      "createdAt": "2025-02-13T09:03:49.180+00:00",
+                                                                      "updatedAt": "2025-02-13T09:03:49.180+00:00",
+                                                                      "title": "Gold Badge dscc",
+                                                                      "image": "https://example.com/badge.png",
+                                                                      "description": "Awarded for excellence",
+                                                                      "badgeCriteria": 10,
+                                                                      "points": 0,
+                                                                      "startDay": "2025-01-01",
+                                                                      "endDay": "2025-12-31",
+                                                                      "isActive": true,
+                                                                      "isDeleted": false
+                                                                    }
+                                                                  ]
+                                                                }
+                                                                """
+                                                )
+                                )
+                ),
                 @ApiResponse(responseCode = "500", description = "Internal server error")
             })
     @GetMapping
@@ -155,47 +182,46 @@ public class BadgeController {
     @Operation(summary = "Update an existing badge", description = "Update a badge with new details")
     @ApiResponses(
             value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Badge updated successfully",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples =
-                                    @ExampleObject(
-                                            value = "{" + "\"code\": 1000,"
-                                                    + "\"status\": \"success\","
-                                                    + "\"message\": \"Badge updated successfully\""
-                                                    + "}"))),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Badge not found",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples =
-                                    @ExampleObject(
-                                            value = "{" + "\"code\": 1016,"
-                                                    + "\"status\": \"fail\","
-                                                    + "\"message\": \"Badge not found\""
-                                                    + "}"))),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Invalid input provided",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples =
-                                    @ExampleObject(
-                                            value = "{" + "\"code\": 1023,"
-                                                    + "\"status\": \"fail\","
-                                                    + "\"message\": \"Invalid request parameters\""
-                                                    + "}")))
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Badge updated successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value = "{" + "\"code\": 1000,"
+                                                                + "\"status\": \"success\","
+                                                                + "\"message\": \"Badge updated successfully\""
+                                                                + "}"))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Badge not found",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value = "{" + "\"code\": 1016,"
+                                                                + "\"status\": \"fail\","
+                                                                + "\"message\": \"Badge not found\""
+                                                                + "}"))),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Invalid input provided",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value = "{" + "\"code\": 1023,"
+                                                                + "\"status\": \"fail\","
+                                                                + "\"message\": \"Invalid request parameters\""
+                                                                + "}")))
             })
     @PatchMapping("/{id}")
     public ResponseEntity<AppApiResponse<Void>> updateBadge(
-            @PathVariable String id,
-            @RequestBody @Valid UpdateBadgeRequest request) {
+            @PathVariable String id, @RequestBody @Valid UpdateBadgeRequest request) {
         badgeService.updateBadge(UUID.fromString(id), request);
         return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)

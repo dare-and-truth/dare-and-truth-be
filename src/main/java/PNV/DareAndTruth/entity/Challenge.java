@@ -63,14 +63,6 @@ public class Challenge extends BaseEntityAudit {
     @Override
     public int hashCode() {
         return Objects.hash(
-                super.hashCode(),
-                hashtag,
-                content,
-                mediaUrl,
-                startDate,
-                endDate,
-                isActive,
-                isDeleted,
-                user);
+                super.hashCode(), hashtag, content, mediaUrl, startDate, endDate, isActive, isDeleted, user);
     }
 }
