@@ -33,16 +33,6 @@ public class Challenge extends BaseEntityAudit {
     @Column(name = "end_date", nullable = false)
     LocalDate endDate;
 
-    @Column(name = "start_time")
-    LocalTime startTime;
-
-    @Column(name = "end_time")
-    LocalTime endTime;
-
-    @Column(name = "is_required_on_time", columnDefinition = "boolean default false")
-    @Builder.Default
-    Boolean isRequiredOnTime = false;
-
     @Column(name = "is_active", columnDefinition = "boolean default true")
     @Builder.Default
     Boolean isActive = true;
@@ -66,9 +56,6 @@ public class Challenge extends BaseEntityAudit {
                 && Objects.equals(mediaUrl, challenge.mediaUrl)
                 && Objects.equals(startDate, challenge.startDate)
                 && Objects.equals(endDate, challenge.endDate)
-                && Objects.equals(startTime, challenge.startTime)
-                && Objects.equals(endTime, challenge.endTime)
-                && Objects.equals(isRequiredOnTime, challenge.isRequiredOnTime)
                 && Objects.equals(isActive, challenge.isActive)
                 && Objects.equals(isDeleted, challenge.isDeleted)
                 && Objects.equals(user, challenge.user);
@@ -83,9 +70,6 @@ public class Challenge extends BaseEntityAudit {
                 mediaUrl,
                 startDate,
                 endDate,
-                startTime,
-                endTime,
-                isRequiredOnTime,
                 isActive,
                 isDeleted,
                 user);

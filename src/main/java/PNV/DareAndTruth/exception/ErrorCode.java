@@ -31,7 +31,6 @@ public enum ErrorCode {
     END_DATE_REQUIRED(1022, "End date is required"),
     END_DATE_FUTURE(1023, "End date must be future"),
     END_DATE_MUST_BE_AFTER_START_DATE(1024, "End date must be after start date"),
-    END_TIME_MUST_BE_AFTER_START_TIME(1025, "End time must be after start time on the same day"),
     USER_ID_REQUIRED(1026, "User ID is required"),
     CHALLENGE_NOT_FOUND(1027, "Challenge does not find"),
     BADGE_TITLE_REQUIRED(1028, "Title is required"),

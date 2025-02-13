@@ -42,12 +42,6 @@ public class ChallengeService {
             throw new AppException(ErrorCode.END_DATE_MUST_BE_AFTER_START_DATE, HttpStatus.BAD_REQUEST);
         }
 
-        if (Boolean.TRUE.equals(
-                        request.getIsRequiredOnTime() && request.getStartDate().equals(request.getEndDate()))
-                && request.getEndTime().isBefore(request.getStartTime())) {
-            throw new AppException(ErrorCode.END_TIME_MUST_BE_AFTER_START_TIME, HttpStatus.BAD_REQUEST);
-        }
-
         Challenge challenge = Challenge.builder()
                 .user(exitingUser.get())
                 .hashtag(request.getHashtag())
@@ -55,9 +49,6 @@ public class ChallengeService {
                 .mediaUrl(request.getMediaUrl())
                 .startDate(request.getStartDate())
                 .endDate(request.getEndDate())
-                .startTime(request.getStartTime())
-                .endTime(request.getEndTime())
-                .isRequiredOnTime(request.getIsRequiredOnTime())
                 .isActive(true)
                 .isDeleted(false)
                 .build();

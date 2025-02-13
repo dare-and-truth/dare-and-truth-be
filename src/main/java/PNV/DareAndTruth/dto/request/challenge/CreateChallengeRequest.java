@@ -33,10 +33,4 @@ public class CreateChallengeRequest {
     @NotNull(message = "END_DATE_REQUIRED")
     @Future(message = "END_DATE_FUTURE")
     private LocalDate endDate;
-
-    private LocalTime startTime;
-
-    private LocalTime endTime;
-
-    private Boolean isRequiredOnTime = false;
 }

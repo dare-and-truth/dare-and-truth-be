@@ -11,8 +11,8 @@ public class CreatePostRequest {
     @NotBlank(message = "USER_ID_REQUIRED")
     private String userId;
 
-    @NotBlank(message = "CHALLENGE_ID_REQUIRED")
-    private String challengeId;
+    @NotBlank(message = "HASHTAG_REQUIRED")
+    private String hashtag;
 
     @NotBlank(message = "CONTENT_REQUIRED")
     private String content;

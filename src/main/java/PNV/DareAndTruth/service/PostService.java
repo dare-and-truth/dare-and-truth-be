@@ -40,11 +40,6 @@ public class PostService {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
-        Optional<Challenge> exitingChallenge = challengeRepository.findById(UUID.fromString(request.getChallengeId()));
-        if (exitingChallenge.isEmpty()) {
-            throw new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.NOT_FOUND);
-        }
-
         Post post = Post.builder()
                 .user(exitingUser.get())
                 .content(request.getContent())
