@@ -17,6 +17,9 @@ import lombok.experimental.FieldDefaults;
 @Table(name = "posts")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Post extends BaseEntityAudit {
+    @Column(name = "hashtag", nullable = false)
+    String hashtag;
+
     @Column(name = "content", nullable = false)
     String content;
 

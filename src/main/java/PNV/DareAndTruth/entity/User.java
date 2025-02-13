@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -32,7 +34,7 @@ public class User extends BaseEntityAudit {
     @Column(name = "is_admin")
     Boolean isAdmin;
 
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public Collection<GrantedAuthority> getAuthorities() {
         return isAdmin != null && isAdmin
                 ? Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN"))
                 : Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER"));
@@ -47,10 +49,12 @@ public class User extends BaseEntityAudit {
     Boolean isDeleted = false;
 
     @OneToMany(mappedBy = "user")
-    Set<Challenge> challenges = new HashSet<>();
+    @JsonManagedReference
+    private List<Challenge> challenges;
 
     @OneToMany(mappedBy = "user")
-    Set<Post> posts;
+    @JsonManagedReference
+    private List<Post> posts;
 
     @Column(name = "refresh_token")
     String refreshToken;

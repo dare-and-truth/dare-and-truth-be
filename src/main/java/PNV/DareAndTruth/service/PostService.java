@@ -1,6 +1,7 @@
 package PNV.DareAndTruth.service;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import jakarta.transaction.Transactional;
@@ -8,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import PNV.DareAndTruth.dto.projection.post.PostSummaryProjection;
 import PNV.DareAndTruth.dto.request.post.CreatePostRequest;
 import PNV.DareAndTruth.entity.Post;
 import PNV.DareAndTruth.entity.User;
@@ -41,6 +43,7 @@ public class PostService {
 
         Post post = Post.builder()
                 .user(exitingUser.get())
+                .hashtag(request.getHashtag())
                 .content(request.getContent())
                 .mediaUrl(request.getMediaUrl())
                 .isActive(true)
@@ -48,5 +51,9 @@ public class PostService {
                 .build();
 
         postRepository.save(post);
+    }
+
+    public Set<PostSummaryProjection> getPosts() {
+        return postRepository.findAllByIsDeletedFalse();
     }
 }
