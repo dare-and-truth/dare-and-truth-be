@@ -23,10 +23,10 @@ public class UpdateBadgeRequest {
     String description;
 
     @Min(1)
-    int badgeCriteria;
+    Integer badgeCriteria;
 
     @Min(0)
-    int points;
+    Integer points;
 
     @NotNull
     LocalDate startDay;
