@@ -3,6 +3,8 @@ package PNV.DareAndTruth.controller;
 import java.util.List;
 import java.util.UUID;
 
+import PNV.DareAndTruth.dto.request.badge.UpdateBadgeRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -84,6 +86,58 @@ public class BadgeController {
                 .status(ApiStatus.SUCCESS)
                 .message("Badge retrieved successfully")
                 .data(badge)
+                .build());
+    }
+
+    @Operation(summary = "Update an existing badge", description = "Update a badge with new details")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Badge updated successfully",
+                            content =
+                            @Content(
+                                    mediaType = "application/json",
+                                    examples =
+                                    @ExampleObject(
+                                            value = "{" + "\"code\": 1000,"
+                                                    + "\"status\": \"success\","
+                                                    + "\"message\": \"Badge updated successfully\""
+                                                    + "}"))),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Badge not found",
+                            content =
+                            @Content(
+                                    mediaType = "application/json",
+                                    examples =
+                                    @ExampleObject(
+                                            value = "{" + "\"code\": 1016,"
+                                                    + "\"status\": \"fail\","
+                                                    + "\"message\": \"Badge not found\""
+                                                    + "}"))),
+                    @ApiResponse(
+                            responseCode = "400",
+                            description = "Invalid input provided",
+                            content =
+                            @Content(
+                                    mediaType = "application/json",
+                                    examples =
+                                    @ExampleObject(
+                                            value = "{" + "\"code\": 1023,"
+                                                    + "\"status\": \"fail\","
+                                                    + "\"message\": \"Invalid request parameters\""
+                                                    + "}")))
+            })
+    @PatchMapping("/{id}")
+    public ResponseEntity<AppApiResponse<Void>> updateBadge(
+            @PathVariable String id,
+            @RequestBody @Valid UpdateBadgeRequest request) {
+        badgeService.updateBadge(UUID.fromString(id), request);
+        return ResponseEntity.ok(AppApiResponse.<Void>builder()
+                .code(1000)
+                .status(ApiStatus.SUCCESS)
+                .message("Badge updated successfully")
                 .build());
     }
 }

@@ -23,6 +23,9 @@ public enum ErrorCode {
     REFRESH_TOKEN_REQUIRED(1014, "Refresh token is required"),
     TOKEN_ALREADY_INVALID(1015, "Token has been disabled!"),
     BADGE_NOT_FOUND(1016, "Badge not found"),
+    BADGE_TITLE_EXISTS(1030,"BADGE_TITLE_EXISTS" ),
+    INVALID_BADGE_DATE_RANGE(1031,"INVALID_BADGE_DATE_RANGE" ),
+
     ;
 
     int code;

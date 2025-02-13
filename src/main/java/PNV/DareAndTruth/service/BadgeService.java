@@ -5,6 +5,8 @@ import static PNV.DareAndTruth.exception.ErrorCode.BADGE_NOT_FOUND;
 import java.util.List;
 import java.util.UUID;
 
+import PNV.DareAndTruth.dto.request.badge.UpdateBadgeRequest;
+import PNV.DareAndTruth.exception.ErrorCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -34,4 +36,31 @@ public class BadgeService {
                 .findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(BADGE_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
+
+//    public void updateBadge(UUID id, UpdateBadgeRequest request) {
+//        Badge badge = badgeRepository.findByIdAndIsDeletedFalse(id)
+//                .orElseThrow(() -> new AppException(ErrorCode.BADGE_NOT_FOUND, HttpStatus.NOT_FOUND));
+//
+//        if (request.getTitle() != null &&
+//                !badge.getTitle().equals(request.getTitle()) &&
+//                badgeRepository.existsByTitle(request.getTitle())) {
+//            throw new AppException(ErrorCode.BADGE_TITLE_EXISTS, HttpStatus.BAD_REQUEST);
+//        }
+//
+//        if (request.getStartDay() != null && request.getEndDay() != null &&
+//                !request.getStartDay().isBefore(request.getEndDay())) {
+//            throw new AppException(ErrorCode.INVALID_BADGE_DATE_RANGE, HttpStatus.BAD_REQUEST);
+//        }
+//
+//        if (request.getTitle() != null) badge.setTitle(request.getTitle());
+//        if (request.getImage() != null) badge.setImage(request.getImage());
+//        if (request.getDescription() != null) badge.setDescription(request.getDescription());
+//        if (request.getBadgeCriteria() != null) badge.setBadgeCriteria(request.getBadgeCriteria());
+//        if (request.getPoints() != null) badge.setPoints(request.getPoints());
+//        if (request.getStartDay() != null) badge.setStartDay(request.getStartDay());
+//        if (request.getEndDay() != null) badge.setEndDay(request.getEndDay());
+//        if (request.getIsActive() != null) badge.setIsActive(request.getIsActive());
+//
+//        badgeRepository.save(badge);
+//    }
 }
