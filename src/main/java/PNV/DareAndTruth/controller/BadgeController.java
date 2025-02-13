@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import PNV.DareAndTruth.dto.request.badge.CreateBadgeRequest;
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
 import PNV.DareAndTruth.entity.Badge;
@@ -27,6 +28,68 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class BadgeController {
     BadgeService badgeService;
+
+    @Operation(summary = "Create a new badge", description = "Create a new badge with provided details")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "201",
+                        description = "Badge created successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value = "{" + "\"code\": 1000,"
+                                                                + "\"status\": \"success\","
+                                                                + "\"message\": \"Create badge successfully\", "
+                                                                + "\"data\": {"
+                                                                + "\"id\": \"a1b2c3d4-5678-90ef-ghij-klmnopqrstuv\", "
+                                                                + "\"title\": \"Gold Badge\", "
+                                                                + "\"description\": \"Awarded for excellence\", "
+                                                                + "\"image\": \"https://example.com/badge.png\", "
+                                                                + "\"badgeCriteria\": 10, "
+                                                                + "\"points\": 100, "
+                                                                + "\"startDay\": \"2025-01-01\", "
+                                                                + "\"endDay\": \"2025-12-31\", "
+                                                                + "\"isActive\": true, "
+                                                                + "} "
+                                                                + "}"))),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Invalid input provided",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value = "{" + "\"code\": 1023,"
+                                                                + "\"status\": \"fail\","
+                                                                + "\"message\": \"Badge title already exists\""
+                                                                + "}"))),
+                @ApiResponse(
+                        responseCode = "409",
+                        description = "Invalid date range",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value = "{" + "\"code\": 1024,"
+                                                                + "\"status\": \"fail\","
+                                                                + "\"message\": \"Start day should be less than end day\""
+                                                                + "}")))
+            })
+    @PostMapping
+    public ResponseEntity<AppApiResponse<Void>> createBadge(@RequestBody @Valid CreateBadgeRequest request) {
+        badgeService.createBadge(request);
+        return ResponseEntity.status(201)
+                .body(AppApiResponse.<Void>builder()
+                        .code(1000)
+                        .status(ApiStatus.SUCCESS)
+                        .message("Create badge successfully")
+                        .build());
+    }
 
     @Operation(summary = "Get all badges", description = "Retrieve a list of all available badges")
     @ApiResponses(

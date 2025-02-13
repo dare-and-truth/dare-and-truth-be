@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import PNV.DareAndTruth.dto.request.auth.RefreshTokenRequest;
 import PNV.DareAndTruth.dto.request.auth.SignUpRequest;
 import PNV.DareAndTruth.dto.request.auth.SigninRequest;
 import PNV.DareAndTruth.dto.response.ApiStatus;
@@ -62,10 +63,10 @@ public class AuthController {
                         content = @Content(mediaType = "application/json"))
             })
     @PostMapping("/sign-up")
-    public ResponseEntity<AppApiResponse<Object>> signUp(@RequestBody @Valid SignUpRequest request) {
+    public ResponseEntity<AppApiResponse<Void>> signUp(@RequestBody @Valid SignUpRequest request) {
         userService.createUser(request);
         return ResponseEntity.status(201)
-                .body(AppApiResponse.builder()
+                .body(AppApiResponse.<Void>builder()
                         .code(1000)
                         .status(ApiStatus.SUCCESS)
                         .message("Sign up successfully")
@@ -103,9 +104,9 @@ public class AuthController {
                         content = @Content(mediaType = "application/json"))
             })
     @PostMapping("/sign-in")
-    public ResponseEntity<AppApiResponse<Object>> login(@RequestBody @Valid SigninRequest request) {
+    public ResponseEntity<AppApiResponse<SigninResponse>> login(@RequestBody @Valid SigninRequest request) {
         SigninResponse signinResponse = authService.authenticateUser(request);
-        return ResponseEntity.ok(AppApiResponse.builder()
+        return ResponseEntity.ok(AppApiResponse.<SigninResponse>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
                 .message("Sign In successful. Welcome back!")
@@ -144,8 +145,8 @@ public class AuthController {
                         content = @Content(mediaType = "application/json"))
             })
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
-        Map<String, Object> response = authService.refreshToken(request.get("refresh_token"));
+    public ResponseEntity<AppApiResponse<Object>> refreshToken(@RequestBody RefreshTokenRequest request) {
+        Map<String, Object> response = authService.refreshToken(request.getRefreshToken());
         return ResponseEntity.ok(AppApiResponse.builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
@@ -185,9 +186,10 @@ public class AuthController {
                         content = @Content(mediaType = "application/json"))
             })
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<AppApiResponse<Void>> logout(@RequestHeader("Authorization") String token) {
         authService.logoutUser(token);
-        return ResponseEntity.ok(AppApiResponse.builder()
+
+        return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
                 .message("Logout successfully")

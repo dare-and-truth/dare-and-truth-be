@@ -13,13 +13,10 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateBadgeRequest {
-    @NotBlank
     String title;
 
-    @NotBlank
     String image;
 
-    @NotBlank
     String description;
 
     @Min(1)
@@ -28,11 +25,9 @@ public class UpdateBadgeRequest {
     @Min(0)
     Integer points;
 
-    @NotNull
     LocalDate startDay;
 
     LocalDate endDay;
 
-    @NotNull
     Boolean isActive;
 }

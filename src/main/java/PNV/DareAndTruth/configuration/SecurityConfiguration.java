@@ -58,13 +58,13 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(
-                        authz -> authz.requestMatchers("/auth/sign-up", "/auth/sign-in", "/auth/refresh-token")
-                                .permitAll()
-                                .requestMatchers("/admin/**", "/users")
-                                .hasRole("ADMIN")
-                                .anyRequest()
-                                .authenticated())
+                .authorizeHttpRequests(authz -> authz.requestMatchers(
+                                "/auth/sign-up", "/auth/sign-in", "/auth/refresh-token", "/swagger-ui/**", "v3/**")
+                        .permitAll()
+                        .requestMatchers("/admin/**", "/users")
+                        .hasRole("ADMIN")
+                        .anyRequest()
+                        .authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
