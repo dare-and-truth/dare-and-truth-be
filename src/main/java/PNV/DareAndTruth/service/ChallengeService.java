@@ -61,4 +61,17 @@ public class ChallengeService {
     public Set<ChallengeSummaryProjection> getChallenges() {
         return challengeRepository.findAllByIsDeletedFalse();
     }
+
+    public ChallengeSummaryProjection getChallengeById(String id) {
+        UUID challengeId;
+        try {
+            challengeId = UUID.fromString(id);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.CHALLENGE_ID_INVALID, HttpStatus.BAD_REQUEST);
+        }
+
+        return challengeRepository
+                .findByIdAndIsDeletedFalse(challengeId)
+                .orElseThrow(() -> new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.NOT_FOUND));
+    }
 }

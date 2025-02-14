@@ -56,4 +56,17 @@ public class PostService {
     public Set<PostSummaryProjection> getPosts() {
         return postRepository.findAllByIsDeletedFalse();
     }
+
+    public PostSummaryProjection getPostById(String id) {
+        UUID postId;
+        try {
+            postId = UUID.fromString(id);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.POST_ID_INVALID, HttpStatus.BAD_REQUEST);
+        }
+
+        return postRepository
+                .findByIdAndIsDeletedFalse(postId)
+                .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND, HttpStatus.NOT_FOUND));
+    }
 }
