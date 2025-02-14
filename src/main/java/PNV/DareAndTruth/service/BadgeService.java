@@ -60,7 +60,7 @@ public class BadgeService {
 
         if (request.getTitle() != null
                 && !badge.getTitle().equals(request.getTitle())
-                && badgeRepository.existsByTitleAndIsDeletedFalse(request.getTitle())){
+                && badgeRepository.existsByTitleAndIsDeletedFalse(request.getTitle())) {
             throw new AppException(ErrorCode.BADGE_TITLE_EXISTS, HttpStatus.BAD_REQUEST);
         }
 

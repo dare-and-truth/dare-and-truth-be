@@ -1,13 +1,15 @@
 package PNV.DareAndTruth.service;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import PNV.DareAndTruth.dto.projection.user.UserDetailProjection;
+import PNV.DareAndTruth.dto.projection.user.UserSummaryProjection;
 import PNV.DareAndTruth.dto.request.auth.SignUpRequest;
 import PNV.DareAndTruth.dto.request.user.UpdateUserRequest;
 import PNV.DareAndTruth.entity.User;
@@ -48,8 +50,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public Set<UserSummaryProjection> getAllUsers() {
+        return userRepository.findAllByIsDeletedFalse();
     }
 
     public User getUserById(String id) {
@@ -61,7 +63,20 @@ public class UserService {
         }
 
         return userRepository
-                .findById(userId)
+                .findByIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+    }
+
+    public UserDetailProjection getUserDetailById(String id) {
+        UUID userId;
+        try {
+            userId = UUID.fromString(id);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
+        }
+
+        return userRepository
+                .findDetailById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
