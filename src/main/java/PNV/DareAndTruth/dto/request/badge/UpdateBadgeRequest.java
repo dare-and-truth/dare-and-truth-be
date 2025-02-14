@@ -17,10 +17,10 @@ public class UpdateBadgeRequest {
 
     String description;
 
-    @Min(1)
+    @Min(value = 1, message = "BADGE_CRITERIA_INVALID")
     Integer badgeCriteria;
 
-    @Min(0)
+    @Min(value = 0, message = "BADGE_POINT_INVALID")
     Integer points;
 
     LocalDate startDay;

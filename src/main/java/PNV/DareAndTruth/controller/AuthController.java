@@ -188,7 +188,6 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<AppApiResponse<Void>> logout(@RequestHeader("Authorization") String token) {
         authService.logoutUser(token);
-
         return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
