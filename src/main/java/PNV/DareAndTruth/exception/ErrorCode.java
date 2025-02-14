@@ -43,6 +43,9 @@ public enum ErrorCode {
     BADGE_TITLE_EXISTS(1034, "Badge title already exists"),
     BADGE_POINT_INVALID(1036, "Points must be at least 0"),
     BADGE_CRITERIA_INVALID(1037, "Badge criteria must be at least 0"),
+    POST_ID_INVALID(1038, "Post ID must be a UUID"),
+    POST_NOT_FOUND(1039, "Post does not find"),
+    CHALLENGE_ID_INVALID(1038, "Challenge ID must be a UUID"),
     ;
 
     int code;

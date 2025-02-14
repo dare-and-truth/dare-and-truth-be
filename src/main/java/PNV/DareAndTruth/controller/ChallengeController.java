@@ -84,19 +84,19 @@ public class ChallengeController {
                                                                 + "\"data\": [ "
                                                                 + "{ "
                                                                 + "\"id\": \"fd609f00-90ef-435f-965c-88884767fbbf\", "
-                                                                + "\"hashtag\": #runChallenge "
+                                                                + "\"hashtag\": \"#runChallenge\", "
                                                                 + "\"content\": \"string\", "
                                                                 + "\"isActive\": true, "
                                                                 + "\"startDate\": \"2025-02-14\", "
-                                                                + "\"endDate\": \"2025-02-15\", "
+                                                                + "\"endDate\": \"2025-02-15\" "
                                                                 + "}, "
                                                                 + "{ "
                                                                 + "\"id\": \"fd609f00-90ef-435f-965c-88884767fbbf\", "
-                                                                + "\"hashtag\": #runChallenge2 "
+                                                                + "\"hashtag\": \"#runChallenge2\", "
                                                                 + "\"content\": \"Running challenge\", "
                                                                 + "\"isActive\": true, "
                                                                 + "\"startDate\": \"2025-02-14\", "
-                                                                + "\"endDate\": \"2025-02-15\", "
+                                                                + "\"endDate\": \"2025-02-15\" "
                                                                 + "} "
                                                                 + "] "
                                                                 + "}"))),
@@ -113,6 +113,53 @@ public class ChallengeController {
                 .status(ApiStatus.SUCCESS)
                 .message("Challenge retrieved successfully")
                 .data(challenges)
+                .build());
+    }
+
+    @Operation(summary = "Get challenge by ID", description = "Retrieve challenge details by ID")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Challenge retrieved successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value = "{\"code\": 1000,"
+                                                                + "\"status\": \"success\","
+                                                                + "\"message\": \"Challenge retrieved successfully\", "
+                                                                + "\"data\": {"
+                                                                + "\"id\": \"fd609f00-90ef-435f-965c-88884767fbbf\", "
+                                                                + "\"hashtag\": \"#runChallenge\", "
+                                                                + "\"content\": \"string\", "
+                                                                + "\"startDate\": \"2025-02-14\", "
+                                                                + "\"endDate\": \"2025-02-15\", "
+                                                                + "\"isActive\": true "
+                                                                + "} "
+                                                                + "}"))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Post not found",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value = "{" + "\"code\": 1006,"
+                                                                + "\"status\": \"fail\","
+                                                                + "\"message\": \"Challenge does not find\""
+                                                                + "}")))
+            })
+    @GetMapping("/{id}")
+    public ResponseEntity<AppApiResponse<ChallengeSummaryProjection>> getChallengeById(@PathVariable String id) {
+        ChallengeSummaryProjection challenge = challengeService.getChallengeById(id);
+        return ResponseEntity.ok(AppApiResponse.<ChallengeSummaryProjection>builder()
+                .code(1000)
+                .status(ApiStatus.SUCCESS)
+                .message("User retrieved successfully")
+                .data(challenge)
                 .build());
     }
 }
