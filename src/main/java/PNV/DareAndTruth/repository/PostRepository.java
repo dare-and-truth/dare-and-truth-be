@@ -1,5 +1,6 @@
 package PNV.DareAndTruth.repository;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -10,4 +11,6 @@ import PNV.DareAndTruth.entity.Post;
 
 public interface PostRepository extends JpaRepository<Post, UUID> {
     Set<PostSummaryProjection> findAllByIsDeletedFalse();
+
+    Optional<PostSummaryProjection> findByIdAndIsDeletedFalse(UUID id);
 }
