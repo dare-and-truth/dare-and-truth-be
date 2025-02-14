@@ -31,10 +31,10 @@ public class Badge extends BaseEntityAudit {
     String description;
 
     @Column(name = "badge_criteria", nullable = false)
-    int badgeCriteria;
+    Integer badgeCriteria;
 
     @Column(name = "points", nullable = false)
-    int points;
+    Integer points;
 
     @Column(name = "start_day", nullable = false)
     LocalDate startDay;

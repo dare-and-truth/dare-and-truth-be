@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import PNV.DareAndTruth.dto.request.badge.CreateBadgeRequest;
+import PNV.DareAndTruth.dto.request.badge.UpdateBadgeRequest;
 import PNV.DareAndTruth.entity.Badge;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
@@ -30,7 +31,7 @@ public class BadgeService {
     BadgeMapper badgeMapper;
 
     public void createBadge(CreateBadgeRequest request) {
-        if (badgeRepository.existsByTitle(request.getTitle())) {
+        if (badgeRepository.existsByTitleAndIsDeletedFalse(request.getTitle())) {
             throw new AppException(ErrorCode.BADGE_TITLE_EXISTS, HttpStatus.BAD_REQUEST);
         }
 
@@ -50,5 +51,34 @@ public class BadgeService {
         return badgeRepository
                 .findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new AppException(BADGE_NOT_FOUND, HttpStatus.NOT_FOUND));
+    }
+
+    public void updateBadge(UUID id, UpdateBadgeRequest request) {
+        Badge badge = badgeRepository
+                .findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new AppException(ErrorCode.BADGE_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        if (request.getTitle() != null
+                && !badge.getTitle().equals(request.getTitle())
+                && badgeRepository.existsByTitleAndIsDeletedFalse(request.getTitle())){
+            throw new AppException(ErrorCode.BADGE_TITLE_EXISTS, HttpStatus.BAD_REQUEST);
+        }
+
+        if (request.getStartDay() != null
+                && request.getEndDay() != null
+                && !request.getStartDay().isBefore(request.getEndDay())) {
+            throw new AppException(ErrorCode.END_DATE_MUST_BE_AFTER_START_DATE, HttpStatus.BAD_REQUEST);
+        }
+
+        if (request.getTitle() != null) badge.setTitle(request.getTitle());
+        if (request.getImage() != null) badge.setImage(request.getImage());
+        if (request.getDescription() != null) badge.setDescription(request.getDescription());
+        if (request.getBadgeCriteria() != null) badge.setBadgeCriteria(request.getBadgeCriteria());
+        if (request.getPoints() != null) badge.setPoints(request.getPoints());
+        if (request.getStartDay() != null) badge.setStartDay(request.getStartDay());
+        if (request.getEndDay() != null) badge.setEndDay(request.getEndDay());
+        if (request.getIsActive() != null) badge.setIsActive(request.getIsActive());
+
+        badgeRepository.save(badge);
     }
 }
