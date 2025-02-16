@@ -81,4 +81,12 @@ public class BadgeService {
 
         badgeRepository.save(badge);
     }
+
+    public void deleteBadge(UUID id) {
+        Badge badge = badgeRepository
+                .findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new AppException(ErrorCode.BADGE_NOT_FOUND, HttpStatus.NOT_FOUND));
+        badge.setIsDeleted(true);
+        badgeRepository.save(badge);
+    }
 }

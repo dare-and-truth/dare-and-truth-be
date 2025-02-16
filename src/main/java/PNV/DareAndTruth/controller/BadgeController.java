@@ -255,4 +255,34 @@ public class BadgeController {
                 .message("Badge updated successfully")
                 .build());
     }
+
+    @Operation(summary = "Delete badge", description = "Mark a badge as deleted (soft delete)")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(responseCode = "200", description = "Badge deleted successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = "{\"code\": 1000, \"status\": \"success\", \"message\": \"Badge deleted successfully\"}"
+                                    )
+                            )
+                    ),
+                    @ApiResponse(responseCode = "404", description = "Badge not found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    examples = @ExampleObject(
+                                            value = "{\"code\": 1016, \"status\": \"fail\", \"message\": \"Badge not found\"}"
+                                    )
+                            )
+                    )
+            })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<AppApiResponse<Void>> deleteBadge(@PathVariable String id) {
+        badgeService.deleteBadge(UUID.fromString(id));
+        return ResponseEntity.ok(AppApiResponse.<Void>builder()
+                .code(1000)
+                .status(ApiStatus.SUCCESS)
+                .message("Badge deleted successfully")
+                .build());
+    }
 }
