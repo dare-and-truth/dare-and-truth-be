@@ -20,7 +20,5 @@ public class UpdateUserRequest {
     @Size(min = 8, message = "PASSWORD_INVALID")
     String password;
 
-    Boolean isAdmin;
-
     Boolean isActive;
 }
