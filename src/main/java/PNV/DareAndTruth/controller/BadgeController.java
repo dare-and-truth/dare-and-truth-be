@@ -103,34 +103,32 @@ public class BadgeController {
                                         mediaType = "application/json",
                                         examples =
                                                 @ExampleObject(
-                                                        value = """
-                                                                  {
-                                                                  "code": 1000,
-                                                                  "status": "success",
-                                                                  "message": "Badges retrieved successfully",
-                                                                  "data": [
-                                                                    {
-                                                                      "id": "847cb87c-307b-4c28-abb2-524d1f711c5a",
-                                                                      "createdBy": null,
-                                                                      "updatedBy": null,
-                                                                      "createdAt": "2025-02-13T09:03:49.180+00:00",
-                                                                      "updatedAt": "2025-02-13T09:03:49.180+00:00",
-                                                                      "title": "Gold Badge dscc",
-                                                                      "image": "https://example.com/badge.png",
-                                                                      "description": "Awarded for excellence",
-                                                                      "badgeCriteria": 10,
-                                                                      "points": 0,
-                                                                      "startDay": "2025-01-01",
-                                                                      "endDay": "2025-12-31",
-                                                                      "isActive": true,
-                                                                      "isDeleted": false
-                                                                    }
-                                                                  ]
-                                                                }
+                                                        value =
                                                                 """
-                                                )
-                                )
-                ),
+																{
+																"code": 1000,
+																"status": "success",
+																"message": "Badges retrieved successfully",
+																"data": [
+																	{
+																	"id": "847cb87c-307b-4c28-abb2-524d1f711c5a",
+																	"createdBy": null,
+																	"updatedBy": null,
+																	"createdAt": "2025-02-13T09:03:49.180+00:00",
+																	"updatedAt": "2025-02-13T09:03:49.180+00:00",
+																	"title": "Gold Badge dscc",
+																	"image": "https://example.com/badge.png",
+																	"description": "Awarded for excellence",
+																	"badgeCriteria": 10,
+																	"points": 0,
+																	"startDay": "2025-01-01",
+																	"endDay": "2025-12-31",
+																	"isActive": true,
+																	"isDeleted": false
+																	}
+																]
+																}
+																"""))),
                 @ApiResponse(responseCode = "500", description = "Internal server error")
             })
     @GetMapping
@@ -155,34 +153,32 @@ public class BadgeController {
                                         mediaType = "application/json",
                                         examples =
                                                 @ExampleObject(
-                                                        value ="""
-                                                                  {
-                                                                  "code": 1000,
-                                                                  "status": "success",
-                                                                  "message": "Badges retrieved successfully",
-                                                                  "data": [
-                                                                    {
-                                                                      "id": "847cb87c-307b-4c28-abb2-524d1f711c5a",
-                                                                      "createdBy": null,
-                                                                      "updatedBy": null,
-                                                                      "createdAt": "2025-02-13T09:03:49.180+00:00",
-                                                                      "updatedAt": "2025-02-13T09:03:49.180+00:00",
-                                                                      "title": "Gold Badge dscc",
-                                                                      "image": "https://example.com/badge.png",
-                                                                      "description": "Awarded for excellence",
-                                                                      "badgeCriteria": 10,
-                                                                      "points": 0,
-                                                                      "startDay": "2025-01-01",
-                                                                      "endDay": "2025-12-31",
-                                                                      "isActive": true,
-                                                                      "isDeleted": false
-                                                                    }
-                                                                  ]
-                                                                }
+                                                        value =
                                                                 """
-                                                )
-                                )
-                ),
+																{
+																"code": 1000,
+																"status": "success",
+																"message": "Badges retrieved successfully",
+																"data": [
+																	{
+																	"id": "847cb87c-307b-4c28-abb2-524d1f711c5a",
+																	"createdBy": null,
+																	"updatedBy": null,
+																	"createdAt": "2025-02-13T09:03:49.180+00:00",
+																	"updatedAt": "2025-02-13T09:03:49.180+00:00",
+																	"title": "Gold Badge dscc",
+																	"image": "https://example.com/badge.png",
+																	"description": "Awarded for excellence",
+																	"badgeCriteria": 10,
+																	"points": 0,
+																	"startDay": "2025-01-01",
+																	"endDay": "2025-12-31",
+																	"isActive": true,
+																	"isDeleted": false
+																	}
+																]
+																}
+																"""))),
                 @ApiResponse(
                         responseCode = "404",
                         description = "Badge not found",

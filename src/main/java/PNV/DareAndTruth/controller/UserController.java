@@ -1,16 +1,17 @@
 package PNV.DareAndTruth.controller;
 
-import java.util.List;
+import java.util.Set;
 
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import PNV.DareAndTruth.dto.projection.user.UserDetailProjection;
+import PNV.DareAndTruth.dto.projection.user.UserSummaryProjection;
 import PNV.DareAndTruth.dto.request.user.UpdateUserRequest;
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
-import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -45,21 +46,15 @@ public class UserController {
                                                                 + "\"data\": [ "
                                                                 + "{ "
                                                                 + "\"id\": \"fd609f00-90ef-435f-965c-88884767fbbf\", "
-                                                                + "\"createdAt\": \"2025-01-23T16:24:05.995+00:00\", "
-                                                                + "\"updatedAt\": \"2025-01-23T17:29:59.700+00:00\", "
                                                                 + "\"username\": \"nhat\", "
                                                                 + "\"email\": \"nhat@gmail.com\", "
-                                                                + "\"isActive\": true, "
-                                                                + "\"isDeleted\": true "
+                                                                + "\"isActive\": true "
                                                                 + "}, "
                                                                 + "{ "
                                                                 + "\"id\": \"480e9041-35fe-4992-96f9-83cc087c4c07\", "
-                                                                + "\"createdAt\": \"2025-01-26T16:15:38.483+00:00\", "
-                                                                + "\"updatedAt\": \"2025-01-26T16:15:38.483+00:00\", "
                                                                 + "\"username\": \"123123\", "
                                                                 + "\"email\": \"nhat2@gmail.com\", "
-                                                                + "\"isActive\": true, "
-                                                                + "\"isDeleted\": false "
+                                                                + "\"isActive\": true "
                                                                 + "} "
                                                                 + "] "
                                                                 + "}"))),
@@ -69,9 +64,9 @@ public class UserController {
                         content = @Content(mediaType = "application/json"))
             })
     @GetMapping
-    public ResponseEntity<AppApiResponse<List<User>>> getAllUsers() {
-        List<User> allUsers = userService.getAllUsers();
-        return ResponseEntity.ok(AppApiResponse.<List<User>>builder()
+    public ResponseEntity<AppApiResponse<Set<UserSummaryProjection>>> getAllUsers() {
+        Set<UserSummaryProjection> allUsers = userService.getAllUsers();
+        return ResponseEntity.ok(AppApiResponse.<Set<UserSummaryProjection>>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
                 .message("Users retrieved successfully")
@@ -95,15 +90,11 @@ public class UserController {
                                                                 + "\"message\": \"User retrieved successfully\", "
                                                                 + "\"data\": {"
                                                                 + "\"id\": \"fd609f00-90ef-435f-965c-88884767fbbf\", "
-                                                                + "\"createdBy\": null,"
-                                                                + "\"updatedBy\": null,"
-                                                                + "\"createdAt\": \"2025-01-23T16:24:05.995+00:00\", "
-                                                                + "\"updatedAt\": \"2025-01-23T17:29:59.700+00:00\", "
                                                                 + "\"username\": \"nhat\", "
                                                                 + "\"email\": \"nhat@gmail.com\", "
-                                                                + "\"isAdmin\": null,"
-                                                                + "\"isActive\": true, "
-                                                                + "\"isDeleted\": true "
+                                                                + "\"createdAt\": \"2025-01-23T16:24:05.995+00:00\", "
+                                                                + "\"updatedAt\": \"2025-01-23T16:24:05.995+00:00\", "
+                                                                + "\"isActive\": true "
                                                                 + "} "
                                                                 + "}"))),
                 @ApiResponse(
@@ -120,9 +111,9 @@ public class UserController {
                                                                 + "}")))
             })
     @GetMapping("/{id}")
-    public ResponseEntity<AppApiResponse<User>> getUserById(@PathVariable String id) {
-        User user = userService.getUserById(id);
-        return ResponseEntity.ok(AppApiResponse.<User>builder()
+    public ResponseEntity<AppApiResponse<UserDetailProjection>> getUserById(@PathVariable String id) {
+        UserDetailProjection user = userService.getUserDetailById(id);
+        return ResponseEntity.ok(AppApiResponse.<UserDetailProjection>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
                 .message("User retrieved successfully")

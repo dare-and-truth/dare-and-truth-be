@@ -7,8 +7,6 @@ import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -48,13 +46,11 @@ public class User extends BaseEntityAudit {
     @Builder.Default
     Boolean isDeleted = false;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference
-    private List<Challenge> challenges;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private Set<Challenge> challenges;
 
-    @OneToMany(mappedBy = "user")
-    @JsonManagedReference
-    private List<Post> posts;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private Set<Post> posts;
 
     @Column(name = "refresh_token")
     String refreshToken;
