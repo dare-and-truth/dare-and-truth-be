@@ -46,6 +46,11 @@ public enum ErrorCode {
     POST_ID_INVALID(1038, "Post ID must be a UUID"),
     POST_NOT_FOUND(1039, "Post does not find"),
     CHALLENGE_ID_INVALID(1038, "Challenge ID must be a UUID"),
+    ADD_FRIEND_REQUEST_EXIST(1039, "Add friend request already exists"),
+    FOLLOWER_ID_REQUIRED(1040, "Follower ID is required"),
+    REQUEST_NOT_FOUND(1041, "Add friend request is not found"),
+    ALREADY_FRIENDS(1042,"You are already friends"),
+    CANNOT_ADD_SELF(1043,"Can not add friend for yourself" ),
     ;
 
     int code;
