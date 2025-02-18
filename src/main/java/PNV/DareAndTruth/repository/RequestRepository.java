@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface RequestRepository extends JpaRepository<Request, UUID> {
     List<Request> findAllByUser(User user);
     Optional<Request> findByUserAndFollower(User user, User follower);
+
+    List<Request> findAllByUserIdOrFollowerId(UUID uuid, UUID uuid1);
 }

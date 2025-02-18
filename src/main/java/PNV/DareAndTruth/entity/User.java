@@ -60,12 +60,10 @@ public class User extends BaseEntityAudit {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @ToString.Exclude
-    @JsonIgnore
     private Set<Request> receivedRequests; // Requests received
 
     @OneToMany(mappedBy = "follower", fetch = FetchType.LAZY)
     @ToString.Exclude
-    @JsonIgnore
     private Set<Request> sentRequests; // Requests sent
 
     // implement equals and hashCode

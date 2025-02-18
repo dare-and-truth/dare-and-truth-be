@@ -1,5 +1,6 @@
 package PNV.DareAndTruth.controller;
 
+import PNV.DareAndTruth.dto.response.request.RequestResponse;
 import PNV.DareAndTruth.entity.Request;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -135,9 +136,9 @@ public class RequestController {
                                                     "{\"code\": 1001, \"status\": \"fail\", \"message\": \"An unexpected error occurred\"}")))
             })
     @GetMapping("/user/{userId}")
-    public ResponseEntity<AppApiResponse<List<Request>>> getAllRequests(@PathVariable String userId) {
-        List<Request> requests = requestService.getAllRequests(userId);
-        return ResponseEntity.ok(AppApiResponse.<List<Request>>builder()
+    public ResponseEntity<AppApiResponse<List<RequestResponse>>> getAllRequests(@PathVariable String userId) {
+        List<RequestResponse> requests = requestService.getAllRequests(userId);
+        return ResponseEntity.ok(AppApiResponse.<List<RequestResponse>>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
                 .message("Fetched requests successfully")
@@ -282,9 +283,9 @@ public class RequestController {
                                             value =
                                                     "{\"code\": 1001, \"status\": \"fail\", \"message\": \"An unexpected error occurred\"}")))
             })
-    @DeleteMapping("/delete/{userId}/{followerId}")
-    public ResponseEntity<AppApiResponse<Void>> deleteFriend(@PathVariable UUID userId, @PathVariable UUID followerId) {
-        requestService.deleteFriend(userId, followerId);
+    @DeleteMapping("/delete/{userId}/{friendId}")
+    public ResponseEntity<AppApiResponse<Void>> deleteFriend(@PathVariable UUID userId, @PathVariable UUID friendId) {
+        requestService.deleteFriend(userId, friendId);
         return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)

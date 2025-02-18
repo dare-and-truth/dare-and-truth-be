@@ -1,6 +1,8 @@
 package PNV.DareAndTruth.service;
 
 import PNV.DareAndTruth.dto.request.request.CreateRequestRequest;
+import PNV.DareAndTruth.dto.response.request.RequestResponse;
+import PNV.DareAndTruth.dto.response.user.UserResponse;
 import PNV.DareAndTruth.entity.Request;
 import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.exception.AppException;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Getter
@@ -52,6 +55,7 @@ public class RequestService {
                 throw new AppException(ErrorCode.ALREADY_FRIENDS, HttpStatus.CONFLICT); // Đã là bạn bè
             } else {
                 mutualRequest.setIsAccepted(true);
+                mutualRequest.setAcceptedAt(LocalDateTime.now());
                 requestRepository.save(mutualRequest);
                 return;
             }
@@ -76,12 +80,27 @@ public class RequestService {
     }
 
 
-@Transactional(readOnly = true)
-    public List<Request> getAllRequests(String userId) {
-        User user = userRepository.findByIdAndIsDeletedFalse(UUID.fromString(userId))
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+    @Transactional(readOnly = true)
+    public List<RequestResponse> getAllRequests(String userId) {
+        // Tìm người dùng từ ID
+        if (!userRepository.existsByIdAndIsDeletedFalse(UUID.fromString(userId))) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
 
-        return requestRepository.findAllByUser(user); // Ensure this query exists in your repository
+        // Lấy tất cả yêu cầu từ người dùng
+        List<Request> requests = requestRepository.findAllByUserIdOrFollowerId(UUID.fromString(userId), UUID.fromString(userId));
+
+        // Chuyển đổi từ Request sang RequestResponse
+        return requests.stream()
+                .map(request -> new RequestResponse(
+                        request.getId(),
+                        request.getFollowedAt(),
+                        request.getIsAccepted(),
+                        request.getAcceptedAt(),
+                        new UserResponse(request.getUser().getId(), request.getUser().getUsername()), // UserResponse cho người nhận
+                        new UserResponse(request.getFollower().getId(), request.getFollower().getUsername()) // UserResponse cho người gửi
+                ))
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -89,7 +108,12 @@ public class RequestService {
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_FOUND, HttpStatus.NOT_FOUND));
 
+        if (Boolean.TRUE.equals(request.getIsAccepted())) {
+            throw new AppException(ErrorCode.ALREADY_FRIENDS, HttpStatus.CONFLICT);
+        }
+
         request.setIsAccepted(true);
+        request.setAcceptedAt(LocalDateTime.now());
         requestRepository.save(request);
     }
 
@@ -101,15 +125,17 @@ public class RequestService {
         requestRepository.delete(request);
     }
 
+    // delete request when: user clicks no accept (), when unfriending )
     @Transactional
-    public void deleteFriend(UUID userId, UUID followerId) {
+    public void deleteFriend(UUID userId, UUID friendId) {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        User follower = userRepository.findByIdAndIsDeletedFalse(followerId)
+        User friend = userRepository.findByIdAndIsDeletedFalse(friendId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        Request request = requestRepository.findByUserAndFollower(user, follower)
+        Request request = requestRepository.findByUserAndFollower(user, friend)
+                .or(() -> requestRepository.findByUserAndFollower(friend, user))
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         requestRepository.delete(request);

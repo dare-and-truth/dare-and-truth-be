@@ -34,6 +34,9 @@ public class Request extends BaseEntity {
     @Column(name = "is_accepted", columnDefinition = "boolean default false")
     Boolean isAccepted;
 
+    @Column(name = "accepted_at")
+    LocalDateTime acceptedAt; // Thời điểm request được chấp nhận
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
