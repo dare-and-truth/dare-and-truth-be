@@ -1,7 +1,6 @@
 package PNV.DareAndTruth.controller;
 
 import PNV.DareAndTruth.dto.response.request.RequestResponse;
-import PNV.DareAndTruth.entity.Request;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -55,64 +54,16 @@ public class RequestController {
                                     @ExampleObject(
                                             value =
                                                     "{\"code\": 1026, \"status\": \"fail\", \"message\": \"User ID is required\"}"))),
-
                     @ApiResponse(
-                            responseCode = "404",
-                            description = "User not found",
+                            responseCode = "422",
+                            description = "Unprocessable Entity - Invalid friend request action",
                             content =
                             @Content(
                                     mediaType = "application/json",
                                     examples =
                                     @ExampleObject(
                                             value =
-                                                    "{\"code\": 1001, \"status\": \"fail\", \"message\": \"User not found\"}"))),
-
-                    @ApiResponse(
-                            responseCode = "409",
-                            description = "Friend request already exists",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples =
-                                    @ExampleObject(
-                                            value =
-                                                    "{\"code\": 1002, \"status\": \"fail\", \"message\": \"Friend request already exists\"}")))
-            })
-    @PostMapping
-    public ResponseEntity<AppApiResponse<Void>> createRequest(@RequestBody @Valid CreateRequestRequest request) {
-        requestService.createRequest(request);
-        return ResponseEntity.status(201)
-                .body(AppApiResponse.<Void>builder()
-                        .code(1000)
-                        .status(ApiStatus.SUCCESS)
-                        .message("Create request successfully")
-                        .build());
-    }
-
-    @Operation(summary = "Get all requests", description = "Get all friend requests for a user")
-    @ApiResponses(
-            value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Successfully fetched requests",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples =
-                                    @ExampleObject(
-                                            value =
-                                                    "{" +
-                                                    "\"code\": 1000," +
-                                                    "\"status\": \"success\"," +
-                                                    "\"message\": \"Fetched requests successfully\"," +
-                                                    "\"data\": [{" +
-                                                    "\"userId\": \"UUID123\"," +
-                                                    "\"followerId\": \"UUID456\"," +
-                                                    "\"followedAt\": \"2025-02-17T12:30:00\"," +
-                                                    "\"isAccepted\": false}" +
-                                                    "]"
-                                    ))),
-
+                                                    "{\"code\": 1045, \"status\": \"fail\", \"message\": \"Cannot send a friend request to yourself\"}"))),
                     @ApiResponse(
                             responseCode = "404",
                             description = "User not found",
@@ -125,16 +76,67 @@ public class RequestController {
                                                     "{\"code\": 1006, \"status\": \"fail\", \"message\": \"User not found\"}"))),
 
                     @ApiResponse(
-                            responseCode = "500",
-                            description = "Internal server error",
+                            responseCode = "409",
+                            description = "Friend request already exists",
                             content =
                             @Content(
                                     mediaType = "application/json",
                                     examples =
                                     @ExampleObject(
                                             value =
-                                                    "{\"code\": 1001, \"status\": \"fail\", \"message\": \"An unexpected error occurred\"}")))
+                                                    "{\"code\": 1041, \"status\": \"fail\", \"message\": \"Friend request already exists\"}")))
             })
+    @PostMapping
+    public ResponseEntity<AppApiResponse<Void>> createRequest(@RequestBody @Valid CreateRequestRequest request) {
+        requestService.createRequest(request);
+        return ResponseEntity.status(201)
+                .body(AppApiResponse.<Void>builder()
+                        .code(1000)
+                        .status(ApiStatus.SUCCESS)
+                        .message("Create request successfully")
+                        .build());
+    }
+
+    @Operation(summary = "Get all requests", description = "Retrieve all friend requests for a user.")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Successfully fetched requests",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value =
+                                    "{" +
+                                            "\"code\": 1000," +
+                                            "\"status\": \"success\"," +
+                                            "\"message\": \"Fetched requests successfully\"," +
+                                            "\"data\": [{" +
+                                            "\"userId\": \"UUID123\"," +
+                                            "\"followerId\": \"UUID456\"," +
+                                            "\"followedAt\": \"2025-02-17T12:30:00\"," +
+                                            "\"isAccepted\": false" +
+                                            "}]" +
+                                            "}")
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "User not found",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value =
+                                    "{\"code\": 1006, \"status\": \"fail\", \"message\": \"User not found\"}")
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Internal server error",
+                    content = @Content(
+                            mediaType = "application/json",
+                            examples = @ExampleObject(value =
+                                    "{\"code\": 1001, \"status\": \"fail\", \"message\": \"An unexpected error occurred\"}")
+                    )
+            )
+    })
     @GetMapping("/user/{userId}")
     public ResponseEntity<AppApiResponse<List<RequestResponse>>> getAllRequests(@PathVariable String userId) {
         List<RequestResponse> requests = requestService.getAllRequests(userId);
@@ -164,6 +166,17 @@ public class RequestController {
                                                     "}"))),
 
                     @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden - User does not have permission to accept this request",
+                            content =
+                            @Content(
+                                    mediaType = "application/json",
+                                    examples =
+                                    @ExampleObject(
+                                            value =
+                                                    "{\"code\": 1047, \"status\": \"fail\", \"message\": \"User is not authorized to accept this request\"}"))),
+
+                    @ApiResponse(
                             responseCode = "404",
                             description = "Request not found",
                             content =
@@ -172,7 +185,18 @@ public class RequestController {
                                     examples =
                                     @ExampleObject(
                                             value =
-                                                    "{\"code\": 1041, \"status\": \"fail\", \"message\": \"Request not found\"}"))),
+                                                    "{\"code\": 1043, \"status\": \"fail\", \"message\": \"Request not found\"}"))),
+
+                    @ApiResponse(
+                            responseCode = "409",
+                            description = "Conflict - Request has already been accepted",
+                            content =
+                            @Content(
+                                    mediaType = "application/json",
+                                    examples =
+                                    @ExampleObject(
+                                            value =
+                                                    "{\"code\": 1044, \"status\": \"fail\", \"message\": \"Request has already been accepted\"}"))),
 
                     @ApiResponse(
                             responseCode = "500",
@@ -185,9 +209,9 @@ public class RequestController {
                                             value =
                                                     "{\"code\": 1001, \"status\": \"fail\", \"message\": \"An unexpected error occurred\"}")))
             })
-    @PatchMapping("/accept/{requestId}")
-    public ResponseEntity<AppApiResponse<Void>> acceptRequest(@PathVariable UUID requestId) {
-        requestService.acceptRequest(requestId);
+    @PatchMapping("/accept")
+    public ResponseEntity<AppApiResponse<Void>> acceptRequest(@RequestParam UUID requestId, @RequestParam UUID userId) {
+        requestService.acceptRequest(requestId,userId);
         return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
@@ -211,6 +235,16 @@ public class RequestController {
                                                     "\"status\": \"success\"," +
                                                     "\"message\": \"Request rejected successfully\"" +
                                                     "}"))),
+                    @ApiResponse(
+                            responseCode = "403",
+                            description = "Forbidden - User does not have permission to reject this request",
+                            content =
+                            @Content(
+                                    mediaType = "application/json",
+                                    examples =
+                                    @ExampleObject(
+                                            value =
+                                                    "{\"code\": 1047, \"status\": \"fail\", \"message\": \"User is not authorized to reject this request\"}"))),
 
                     @ApiResponse(
                             responseCode = "404",
@@ -221,7 +255,7 @@ public class RequestController {
                                     examples =
                                     @ExampleObject(
                                             value =
-                                                    "{\"code\": 1041, \"status\": \"fail\", \"message\": \"Request not found\"}"))),
+                                                    "{\"code\": 1043, \"status\": \"fail\", \"message\": \"Request not found\"}"))),
 
                     @ApiResponse(
                             responseCode = "500",
@@ -234,9 +268,9 @@ public class RequestController {
                                             value =
                                                     "{\"code\": 1001, \"status\": \"fail\", \"message\": \"An unexpected error occurred\"}")))
             })
-    @DeleteMapping("/reject/{requestId}")
-    public ResponseEntity<AppApiResponse<Void>> rejectRequest(@PathVariable UUID requestId) {
-        requestService.rejectRequest(requestId);
+    @DeleteMapping("/reject")
+    public ResponseEntity<AppApiResponse<Void>> rejectRequest(@RequestParam UUID requestId, @RequestParam UUID userId) {
+        requestService.rejectRequest(requestId,userId);
         return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
@@ -260,18 +294,27 @@ public class RequestController {
                                                     "\"status\": \"success\"," +
                                                     "\"message\": \"Friend deleted successfully\"" +
                                                     "}"))),
-
                     @ApiResponse(
-                            responseCode = "404",
-                            description = "User or Follower not found",
+                            responseCode = "403",
+                            description = "Forbidden - User is not authorized to delete this friend",
                             content =
                             @Content(
                                     mediaType = "application/json",
                                     examples =
                                     @ExampleObject(
                                             value =
-                                                    "{\"code\": 1006, \"status\": \"fail\", \"message\": \"User or Follower not found\"}"))),
+                                                    "{\"code\": 1047, \"status\": \"fail\", \"message\": \"User is not authorized to delete this friend\"}"))),
 
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Friend not found",
+                            content =
+                            @Content(
+                                    mediaType = "application/json",
+                                    examples =
+                                    @ExampleObject(
+                                            value =
+                                                    "{\"code\": 1006, \"status\": \"fail\", \"message\": \"Friend not found\"}"))),
                     @ApiResponse(
                             responseCode = "500",
                             description = "Internal server error",
@@ -283,8 +326,8 @@ public class RequestController {
                                             value =
                                                     "{\"code\": 1001, \"status\": \"fail\", \"message\": \"An unexpected error occurred\"}")))
             })
-    @DeleteMapping("/delete/{userId}/{friendId}")
-    public ResponseEntity<AppApiResponse<Void>> deleteFriend(@PathVariable UUID userId, @PathVariable UUID friendId) {
+    @DeleteMapping("/delete")
+    public ResponseEntity<AppApiResponse<Void>> deleteFriend(@RequestParam UUID userId, @RequestParam UUID friendId) {
         requestService.deleteFriend(userId, friendId);
         return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)

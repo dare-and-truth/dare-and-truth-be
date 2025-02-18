@@ -52,7 +52,7 @@ public class RequestService {
 
         if (mutualRequest != null) {
             if (Boolean.TRUE.equals(mutualRequest.getIsAccepted())) {
-                throw new AppException(ErrorCode.ALREADY_FRIENDS, HttpStatus.CONFLICT); // Đã là bạn bè
+                throw new AppException(ErrorCode.ALREADY_FRIENDS, HttpStatus.CONFLICT);
             } else {
                 mutualRequest.setIsAccepted(true);
                 mutualRequest.setAcceptedAt(LocalDateTime.now());
@@ -64,9 +64,9 @@ public class RequestService {
         Request existingRequest = requestRepository.findByUserAndFollower(user, follower).orElse(null);
         if (existingRequest != null) {
             if (Boolean.TRUE.equals(existingRequest.getIsAccepted())) {
-                throw new AppException(ErrorCode.ALREADY_FRIENDS, HttpStatus.CONFLICT); // Đã là bạn bè
+                throw new AppException(ErrorCode.ALREADY_FRIENDS, HttpStatus.CONFLICT);
             } else {
-                throw new AppException(ErrorCode.ADD_FRIEND_REQUEST_EXIST, HttpStatus.CONFLICT); // Lời mời đã tồn tại
+                throw new AppException(ErrorCode.ADD_FRIEND_REQUEST_EXIST, HttpStatus.CONFLICT);
             }
         }
 
@@ -82,31 +82,33 @@ public class RequestService {
 
     @Transactional(readOnly = true)
     public List<RequestResponse> getAllRequests(String userId) {
-        // Tìm người dùng từ ID
+
         if (!userRepository.existsByIdAndIsDeletedFalse(UUID.fromString(userId))) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
-        // Lấy tất cả yêu cầu từ người dùng
         List<Request> requests = requestRepository.findAllByUserIdOrFollowerId(UUID.fromString(userId), UUID.fromString(userId));
 
-        // Chuyển đổi từ Request sang RequestResponse
         return requests.stream()
                 .map(request -> new RequestResponse(
                         request.getId(),
                         request.getFollowedAt(),
                         request.getIsAccepted(),
                         request.getAcceptedAt(),
-                        new UserResponse(request.getUser().getId(), request.getUser().getUsername()), // UserResponse cho người nhận
-                        new UserResponse(request.getFollower().getId(), request.getFollower().getUsername()) // UserResponse cho người gửi
+                        new UserResponse(request.getUser().getId(), request.getUser().getUsername()),
+                        new UserResponse(request.getFollower().getId(), request.getFollower().getUsername())
                 ))
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public void acceptRequest(UUID requestId) {
+    public void acceptRequest(UUID requestId, UUID userId) {
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        if (!request.getUser().getId().equals(userId)) {
+            throw new AppException(ErrorCode.PERMISSION_DENIED, HttpStatus.FORBIDDEN);
+        }
 
         if (Boolean.TRUE.equals(request.getIsAccepted())) {
             throw new AppException(ErrorCode.ALREADY_FRIENDS, HttpStatus.CONFLICT);
@@ -118,14 +120,18 @@ public class RequestService {
     }
 
     @Transactional
-    public void rejectRequest(UUID requestId) {
+    public void rejectRequest(UUID requestId, UUID userId) {
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        if (!request.getUser().getId().equals(userId)) {
+            throw new AppException(ErrorCode.PERMISSION_DENIED, HttpStatus.FORBIDDEN);
+        }
 
         requestRepository.delete(request);
     }
 
-    // delete request when: user clicks no accept (), when unfriending )
+    // delete request when: user clicks no accept (above), when unfriending (below)
     @Transactional
     public void deleteFriend(UUID userId, UUID friendId) {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
@@ -137,6 +143,10 @@ public class RequestService {
         Request request = requestRepository.findByUserAndFollower(user, friend)
                 .or(() -> requestRepository.findByUserAndFollower(friend, user))
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        if (Boolean.FALSE.equals(request.getIsAccepted())) {
+            throw new AppException(ErrorCode.FRIEND_REQUEST_NOT_ACCEPTED, HttpStatus.BAD_REQUEST);
+        }
 
         requestRepository.delete(request);
     }
