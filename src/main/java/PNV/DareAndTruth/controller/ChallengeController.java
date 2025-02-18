@@ -2,8 +2,11 @@ package PNV.DareAndTruth.controller;
 
 import java.util.Set;
 
+import PNV.DareAndTruth.service.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +28,10 @@ import lombok.experimental.FieldDefaults;
 @RequestMapping("/challenges")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Slf4j
 public class ChallengeController {
     ChallengeService challengeService;
+    JwtService jwtService;
 
     @Operation(
             summary = "Create new challenge",
@@ -57,8 +62,12 @@ public class ChallengeController {
                                         }))
             })
     @PostMapping
-    public ResponseEntity<AppApiResponse<Void>> createChallenge(@Valid @RequestBody CreateChallengeRequest request) {
-        challengeService.createChallenge(request);
+    public ResponseEntity<AppApiResponse<Void>> createChallenge(@Valid @RequestBody CreateChallengeRequest request, HttpServletRequest httpServletRequest) {
+
+        String token = jwtService.extractTokenFromHeader(httpServletRequest);
+        String userEmail = jwtService.extractEmail(token);
+
+        challengeService.createChallenge(request, userEmail);
         return ResponseEntity.status(201)
                 .body(AppApiResponse.<Void>builder()
                         .code(1000)

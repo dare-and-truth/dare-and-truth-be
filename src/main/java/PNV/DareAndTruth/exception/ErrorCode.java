@@ -46,6 +46,8 @@ public enum ErrorCode {
     POST_ID_INVALID(1038, "Post ID must be a UUID"),
     POST_NOT_FOUND(1039, "Post does not find"),
     CHALLENGE_ID_INVALID(1038, "Challenge ID must be a UUID"),
+    HASHTAG_ALREADY_EXISTS_IN_DATE_RANGE(1039, "Hashtag already exists in date range"),
+    UNAUTHORIZED(1040, "Please login")
     ;
 
     int code;
