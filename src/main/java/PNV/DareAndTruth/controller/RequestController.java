@@ -210,8 +210,8 @@ public class RequestController {
                                                     "{\"code\": 1001, \"status\": \"fail\", \"message\": \"An unexpected error occurred\"}")))
             })
     @PatchMapping("/accept")
-    public ResponseEntity<AppApiResponse<Void>> acceptRequest(@RequestParam UUID requestId, @RequestParam UUID userId) {
-        requestService.acceptRequest(requestId,userId);
+    public ResponseEntity<AppApiResponse<Void>> acceptRequest(@RequestParam String requestId, @RequestParam String userId) {
+        requestService.acceptRequest(UUID.fromString(requestId),UUID.fromString(userId));
         return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
@@ -269,8 +269,8 @@ public class RequestController {
                                                     "{\"code\": 1001, \"status\": \"fail\", \"message\": \"An unexpected error occurred\"}")))
             })
     @DeleteMapping("/reject")
-    public ResponseEntity<AppApiResponse<Void>> rejectRequest(@RequestParam UUID requestId, @RequestParam UUID userId) {
-        requestService.rejectRequest(requestId,userId);
+    public ResponseEntity<AppApiResponse<Void>> rejectRequest(@RequestParam String requestId, @RequestParam String userId) {
+        requestService.rejectRequest(UUID.fromString(requestId), UUID.fromString(userId));
         return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
@@ -327,8 +327,8 @@ public class RequestController {
                                                     "{\"code\": 1001, \"status\": \"fail\", \"message\": \"An unexpected error occurred\"}")))
             })
     @DeleteMapping("/delete")
-    public ResponseEntity<AppApiResponse<Void>> deleteFriend(@RequestParam UUID userId, @RequestParam UUID friendId) {
-        requestService.deleteFriend(userId, friendId);
+    public ResponseEntity<AppApiResponse<Void>> deleteFriend(@RequestParam String userId, @RequestParam String friendId) {
+        requestService.deleteFriend(UUID.fromString(userId), UUID.fromString(friendId));
         return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
