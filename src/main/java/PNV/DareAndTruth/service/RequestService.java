@@ -107,7 +107,7 @@ public class RequestService {
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if (!request.getUser().getId().equals(userId)) {
-            throw new AppException(ErrorCode.PERMISSION_DENIED, HttpStatus.FORBIDDEN);
+            throw new AppException(ErrorCode.PERMISSION_DENIED, HttpStatus.BAD_REQUEST);
         }
 
         if (Boolean.TRUE.equals(request.getIsAccepted())) {
@@ -125,7 +125,7 @@ public class RequestService {
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if (!request.getUser().getId().equals(userId)) {
-            throw new AppException(ErrorCode.PERMISSION_DENIED, HttpStatus.FORBIDDEN);
+            throw new AppException(ErrorCode.PERMISSION_DENIED, HttpStatus.BAD_REQUEST);
         }
 
         requestRepository.delete(request);

@@ -52,7 +52,9 @@ public enum ErrorCode {
     ALREADY_FRIENDS(1044,"You are already friends"),
     CANNOT_ADD_SELF(1045,"Can not add friend for yourself" ),
     FRIEND_REQUEST_NOT_ACCEPTED(1046,"You are not friends" ),
-    PERMISSION_DENIED(1047,"You do not have permission to perform this action" )
+    PERMISSION_DENIED(1047,"You do not have permission to perform this action" ),
+    HASHTAG_ALREADY_EXISTS_IN_DATE_RANGE(1048, "Hashtag already exists in date range"),
+    UNAUTHORIZED(1049, "Please login")
     ;
 
     int code;

@@ -9,6 +9,7 @@ import javax.crypto.SecretKey;
 
 import jakarta.annotation.PostConstruct;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -106,5 +107,15 @@ public class JwtService {
     public boolean isRefreshToken(String token) {
         Claims claims = extractAllClaims(token);
         return "refresh".equals(claims.get("type", String.class));
+    }
+
+    public String extractTokenFromHeader(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new AppException(ErrorCode.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+        }
+
+        return authorizationHeader.substring(7); // Cắt "Bearer " để lấy token thực sự
     }
 }
