@@ -33,8 +33,8 @@ public class ChallengeService {
     UserRepository userRepository;
 
     @Transactional
-    public void createChallenge(CreateChallengeRequest request) {
-        Optional<User> exitingUser = userRepository.findById(UUID.fromString(request.getUserId()));
+    public void createChallenge(CreateChallengeRequest request, String userEmail) {
+        Optional<User> exitingUser = userRepository.findByEmail(userEmail);
         if (exitingUser.isEmpty()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
@@ -42,6 +42,13 @@ public class ChallengeService {
         // Validate dates
         if (request.getEndDate().isBefore(request.getStartDate())) {
             throw new AppException(ErrorCode.END_DATE_MUST_BE_AFTER_START_DATE, HttpStatus.BAD_REQUEST);
+        }
+
+        // Validate hashtag in range date from start date to end date
+        boolean existsWithOverlappingDates = challengeRepository.existsWithOverlappingDates(request.getHashtag(), request.getStartDate(), request.getEndDate());
+
+        if (existsWithOverlappingDates) {
+            throw new AppException(ErrorCode.HASHTAG_ALREADY_EXISTS_IN_DATE_RANGE, HttpStatus.BAD_REQUEST);
         }
 
         Challenge challenge = Challenge.builder()
@@ -59,7 +66,7 @@ public class ChallengeService {
     }
 
     public Set<ChallengeSummaryProjection> getChallenges() {
-        return challengeRepository.findAllByIsDeletedFalse();
+        return challengeRepository.findAllByIsDeletedFalseOrderByCreatedAtDesc();
     }
 
     public ChallengeSummaryProjection getChallengeById(String id) {
