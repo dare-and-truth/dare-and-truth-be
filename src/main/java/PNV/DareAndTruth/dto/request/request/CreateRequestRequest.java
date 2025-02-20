@@ -17,9 +17,6 @@ public class CreateRequestRequest {
     @NotBlank(message = "USER_ID_REQUIRED")
     String userId;
 
-    @NotBlank(message = "FOLLOWER_ID_REQUIRED")
-    String followerId;
-
     Boolean isAccepted;
     LocalDateTime followedAt;
 }

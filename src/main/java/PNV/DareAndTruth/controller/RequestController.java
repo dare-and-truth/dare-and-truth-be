@@ -1,6 +1,7 @@
 package PNV.DareAndTruth.controller;
 
 import PNV.DareAndTruth.dto.response.request.RequestResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import PNV.DareAndTruth.service.JwtService;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +28,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RequestController {
     RequestService requestService;
+    JwtService jwtService;
 
     @Operation(summary = "Create a new request", description = "Create a new friend request between two users")
     @ApiResponses(
@@ -87,8 +90,10 @@ public class RequestController {
                                                     "{\"code\": 1041, \"status\": \"fail\", \"message\": \"Friend request already exists\"}")))
             })
     @PostMapping
-    public ResponseEntity<AppApiResponse<Void>> createRequest(@RequestBody @Valid CreateRequestRequest request) {
-        requestService.createRequest(request);
+    public ResponseEntity<AppApiResponse<Void>> createRequest(@RequestBody @Valid CreateRequestRequest request, HttpServletRequest httpServletRequest) {
+        String token = jwtService.extractTokenFromHeader(httpServletRequest);
+        String userEmail = jwtService.extractEmail(token);
+        requestService.createRequest(request,userEmail);
         return ResponseEntity.status(201)
                 .body(AppApiResponse.<Void>builder()
                         .code(1000)
@@ -137,9 +142,11 @@ public class RequestController {
                     )
             )
     })
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<AppApiResponse<List<RequestResponse>>> getAllRequests(@PathVariable String userId) {
-        List<RequestResponse> requests = requestService.getAllRequests(userId);
+    @GetMapping("/user")
+    public ResponseEntity<AppApiResponse<List<RequestResponse>>> getAllRequests(HttpServletRequest httpServletRequest) {
+        String token = jwtService.extractTokenFromHeader(httpServletRequest);
+        String userEmail = jwtService.extractEmail(token);
+        List<RequestResponse> requests = requestService.getAllRequests(userEmail);
         return ResponseEntity.ok(AppApiResponse.<List<RequestResponse>>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
@@ -164,18 +171,6 @@ public class RequestController {
                                                     "\"status\": \"success\"," +
                                                     "\"message\": \"Request accepted successfully\"" +
                                                     "}"))),
-
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden - User does not have permission to accept this request",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples =
-                                    @ExampleObject(
-                                            value =
-                                                    "{\"code\": 1047, \"status\": \"fail\", \"message\": \"User is not authorized to accept this request\"}"))),
-
                     @ApiResponse(
                             responseCode = "404",
                             description = "Request not found",
@@ -210,8 +205,10 @@ public class RequestController {
                                                     "{\"code\": 1001, \"status\": \"fail\", \"message\": \"An unexpected error occurred\"}")))
             })
     @PatchMapping("/accept")
-    public ResponseEntity<AppApiResponse<Void>> acceptRequest(@RequestParam String requestId, @RequestParam String userId) {
-        requestService.acceptRequest(UUID.fromString(requestId),UUID.fromString(userId));
+    public ResponseEntity<AppApiResponse<Void>> acceptRequest(@RequestParam String requestId, HttpServletRequest httpServletRequest) {
+        String token = jwtService.extractTokenFromHeader(httpServletRequest);
+        String userEmail = jwtService.extractEmail(token);
+        requestService.acceptRequest(UUID.fromString(requestId),userEmail);
         return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
@@ -236,17 +233,6 @@ public class RequestController {
                                                     "\"message\": \"Request rejected successfully\"" +
                                                     "}"))),
                     @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden - User does not have permission to reject this request",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples =
-                                    @ExampleObject(
-                                            value =
-                                                    "{\"code\": 1047, \"status\": \"fail\", \"message\": \"User is not authorized to reject this request\"}"))),
-
-                    @ApiResponse(
                             responseCode = "404",
                             description = "Request not found",
                             content =
@@ -269,8 +255,10 @@ public class RequestController {
                                                     "{\"code\": 1001, \"status\": \"fail\", \"message\": \"An unexpected error occurred\"}")))
             })
     @DeleteMapping("/reject")
-    public ResponseEntity<AppApiResponse<Void>> rejectRequest(@RequestParam String requestId, @RequestParam String userId) {
-        requestService.rejectRequest(UUID.fromString(requestId), UUID.fromString(userId));
+    public ResponseEntity<AppApiResponse<Void>> rejectRequest(@RequestParam String requestId, HttpServletRequest httpServletRequest) {
+        String token = jwtService.extractTokenFromHeader(httpServletRequest);
+        String userEmail = jwtService.extractEmail(token);
+        requestService.rejectRequest(UUID.fromString(requestId), userEmail);
         return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
@@ -295,17 +283,6 @@ public class RequestController {
                                                     "\"message\": \"Friend deleted successfully\"" +
                                                     "}"))),
                     @ApiResponse(
-                            responseCode = "403",
-                            description = "Forbidden - User is not authorized to delete this friend",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples =
-                                    @ExampleObject(
-                                            value =
-                                                    "{\"code\": 1047, \"status\": \"fail\", \"message\": \"User is not authorized to delete this friend\"}"))),
-
-                    @ApiResponse(
                             responseCode = "404",
                             description = "Friend not found",
                             content =
@@ -327,8 +304,10 @@ public class RequestController {
                                                     "{\"code\": 1001, \"status\": \"fail\", \"message\": \"An unexpected error occurred\"}")))
             })
     @DeleteMapping("/delete")
-    public ResponseEntity<AppApiResponse<Void>> deleteFriend(@RequestParam String userId, @RequestParam String friendId) {
-        requestService.deleteFriend(UUID.fromString(userId), UUID.fromString(friendId));
+    public ResponseEntity<AppApiResponse<Void>> deleteFriend(HttpServletRequest httpServletRequest, @RequestParam String friendId) {
+        String token = jwtService.extractTokenFromHeader(httpServletRequest);
+        String userEmail = jwtService.extractEmail(token);
+        requestService.deleteFriend(userEmail, UUID.fromString(friendId));
         return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)

@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,18 +35,22 @@ public class RequestService {
     RequestRepository requestRepository;
 
     @Transactional
-    public void createRequest(CreateRequestRequest request) {
+    public void createRequest(CreateRequestRequest request, String userEmail) {
+        Optional<User> exitingUser = userRepository.findByEmail(userEmail);
+        if (exitingUser.isEmpty()) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        UUID followerId = exitingUser.get().getId();
         UUID userId = UUID.fromString(request.getUserId());
-        UUID followerId = UUID.fromString(request.getFollowerId());
 
         if (userId.equals(followerId)) {
             throw new AppException(ErrorCode.CANNOT_ADD_SELF, HttpStatus.BAD_REQUEST);
         }
 
-        User user = userRepository.findByIdAndIsDeletedFalse(UUID.fromString(request.getUserId()))
+        User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        User follower = userRepository.findByIdAndIsDeletedFalse(UUID.fromString(request.getFollowerId()))
+        User follower = userRepository.findByIdAndIsDeletedFalse(followerId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         Request mutualRequest = requestRepository.findByUserAndFollower(follower, user).orElse(null);
@@ -81,13 +86,19 @@ public class RequestService {
 
 
     @Transactional(readOnly = true)
-    public List<RequestResponse> getAllRequests(String userId) {
+    public List<RequestResponse> getAllRequests(String userEmail) {
 
-        if (!userRepository.existsByIdAndIsDeletedFalse(UUID.fromString(userId))) {
+        Optional<User> exitingUser = userRepository.findByEmail(userEmail);
+        if (exitingUser.isEmpty()) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        UUID userId = exitingUser.get().getId();
+
+        if (!userRepository.existsByIdAndIsDeletedFalse(userId)) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
-        List<Request> requests = requestRepository.findAllByUserIdOrFollowerId(UUID.fromString(userId), UUID.fromString(userId));
+        List<Request> requests = requestRepository.findAllByUserIdOrFollowerId(userId, userId);
 
         return requests.stream()
                 .map(request -> new RequestResponse(
@@ -102,9 +113,15 @@ public class RequestService {
     }
 
     @Transactional
-    public void acceptRequest(UUID requestId, UUID userId) {
+    public void acceptRequest(UUID requestId, String userEmail) {
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        Optional<User> exitingUser = userRepository.findByEmail(userEmail);
+        if (exitingUser.isEmpty()) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        UUID userId = exitingUser.get().getId();
 
         if (!request.getUser().getId().equals(userId)) {
             throw new AppException(ErrorCode.PERMISSION_DENIED, HttpStatus.BAD_REQUEST);
@@ -120,9 +137,15 @@ public class RequestService {
     }
 
     @Transactional
-    public void rejectRequest(UUID requestId, UUID userId) {
+    public void rejectRequest(UUID requestId, String userEmail) {
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new AppException(ErrorCode.REQUEST_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        Optional<User> exitingUser = userRepository.findByEmail(userEmail);
+        if (exitingUser.isEmpty()) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        UUID userId = exitingUser.get().getId();
 
         if (!request.getUser().getId().equals(userId)) {
             throw new AppException(ErrorCode.PERMISSION_DENIED, HttpStatus.BAD_REQUEST);
@@ -133,7 +156,13 @@ public class RequestService {
 
     // delete request when: user clicks no accept (above), when unfriending (below)
     @Transactional
-    public void deleteFriend(UUID userId, UUID friendId) {
+    public void deleteFriend(String userEmail, UUID friendId) {
+        Optional<User> exitingUser = userRepository.findByEmail(userEmail);
+        if (exitingUser.isEmpty()) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        UUID userId = exitingUser.get().getId();
+
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
