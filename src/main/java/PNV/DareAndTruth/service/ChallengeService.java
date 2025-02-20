@@ -1,9 +1,12 @@
 package PNV.DareAndTruth.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import PNV.DareAndTruth.dto.projection.user.UserWithIdProjection;
+import PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountResponse;
 import jakarta.transaction.Transactional;
 
 import org.springframework.http.HttpStatus;
@@ -80,5 +83,13 @@ public class ChallengeService {
         return challengeRepository
                 .findByIdAndIsDeletedFalse(challengeId)
                 .orElseThrow(() -> new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.NOT_FOUND));
+    }
+
+    public List<ChallengeWithUserAndLikeCountResponse> getChallengesWithLikeCount(String userEmail) {
+        Optional<UserWithIdProjection> user = userRepository.findByEmailAndIsDeletedFalse(userEmail);
+        if (user.isEmpty()) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        return challengeRepository.findAllChallengesWithLikeCount(user.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND)).getId());
     }
 }
