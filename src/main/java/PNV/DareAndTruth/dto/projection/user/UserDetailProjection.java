@@ -1,6 +1,6 @@
 package PNV.DareAndTruth.dto.projection.user;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public interface UserDetailProjection {
@@ -12,7 +12,7 @@ public interface UserDetailProjection {
 
     String getIsActive();
 
-    Date getCreatedAt();
+    LocalDateTime getCreatedAt();
 
-    Date getUpdatedAt();
+    LocalDateTime getUpdatedAt();
 }

@@ -1,7 +1,9 @@
 package PNV.DareAndTruth.controller;
 
+import java.util.List;
 import java.util.Set;
 
+import PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountResponse;
 import PNV.DareAndTruth.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -115,7 +117,7 @@ public class ChallengeController {
                         content = @Content(mediaType = "application/json"))
             })
     @GetMapping
-    public ResponseEntity<AppApiResponse<Set<ChallengeSummaryProjection>>> getAllPost() {
+    public ResponseEntity<AppApiResponse<Set<ChallengeSummaryProjection>>> getAllChallenges() {
         Set<ChallengeSummaryProjection> challenges = challengeService.getChallenges();
         return ResponseEntity.ok(AppApiResponse.<Set<ChallengeSummaryProjection>>builder()
                 .code(1000)
@@ -169,6 +171,58 @@ public class ChallengeController {
                 .status(ApiStatus.SUCCESS)
                 .message("User retrieved successfully")
                 .data(challenge)
+                .build());
+    }
+
+    @Operation(summary = "Get all challenges for feed", description = "Retrieve a list of all challenges for feed to render on the homepage")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Challenges retrieved successfully",
+                            content =
+                            @Content(
+                                    mediaType = "application/json",
+                                    examples =
+                                    @ExampleObject(
+                                            value = """
+                                                    {
+                                                      "code": 1000,
+                                                      "status": "success",
+                                                      "message": "Challenge retrieved successfully",
+                                                      "data": [
+                                                        {
+                                                          "id": "b8762fa3-6e4c-4bec-a190-f061b373da12",
+                                                          "hashtag": "eye",
+                                                          "content": "Welcome to eye challenge",
+                                                          "mediaUrl": "https://ldzbpqvspnjrhgfgigev.supabase.co/storage/v1/object/public/uploads/271c0b3d-fbc9-475e-ba5b-21806611fd03.jpg",
+                                                          "startDate": "2025-02-20",
+                                                          "endDate": "2025-02-23",
+                                                          "userId": "2d76e0be-e529-48aa-b4a5-6ca3b43e7717",
+                                                          "username": "string",
+                                                          "likeCount": 1
+                                                        }
+                                                      ]
+                                                    }
+                                                    """))),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Internal server error",
+                            content = @Content(mediaType = "application/json"))
+            })
+    @GetMapping("/with-like-count")
+    public ResponseEntity<AppApiResponse<List<ChallengeWithUserAndLikeCountResponse>>> getAllChallengesWithLikeCount(HttpServletRequest httpServletRequest) {
+
+        String token = jwtService.extractTokenFromHeader(httpServletRequest);
+        String userEmail = jwtService.extractEmail(token);
+
+        List<ChallengeWithUserAndLikeCountResponse> challenges = challengeService.getChallengesWithLikeCount(userEmail);
+
+        return ResponseEntity.ok(AppApiResponse.<List<ChallengeWithUserAndLikeCountResponse>>builder()
+                .code(1000)
+                .status(ApiStatus.SUCCESS)
+                .message("Challenge retrieved successfully")
+                .data(challenges)
                 .build());
     }
 }

@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import PNV.DareAndTruth.dto.projection.user.UserWithIdProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,6 +17,8 @@ import PNV.DareAndTruth.entity.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);
+
+    Optional<UserWithIdProjection> findByEmailAndIsDeletedFalse(String email);
 
     Optional<User> findByIdAndIsDeletedFalse(UUID id);
 

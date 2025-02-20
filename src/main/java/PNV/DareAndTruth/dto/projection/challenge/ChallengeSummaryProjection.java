@@ -1,7 +1,7 @@
 package PNV.DareAndTruth.dto.projection.challenge;
 
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public interface ChallengeSummaryProjection {
@@ -21,7 +21,7 @@ public interface ChallengeSummaryProjection {
 
     Boolean getIsActive();
 
-    Date getCreatedAt();
+    LocalDateTime getCreatedAt();
 
     interface User {
         UUID getId();
