@@ -1,7 +1,7 @@
 package PNV.DareAndTruth.entity;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 import jakarta.persistence.Column;
@@ -25,11 +25,11 @@ public abstract class BaseEntityAudit extends BaseEntity implements Serializable
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    Date createdAt;
+    LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    Date updatedAt;
+    LocalDateTime updatedAt;
 
     @Override
     public boolean equals(Object o) {
