@@ -2,7 +2,6 @@ package PNV.DareAndTruth.entity;
 
 import java.util.*;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import org.springframework.security.core.GrantedAuthority;
