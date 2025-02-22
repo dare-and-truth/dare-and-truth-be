@@ -16,13 +16,9 @@ import PNV.DareAndTruth.exception.ErrorCode;
 import PNV.DareAndTruth.mapper.BadgeMapper;
 import PNV.DareAndTruth.repository.BadgeRepository;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

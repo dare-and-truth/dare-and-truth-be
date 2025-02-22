@@ -3,12 +3,9 @@ package PNV.DareAndTruth.controller;
 import java.util.List;
 import java.util.Set;
 
-import PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountResponse;
-import PNV.DareAndTruth.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +13,9 @@ import PNV.DareAndTruth.dto.projection.challenge.ChallengeSummaryProjection;
 import PNV.DareAndTruth.dto.request.challenge.CreateChallengeRequest;
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
+import PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountAndCommentCountResponse;
 import PNV.DareAndTruth.service.ChallengeService;
+import PNV.DareAndTruth.service.JwtService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
@@ -25,6 +24,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/challenges")
@@ -64,7 +64,8 @@ public class ChallengeController {
                                         }))
             })
     @PostMapping
-    public ResponseEntity<AppApiResponse<Void>> createChallenge(@Valid @RequestBody CreateChallengeRequest request, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<AppApiResponse<Void>> createChallenge(
+            @Valid @RequestBody CreateChallengeRequest request, HttpServletRequest httpServletRequest) {
 
         String token = jwtService.extractTokenFromHeader(httpServletRequest);
         String userEmail = jwtService.extractEmail(token);
@@ -174,51 +175,59 @@ public class ChallengeController {
                 .build());
     }
 
-    @Operation(summary = "Get all challenges for feed", description = "Retrieve a list of all challenges for feed to render on the homepage")
+    @Operation(
+            summary = "Get all challenges for feed",
+            description = "Retrieve a list of all challenges for feed to render on the homepage")
     @ApiResponses(
             value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Challenges retrieved successfully",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples =
-                                    @ExampleObject(
-                                            value = """
-                                                    {
-                                                      "code": 1000,
-                                                      "status": "success",
-                                                      "message": "Challenge retrieved successfully",
-                                                      "data": [
-                                                        {
-                                                          "id": "b8762fa3-6e4c-4bec-a190-f061b373da12",
-                                                          "hashtag": "eye",
-                                                          "content": "Welcome to eye challenge",
-                                                          "mediaUrl": "https://ldzbpqvspnjrhgfgigev.supabase.co/storage/v1/object/public/uploads/271c0b3d-fbc9-475e-ba5b-21806611fd03.jpg",
-                                                          "startDate": "2025-02-20",
-                                                          "endDate": "2025-02-23",
-                                                          "userId": "2d76e0be-e529-48aa-b4a5-6ca3b43e7717",
-                                                          "username": "string",
-                                                          "likeCount": 1
-                                                        }
-                                                      ]
-                                                    }
-                                                    """))),
-                    @ApiResponse(
-                            responseCode = "500",
-                            description = "Internal server error",
-                            content = @Content(mediaType = "application/json"))
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Challenges retrieved successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+													{
+													"code": 1000,
+													"status": "success",
+													"message": "Challenge retrieved successfully",
+													"data": [
+														{
+														"id": "e3196817-5751-4359-9f3e-dcafef4f2b16",
+															"hashtag": "LearningChallenge",
+															"content": "Learn new technologies to grow up yourself !!!",
+															"mediaUrl": "https://ldzbpqvspnjrhgfgigev.supabase.co/storage/v1/object/public/uploads/f20fa22c-9327-42bc-b21a-8f43aa9b3fd8.png",
+															"startDate": "2025-02-22",
+															"endDate": "2025-02-28",
+															"createdAt": "2025-02-22T12:31:41.338293",
+															"userId": "2d76e0be-e529-48aa-b4a5-6ca3b43e7717",
+															"username": "Admin",
+															"likeCount": 0,
+															"commentCount": 1,
+															"isLiked": false
+														}
+													]
+													}
+													"""))),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal server error",
+                        content = @Content(mediaType = "application/json"))
             })
     @GetMapping("/with-like-count")
-    public ResponseEntity<AppApiResponse<List<ChallengeWithUserAndLikeCountResponse>>> getAllChallengesWithLikeCount(HttpServletRequest httpServletRequest) {
+    public ResponseEntity<AppApiResponse<List<ChallengeWithUserAndLikeCountAndCommentCountResponse>>>
+            getAllChallengesWithLikeCountAndCommentCount(HttpServletRequest httpServletRequest) {
 
         String token = jwtService.extractTokenFromHeader(httpServletRequest);
         String userEmail = jwtService.extractEmail(token);
 
-        List<ChallengeWithUserAndLikeCountResponse> challenges = challengeService.getChallengesWithLikeCount(userEmail);
+        List<ChallengeWithUserAndLikeCountAndCommentCountResponse> challenges =
+                challengeService.getChallengesWithLikeCount(userEmail);
 
-        return ResponseEntity.ok(AppApiResponse.<List<ChallengeWithUserAndLikeCountResponse>>builder()
+        return ResponseEntity.ok(AppApiResponse.<List<ChallengeWithUserAndLikeCountAndCommentCountResponse>>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
                 .message("Challenge retrieved successfully")

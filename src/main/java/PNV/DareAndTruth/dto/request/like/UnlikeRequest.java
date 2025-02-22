@@ -1,9 +1,11 @@
 package PNV.DareAndTruth.dto.request.like;
 
 import jakarta.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.UUID;
+
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.UUID;
 
 @Getter
 @Setter

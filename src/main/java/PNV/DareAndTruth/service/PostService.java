@@ -19,14 +19,10 @@ import PNV.DareAndTruth.repository.ChallengeRepository;
 import PNV.DareAndTruth.repository.PostRepository;
 import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 @Service
-@Getter
-@Setter
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PostService {

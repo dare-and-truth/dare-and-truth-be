@@ -35,9 +35,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String requestPath = request.getServletPath();
 
         // Ignore filter if it is public route
-        if (requestPath.equals("/auth/sign-up") ||
-                requestPath.equals("/auth/sign-in") ||
-                requestPath.equals("/auth/refresh-token")) {
+        if (requestPath.equals("/auth/sign-up")
+                || requestPath.equals("/auth/sign-in")
+                || requestPath.equals("/auth/refresh-token")) {
             chain.doFilter(request, response);
             return;
         }
