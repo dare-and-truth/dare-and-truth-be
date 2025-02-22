@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import PNV.DareAndTruth.dto.projection.user.UserWithIdProjection;
-import PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountResponse;
+import PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountAndCommentCountResponse;
 import jakarta.transaction.Transactional;
 
 import org.springframework.http.HttpStatus;
@@ -21,14 +21,10 @@ import PNV.DareAndTruth.exception.ErrorCode;
 import PNV.DareAndTruth.repository.ChallengeRepository;
 import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 @Service
-@Getter
-@Setter
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ChallengeService {
@@ -85,11 +81,11 @@ public class ChallengeService {
                 .orElseThrow(() -> new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
-    public List<ChallengeWithUserAndLikeCountResponse> getChallengesWithLikeCount(String userEmail) {
+    public List<ChallengeWithUserAndLikeCountAndCommentCountResponse> getChallengesWithLikeCount(String userEmail) {
         Optional<UserWithIdProjection> user = userRepository.findByEmailAndIsDeletedFalse(userEmail);
         if (user.isEmpty()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
-        return challengeRepository.findAllChallengesWithLikeCount(user.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND)).getId());
+        return challengeRepository.findAllChallengesWithLikeCountAndCommentCount(user.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND)).getId());
     }
 }

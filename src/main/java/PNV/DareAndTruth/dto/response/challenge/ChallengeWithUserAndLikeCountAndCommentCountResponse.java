@@ -12,7 +12,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ChallengeWithUserAndLikeCountResponse {
+public class ChallengeWithUserAndLikeCountAndCommentCountResponse {
     UUID id;
     String hashtag;
     String content;
@@ -23,5 +23,6 @@ public class ChallengeWithUserAndLikeCountResponse {
     UUID userId;
     String username;
     Long likeCount;
+    Long commentCount;
     Boolean isLiked;
 }

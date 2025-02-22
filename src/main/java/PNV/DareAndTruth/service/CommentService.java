@@ -1,18 +1,17 @@
 package PNV.DareAndTruth.service;
 
-import PNV.DareAndTruth.dto.request.like.LikeRequest;
-import PNV.DareAndTruth.dto.request.like.UnlikeRequest;
+import PNV.DareAndTruth.dto.projection.comment.CommentSummaryProjection;
+import PNV.DareAndTruth.dto.request.comment.CreateCommentRequest;
 import PNV.DareAndTruth.entity.Challenge;
-import PNV.DareAndTruth.entity.Like;
+import PNV.DareAndTruth.entity.Comment;
 import PNV.DareAndTruth.entity.Post;
 import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
 import PNV.DareAndTruth.repository.ChallengeRepository;
-import PNV.DareAndTruth.repository.LikeRepository;
+import PNV.DareAndTruth.repository.CommentRepository;
 import PNV.DareAndTruth.repository.PostRepository;
 import PNV.DareAndTruth.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,27 +19,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class LikeService {
-    LikeRepository likeRepository;
+public class CommentService {
+    CommentRepository commentRepository;
     UserRepository userRepository;
     PostRepository postRepository;
     ChallengeRepository challengeRepository;
 
-    public void likeFeed(LikeRequest request, String userEmail) {
+    public void createComment(CreateCommentRequest request, String userEmail){
         Optional<User> user = userRepository.findByEmail(userEmail);
         UUID feedId;
 
         if (user.isEmpty()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST);
-        }
-
-        if (likeRepository.existsByUserIdAndFeedId(user.get().getId(), UUID.fromString(request.getFeedId()))) {
-            throw new AppException(ErrorCode.LIKE_ALREADY_EXISTS, HttpStatus.CONFLICT);
         }
 
         if (request.isChallenge()) {
@@ -52,26 +48,27 @@ public class LikeService {
             Optional<Post> post = postRepository.findById(UUID.fromString(request.getFeedId()));
             if (post.isEmpty()) {
                 throw new AppException(ErrorCode.POST_NOT_FOUND, HttpStatus.BAD_REQUEST);
-            } else feedId = post.get().getId();        }
-
-        Like like = Like.builder()
-                .user(user.get())
-                .feedId(feedId)
-                .build();
-
-        likeRepository.save(like);
-    }
-
-    @Transactional
-    public void unlikeFeed(UnlikeRequest request, String userEmail) {
-        Optional<User> user = userRepository.findByEmail(userEmail);
-
-        if (user.isEmpty()) {
-            throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST);
+            } else feedId = post.get().getId();
         }
 
-        Optional<Like> existingLike = likeRepository.findByUserIdAndFeedId(user.get().getId(), UUID.fromString(request.getFeedId()));
+        var comment = Comment.builder()
+                .user(user.get())
+                .feedId(feedId)
+                .content(request.getContent())
+                .mediaUrl(request.getMediaUrl())
+                .build();
+        commentRepository.save(comment);
+    }
 
-        likeRepository.delete(existingLike.orElseThrow(() -> new AppException(ErrorCode.LIKE_NOT_FOUND, HttpStatus.BAD_REQUEST)));
+    public Set<CommentSummaryProjection> getCommentsByFeedId(String feedId) {
+        // handle invalid UUID
+        UUID feedUUID;
+        try {
+            feedUUID = UUID.fromString(feedId);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.FEED_ID_INVALID, HttpStatus.BAD_REQUEST);
+        }
+        // retrieve comments by feedId
+        return commentRepository.findAllByFeedIdOrderByCreatedAtDesc(feedUUID);
     }
 }
