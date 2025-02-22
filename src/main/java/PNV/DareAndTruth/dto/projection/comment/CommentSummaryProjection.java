@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public interface CommentSummaryProjection {
     UUID getId();
+
     String getContent();
 
     String getMediaUrl();
@@ -15,6 +16,7 @@ public interface CommentSummaryProjection {
 
     interface User {
         String getUsername();
+
         UUID getId();
     }
 }

@@ -1,14 +1,16 @@
 package PNV.DareAndTruth.entity;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
+import org.hibernate.annotations.CreationTimestamp;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Entity
 @Getter
@@ -18,7 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Table(name = "comments")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Comment extends BaseEntity{
+public class Comment extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     User user;

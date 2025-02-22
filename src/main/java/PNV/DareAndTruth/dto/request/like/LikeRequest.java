@@ -1,11 +1,13 @@
 package PNV.DareAndTruth.dto.request.like;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+
 import org.hibernate.validator.constraints.UUID;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

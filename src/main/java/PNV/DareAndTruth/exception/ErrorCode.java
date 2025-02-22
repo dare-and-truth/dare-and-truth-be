@@ -49,11 +49,11 @@ public enum ErrorCode {
     HASHTAG_ALREADY_EXISTS_IN_DATE_RANGE(1039, "Hashtag already exists in date range"),
     UNAUTHORIZED(1040, "Please login"),
     POST_ID_REQUIRED(1041, "User ID is required"),
-    CHALLENGE_OR_POST_NOT_FOUND(1042,"Challenge or post not found"),
-    FEED_ID_REQUIRED(1043,"Feed ID is required"),
-    FEED_ID_INVALID(1043,"Feed ID must be a UUID"),
-    LIKE_ALREADY_EXISTS(1044,"Like already exists"),
-    LIKE_NOT_FOUND(1045,"Like does not exist"),
+    CHALLENGE_OR_POST_NOT_FOUND(1042, "Challenge or post not found"),
+    FEED_ID_REQUIRED(1043, "Feed ID is required"),
+    FEED_ID_INVALID(1043, "Feed ID must be a UUID"),
+    LIKE_ALREADY_EXISTS(1044, "Like already exists"),
+    LIKE_NOT_FOUND(1045, "Like does not exist"),
     ;
 
     int code;

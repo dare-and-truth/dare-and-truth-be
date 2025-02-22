@@ -1,5 +1,12 @@
 package PNV.DareAndTruth.service;
 
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
 import PNV.DareAndTruth.dto.projection.comment.CommentSummaryProjection;
 import PNV.DareAndTruth.dto.request.comment.CreateCommentRequest;
 import PNV.DareAndTruth.entity.Challenge;
@@ -15,12 +22,6 @@ import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class CommentService {
     PostRepository postRepository;
     ChallengeRepository challengeRepository;
 
-    public void createComment(CreateCommentRequest request, String userEmail){
+    public void createComment(CreateCommentRequest request, String userEmail) {
         Optional<User> user = userRepository.findByEmail(userEmail);
         UUID feedId;
 

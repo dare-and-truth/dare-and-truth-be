@@ -1,5 +1,13 @@
 package PNV.DareAndTruth.service;
 
+import java.util.Optional;
+import java.util.UUID;
+
+import jakarta.transaction.Transactional;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
 import PNV.DareAndTruth.dto.request.like.LikeRequest;
 import PNV.DareAndTruth.dto.request.like.UnlikeRequest;
 import PNV.DareAndTruth.entity.Challenge;
@@ -12,15 +20,9 @@ import PNV.DareAndTruth.repository.ChallengeRepository;
 import PNV.DareAndTruth.repository.LikeRepository;
 import PNV.DareAndTruth.repository.PostRepository;
 import PNV.DareAndTruth.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -52,12 +54,10 @@ public class LikeService {
             Optional<Post> post = postRepository.findById(UUID.fromString(request.getFeedId()));
             if (post.isEmpty()) {
                 throw new AppException(ErrorCode.POST_NOT_FOUND, HttpStatus.BAD_REQUEST);
-            } else feedId = post.get().getId();        }
+            } else feedId = post.get().getId();
+        }
 
-        Like like = Like.builder()
-                .user(user.get())
-                .feedId(feedId)
-                .build();
+        Like like = Like.builder().user(user.get()).feedId(feedId).build();
 
         likeRepository.save(like);
     }
@@ -70,8 +70,10 @@ public class LikeService {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
 
-        Optional<Like> existingLike = likeRepository.findByUserIdAndFeedId(user.get().getId(), UUID.fromString(request.getFeedId()));
+        Optional<Like> existingLike =
+                likeRepository.findByUserIdAndFeedId(user.get().getId(), UUID.fromString(request.getFeedId()));
 
-        likeRepository.delete(existingLike.orElseThrow(() -> new AppException(ErrorCode.LIKE_NOT_FOUND, HttpStatus.BAD_REQUEST)));
+        likeRepository.delete(
+                existingLike.orElseThrow(() -> new AppException(ErrorCode.LIKE_NOT_FOUND, HttpStatus.BAD_REQUEST)));
     }
 }

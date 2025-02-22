@@ -5,15 +5,15 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import PNV.DareAndTruth.dto.projection.user.UserWithIdProjection;
-import PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountAndCommentCountResponse;
 import jakarta.transaction.Transactional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import PNV.DareAndTruth.dto.projection.challenge.ChallengeSummaryProjection;
+import PNV.DareAndTruth.dto.projection.user.UserWithIdProjection;
 import PNV.DareAndTruth.dto.request.challenge.CreateChallengeRequest;
+import PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountAndCommentCountResponse;
 import PNV.DareAndTruth.entity.Challenge;
 import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.exception.AppException;
@@ -44,7 +44,8 @@ public class ChallengeService {
         }
 
         // Validate hashtag in range date from start date to end date
-        boolean existsWithOverlappingDates = challengeRepository.existsWithOverlappingDates(request.getHashtag(), request.getStartDate(), request.getEndDate());
+        boolean existsWithOverlappingDates = challengeRepository.existsWithOverlappingDates(
+                request.getHashtag(), request.getStartDate(), request.getEndDate());
 
         if (existsWithOverlappingDates) {
             throw new AppException(ErrorCode.HASHTAG_ALREADY_EXISTS_IN_DATE_RANGE, HttpStatus.BAD_REQUEST);
@@ -86,6 +87,8 @@ public class ChallengeService {
         if (user.isEmpty()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
-        return challengeRepository.findAllChallengesWithLikeCountAndCommentCount(user.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND)).getId());
+        return challengeRepository.findAllChallengesWithLikeCountAndCommentCount(
+                user.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND))
+                        .getId());
     }
 }
