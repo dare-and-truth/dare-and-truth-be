@@ -47,13 +47,23 @@ public class User extends BaseEntityAudit {
     Boolean isDeleted = false;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Set<Challenge> challenges;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @ToString.Exclude
     private Set<Post> posts;
 
     @Column(name = "refresh_token")
     String refreshToken;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private Set<Request> receivedRequests; // Requests received
+
+    @OneToMany(mappedBy = "follower", fetch = FetchType.LAZY)
+    @ToString.Exclude
+    private Set<Request> sentRequests; // Requests sent
 
     // implement equals and hashCode
     @Override

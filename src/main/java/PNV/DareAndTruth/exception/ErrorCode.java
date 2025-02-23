@@ -54,6 +54,13 @@ public enum ErrorCode {
     FEED_ID_INVALID(1043, "Feed ID must be a UUID"),
     LIKE_ALREADY_EXISTS(1044, "Like already exists"),
     LIKE_NOT_FOUND(1045, "Like does not exist"),
+    ADD_FRIEND_REQUEST_EXIST(1046, "Add friend request already exists"),
+    FOLLOWER_ID_REQUIRED(1047, "Follower ID is required"),
+    REQUEST_NOT_FOUND(1048, "Add friend request is not found"),
+    ALREADY_FRIENDS(1049, "You are already friends"),
+    CANNOT_ADD_SELF(1050, "Can not add friend for yourself"),
+    FRIEND_REQUEST_NOT_ACCEPTED(1051, "You are not friends"),
+    PERMISSION_DENIED(1052, "You do not have permission to perform this action"),
     ;
 
     int code;

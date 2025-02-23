@@ -26,4 +26,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     @Query("SELECT u FROM User u WHERE u.id = :userId AND u.isDeleted = false")
     Optional<UserDetailProjection> findDetailById(@Param("userId") UUID userId);
+
+    boolean existsByIdAndIsDeletedFalse(UUID uuid);
 }
