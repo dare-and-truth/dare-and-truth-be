@@ -11,6 +11,4 @@ public interface LikeRepository extends JpaRepository<Like, UUID> {
     boolean existsByUserIdAndFeedId(UUID userId, UUID feedId);
 
     Optional<Like> findByUserIdAndFeedId(UUID userId, UUID feedId);
-
-    void deleteByFeedId(UUID feedId);
 }

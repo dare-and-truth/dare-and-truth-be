@@ -11,7 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import PNV.DareAndTruth.dto.projection.challenge.ChallengeSummaryProjection;
-import PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountResponse;
+import PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountAndCommentCountResponse;
 import PNV.DareAndTruth.entity.Challenge;
 
 public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
@@ -32,18 +32,22 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
 
     @Query(
             """
-	SELECT new PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountResponse(
-		c.id, c.hashtag, c.content, c.mediaUrl,
-		c.startDate, c.endDate, c.createdAt,
-		c.user.id, c.user.username,
-		COUNT(l.id),
-		CASE WHEN COUNT(likedByUser.id) > 0 THEN true ELSE false END
-	)
-	FROM Challenge c
-	LEFT JOIN Like l ON c.id = l.feedId
-	LEFT JOIN Like likedByUser ON c.id = likedByUser.feedId AND likedByUser.user.id = :userId
-	GROUP BY c.id, c.hashtag, c.content, c.mediaUrl, c.startDate, c.endDate, c.createdAt, c.user.id, c.user.username
-	ORDER BY c.updatedAt DESC
-""")
-    List<ChallengeWithUserAndLikeCountResponse> findAllChallengesWithLikeCount(@Param("userId") UUID userId);
+		SELECT new PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountAndCommentCountResponse(
+			c.id, c.hashtag, c.content, c.mediaUrl,
+			c.startDate, c.endDate, c.createdAt,
+			c.user.id, c.user.username,
+			COUNT(DISTINCT l.id),
+			COUNT(DISTINCT cm.id),
+			CASE WHEN COUNT(DISTINCT likedByUser.id) > 0 THEN true ELSE false END
+		)
+		FROM Challenge c
+		LEFT JOIN Like l ON c.id = l.feedId
+		LEFT JOIN Comment cm ON c.id = cm.feedId
+		LEFT JOIN Like likedByUser ON c.id = likedByUser.feedId AND likedByUser.user.id = :userId
+		WHERE c.isDeleted = false AND c.isActive = true
+		GROUP BY c.id, c.hashtag, c.content, c.mediaUrl, c.startDate, c.endDate, c.createdAt, c.user.id, c.user.username
+		ORDER BY c.updatedAt DESC
+	""")
+    List<ChallengeWithUserAndLikeCountAndCommentCountResponse> findAllChallengesWithLikeCountAndCommentCount(
+            @Param("userId") UUID userId);
 }

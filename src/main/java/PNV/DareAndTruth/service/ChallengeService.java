@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import PNV.DareAndTruth.dto.projection.challenge.ChallengeSummaryProjection;
 import PNV.DareAndTruth.dto.projection.user.UserWithIdProjection;
 import PNV.DareAndTruth.dto.request.challenge.CreateChallengeRequest;
-import PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountResponse;
+import PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountAndCommentCountResponse;
 import PNV.DareAndTruth.entity.Challenge;
 import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.exception.AppException;
@@ -86,12 +86,12 @@ public class ChallengeService {
                 .orElseThrow(() -> new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
-    public List<ChallengeWithUserAndLikeCountResponse> getChallengesWithLikeCount(String userEmail) {
+    public List<ChallengeWithUserAndLikeCountAndCommentCountResponse> getChallengesWithLikeCount(String userEmail) {
         Optional<UserWithIdProjection> user = userRepository.findByEmailAndIsDeletedFalse(userEmail);
         if (user.isEmpty()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
-        return challengeRepository.findAllChallengesWithLikeCount(
+        return challengeRepository.findAllChallengesWithLikeCountAndCommentCount(
                 user.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND))
                         .getId());
     }
