@@ -7,8 +7,6 @@ import java.util.UUID;
 public interface ChallengeSummaryProjection {
     UUID getId();
 
-    UUID getUserId();
-
     String getHashtag();
 
     String getContent();
@@ -22,6 +20,8 @@ public interface ChallengeSummaryProjection {
     Boolean getIsActive();
 
     LocalDateTime getCreatedAt();
+
+    User getUser();
 
     interface User {
         UUID getId();
