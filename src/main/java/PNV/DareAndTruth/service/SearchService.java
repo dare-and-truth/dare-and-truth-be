@@ -24,10 +24,10 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 public class SearchService {
-    final ChallengeRepository challengeRepository;
-    final UserRepository userRepository;
+    ChallengeRepository challengeRepository;
+    UserRepository userRepository;
 
     // Find the user by email and set their ID.
     // If the user is not found, throw an error.
