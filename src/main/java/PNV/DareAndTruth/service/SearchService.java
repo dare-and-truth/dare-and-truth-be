@@ -28,16 +28,14 @@ import lombok.experimental.FieldDefaults;
 public class SearchService {
     final ChallengeRepository challengeRepository;
     final UserRepository userRepository;
-    UUID existingUserId;
 
     // Find the user by email and set their ID.
     // If the user is not found, throw an error.
-    private void setUserIdFromEmail(String userEmail) {
-        Optional<User> exitingUser = userRepository.findByEmail(userEmail);
-        if (exitingUser.isEmpty()) {
-            throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-        }
-        this.existingUserId = exitingUser.get().getId();
+    private UUID getUserIdFromEmail(String userEmail) {
+        return userRepository
+                .findByEmail(userEmail)
+                .map(User::getId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
     // Remove accents from a string.
@@ -77,7 +75,7 @@ public class SearchService {
     // Search for users based on a keyword.
     // First, find exact matches. Then, search for partial matches word by word.
     public List<UserWithIdAndUsernameProjection> searchUsers(String keyword, String userEmail) {
-        setUserIdFromEmail(userEmail);
+        UUID existingUserId = getUserIdFromEmail(userEmail);
         String normalizedKeyword = removeDiacritics(keyword.toLowerCase()).replaceAll("\\s+", "");
 
         List<UserWithIdAndUsernameProjection> firstSearchResults =
