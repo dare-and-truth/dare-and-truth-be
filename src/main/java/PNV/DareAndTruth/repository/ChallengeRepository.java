@@ -19,6 +19,9 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
 
     Optional<ChallengeSummaryProjection> findByIdAndIsDeletedFalse(UUID uuid);
 
+    String SPECIAL_CHARACTERS = "áàạảãâấầậẩẫăắằặẳẵéèẹẻẽêếềệểễíìịỉĩóòọỏõôốồộổỗơớờợởỡúùụủũưứừựửữýỳỵỷỹđ";
+    String REPLACEMENT_CHARACTERS = "aaaaaaaaaaaaaaaaaeeeeeeeeeeiiiiiooooooooooooooooouuuuuuuuuuyyyyyd";
+
     @Query(
             """
 		SELECT COUNT(c) > 0 FROM Challenge c WHERE c.hashtag = :hashtag
@@ -50,4 +53,50 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
 	""")
     List<ChallengeWithUserAndLikeCountAndCommentCountResponse> findAllChallengesWithLikeCountAndCommentCount(
             @Param("userId") UUID userId);
+
+    @Query("SELECT c FROM Challenge c WHERE " + "LOWER(TRANSLATE(c.hashtag, '"
+            + SPECIAL_CHARACTERS
+            + "', '"
+            + REPLACEMENT_CHARACTERS
+            + "')) "
+            + "ILIKE LOWER(CONCAT('%', :word, '%')) "
+            + "OR LOWER(TRANSLATE(c.content, '"
+            + SPECIAL_CHARACTERS
+            + "', '"
+            + REPLACEMENT_CHARACTERS
+            + "')) "
+            + "ILIKE LOWER(CONCAT('%', :word, '%'))")
+    List<ChallengeSummaryProjection> searchChallengesBySingleWord(@Param("word") String word);
+
+    @Query("SELECT c FROM Challenge c WHERE " + "LOWER(REPLACE(TRANSLATE(c.hashtag, '"
+            + SPECIAL_CHARACTERS
+            + "', '"
+            + REPLACEMENT_CHARACTERS
+            + "'), ' ', '')) "
+            + "ILIKE LOWER(CONCAT('%', :normalizedKeyword, '%')) "
+            + "OR LOWER(REPLACE(TRANSLATE(c.content, '"
+            + SPECIAL_CHARACTERS
+            + "', '"
+            + REPLACEMENT_CHARACTERS
+            + "'), ' ', '')) "
+            + "ILIKE LOWER(CONCAT('%', :normalizedKeyword, '%'))"
+            + "AND c.id NOT IN :excludedIds")
+    List<ChallengeSummaryProjection> searchChallengesByNormalizedKeyword(
+            @Param("normalizedKeyword") String normalizedKeyword, @Param("excludedIds") List<UUID> excludedIds);
+
+    @Query("SELECT c FROM Challenge c WHERE " + "(LOWER(TRANSLATE(c.hashtag, '"
+            + SPECIAL_CHARACTERS
+            + "', '"
+            + REPLACEMENT_CHARACTERS
+            + "')) "
+            + "ILIKE LOWER(CONCAT('%', :normalizedKeyword, '%')) "
+            + "OR LOWER(TRANSLATE(c.content, '"
+            + SPECIAL_CHARACTERS
+            + "', '"
+            + REPLACEMENT_CHARACTERS
+            + "')) "
+            + "ILIKE LOWER(CONCAT('%', :normalizedKeyword, '%'))) "
+            + "AND c.id NOT IN :excludedIds")
+    List<ChallengeSummaryProjection> searchChallengesExcludingIds(
+            @Param("normalizedKeyword") String normalizedKeyword, @Param("excludedIds") List<UUID> excludedIds);
 }

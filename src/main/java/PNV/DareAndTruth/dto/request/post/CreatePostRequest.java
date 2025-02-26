@@ -8,9 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreatePostRequest {
-    @NotBlank(message = "USER_ID_REQUIRED")
-    private String userId;
-
     @NotBlank(message = "HASHTAG_REQUIRED")
     private String hashtag;
 

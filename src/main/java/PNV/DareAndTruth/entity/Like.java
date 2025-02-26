@@ -26,6 +26,9 @@ public class Like extends BaseEntity {
     @NotNull
     UUID feedId;
 
+    @Column(name = "feed_type") // "post" hoặc "challenge"
+    String feedType;
+
     LocalDateTime likedAt;
 
     @Override
