@@ -2,7 +2,6 @@ package PNV.DareAndTruth.controller;
 
 import java.util.Set;
 
-import PNV.DareAndTruth.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -13,6 +12,7 @@ import PNV.DareAndTruth.dto.projection.post.PostSummaryProjection;
 import PNV.DareAndTruth.dto.request.post.CreatePostRequest;
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
+import PNV.DareAndTruth.service.JwtService;
 import PNV.DareAndTruth.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -58,7 +58,8 @@ public class PostController {
                                         }))
             })
     @PostMapping
-    public ResponseEntity<AppApiResponse<Void>> createPost(@Valid @RequestBody CreatePostRequest request, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<AppApiResponse<Void>> createPost(
+            @Valid @RequestBody CreatePostRequest request, HttpServletRequest httpServletRequest) {
 
         String token = jwtService.extractTokenFromHeader(httpServletRequest);
         String userEmail = jwtService.extractEmail(token);

@@ -24,7 +24,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SearchService {
     ChallengeRepository challengeRepository;
     UserRepository userRepository;
