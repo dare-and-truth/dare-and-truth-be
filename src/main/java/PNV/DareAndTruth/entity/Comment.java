@@ -31,6 +31,9 @@ public class Comment extends BaseEntity {
     @Column(name = "content", nullable = false)
     String content;
 
+    @Column(name = "feed_type") // "post" hoặc "challenge"
+    String feedType;
+
     @Column(name = "media_url")
     String mediaUrl;
 

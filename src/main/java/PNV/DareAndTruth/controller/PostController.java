@@ -2,6 +2,7 @@ package PNV.DareAndTruth.controller;
 
 import java.util.Set;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import PNV.DareAndTruth.dto.projection.post.PostSummaryProjection;
 import PNV.DareAndTruth.dto.request.post.CreatePostRequest;
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
+import PNV.DareAndTruth.service.JwtService;
 import PNV.DareAndTruth.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -27,6 +29,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PostController {
     PostService postService;
+    JwtService jwtService;
 
     @Operation(summary = "Create new post", description = "Create a new post by providing valid challenge details.")
     @ApiResponses(
@@ -55,8 +58,13 @@ public class PostController {
                                         }))
             })
     @PostMapping
-    public ResponseEntity<AppApiResponse<Void>> createPost(@Valid @RequestBody CreatePostRequest request) {
-        postService.createPost(request);
+    public ResponseEntity<AppApiResponse<Void>> createPost(
+            @Valid @RequestBody CreatePostRequest request, HttpServletRequest httpServletRequest) {
+
+        String token = jwtService.extractTokenFromHeader(httpServletRequest);
+        String userEmail = jwtService.extractEmail(token);
+
+        postService.createPost(request, userEmail);
         return ResponseEntity.status(201)
                 .body(AppApiResponse.<Void>builder()
                         .code(1000)

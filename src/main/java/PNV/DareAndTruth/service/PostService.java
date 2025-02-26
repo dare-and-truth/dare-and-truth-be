@@ -31,8 +31,8 @@ public class PostService {
     ChallengeRepository challengeRepository;
 
     @Transactional
-    public void createPost(CreatePostRequest request) {
-        Optional<User> exitingUser = userRepository.findById(UUID.fromString(request.getUserId()));
+    public void createPost(CreatePostRequest request, String userEmail) {
+        Optional<User> exitingUser = userRepository.findByEmail(userEmail);
         if (exitingUser.isEmpty()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }

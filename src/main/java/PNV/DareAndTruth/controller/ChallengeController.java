@@ -207,36 +207,7 @@ public class ChallengeController {
 																"username": "Admin",
 																"likeCount": 0,
 																"commentCount": 1,
-																"isLiked": false
-															}
-														]
-														}
-														"""))),
-                @ApiResponse(
-                        responseCode = "200",
-                        description = "Challenges retrieved successfully",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        value =
-                                                                """
-														{
-														"code": 1000,
-														"status": "success",
-														"message": "Challenge retrieved successfully",
-														"data": [
-															{
-															"id": "b8762fa3-6e4c-4bec-a190-f061b373da12",
-															"hashtag": "eye",
-															"content": "Welcome to eye challenge",
-															"mediaUrl": "https://ldzbpqvspnjrhgfgigev.supabase.co/storage/v1/object/public/uploads/271c0b3d-fbc9-475e-ba5b-21806611fd03.jpg",
-															"startDate": "2025-02-20",
-															"endDate": "2025-02-23",
-															"userId": "2d76e0be-e529-48aa-b4a5-6ca3b43e7717",
-															"username": "string",
-															"likeCount": 1
+																"liked": false
 															}
 														]
 														}
