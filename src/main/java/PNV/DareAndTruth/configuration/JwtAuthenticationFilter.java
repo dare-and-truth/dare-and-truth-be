@@ -2,6 +2,7 @@ package PNV.DareAndTruth.configuration;
 
 import java.io.IOException;
 
+import PNV.DareAndTruth.exception.AppException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -45,7 +46,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            chain.doFilter(request, response);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            response.getWriter().write("Authorization header is missing or invalid!");
             return;
         }
 
@@ -57,7 +59,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String email = jwtService.extractEmail(token);
+        String email;
+        try {
+            email = jwtService.extractEmail(token);
+        } catch (AppException e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            response.getWriter().write("Token is invalid or expired!");
+            return;
+        }
 
         if (jwtService.isRefreshToken(token)) {
             chain.doFilter(request, response);
@@ -67,11 +76,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = customUserDetailsService.loadUserByEmail(email);
 
-            if (jwtService.validateToken(token)) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+            try {
+                if (jwtService.validateToken(token)) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.getWriter().write("Token validation failed!");
+                    return;
+                }
+            } catch (AppException e) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Token is invalid or expired!");
+                return;
             }
         }
 
