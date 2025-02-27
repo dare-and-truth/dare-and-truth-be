@@ -1,18 +1,19 @@
-package PNV.DareAndTruth.dto.projection.calendar;
+package PNV.DareAndTruth.dto.projection.reminder;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
-public interface CalendarSummaryProjection {
+public interface ReminderSummaryProjection {
     UUID getId();
     String getTitle();
+    String getHashtag();
     LocalDate getStartDate();
     LocalDate getEndDate();
+    String getReminderContent();
+    LocalTime getReminderTime();
     LocalTime getStartTime();
     LocalTime getEndTime();
-    int getRepeatType();
-    Boolean getIsChallenge();
     UUID getUserId();
 
 }

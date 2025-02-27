@@ -64,11 +64,11 @@ public enum ErrorCode {
     START_TIME_REQUIRED(1053,"Start time is required"),
     END_TIME_REQUIRED(1054,"End time is required"),
     REPEAT_TYPE_REQUIRED(1055,"Repeat type is required"),
-    CALENDAR_ALREADY_EXISTS(1056,"Calendar already exist"),
+    REMINDER_ALREADY_EXISTS(1056,"Reminder already exist"),
     INVALID_DATE_FORMAT(1057, "Invalid date format, use YYYY-MM-DD"),
     INVALID_MONTH(1058, "Month must be between 1 and 12"),
     INVALID_DAY(1059, "Day does not exist for the given month and year"),
-    CALENDAR_NOT_FOUND(1060,"Calendar is not found"),
+    REMINDER_NOT_FOUND(1060,"Reminder is not found"),
     ;
 
     int code;
