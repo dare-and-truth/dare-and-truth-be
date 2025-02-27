@@ -11,6 +11,7 @@ spring:
       ddl-auto: update
     properties:
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+
 server:
   port: 8080
 
@@ -21,8 +22,8 @@ openapi:
   service:
     api-docs: DareAndTruth-service
     title: Dare&Truth API Documentation
-    version: v0.0.1
-    server: http://localhost:8080
+    version: ${API_DOC_VERSION:v0.0.1}
+    server: ${BE_URL:http://localhost:8080}
 
 app:
   jwt:
