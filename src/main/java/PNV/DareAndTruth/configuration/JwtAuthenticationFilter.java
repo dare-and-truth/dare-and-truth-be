@@ -2,7 +2,6 @@ package PNV.DareAndTruth.configuration;
 
 import java.io.IOException;
 
-import PNV.DareAndTruth.exception.AppException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +14,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.service.CustomUserDetailsService;
 import PNV.DareAndTruth.service.JwtService;
 import lombok.AccessLevel;
@@ -30,18 +30,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final CustomUserDetailsService customUserDetailsService;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+        return path.equals("/auth/sign-up")
+                || path.equals("/auth/sign-in")
+                || path.equals("/auth/refresh-token")
+                || path.startsWith("/swagger-ui/")
+                || path.startsWith("/v3/");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-
-        String requestPath = request.getServletPath();
-
-        // Ignore filter if it is public route
-        if (requestPath.equals("/auth/sign-up")
-                || requestPath.equals("/auth/sign-in")
-                || requestPath.equals("/auth/refresh-token")) {
-            chain.doFilter(request, response);
-            return;
-        }
 
         String authHeader = request.getHeader("Authorization");
 
