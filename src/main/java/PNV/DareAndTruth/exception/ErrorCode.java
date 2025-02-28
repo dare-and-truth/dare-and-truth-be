@@ -61,14 +61,14 @@ public enum ErrorCode {
     CANNOT_ADD_SELF(1050, "Can not add friend for yourself"),
     FRIEND_REQUEST_NOT_ACCEPTED(1051, "You are not friends"),
     PERMISSION_DENIED(1052, "You do not have permission to perform this action"),
-    START_TIME_REQUIRED(1053,"Start time is required"),
-    END_TIME_REQUIRED(1054,"End time is required"),
-    REPEAT_TYPE_REQUIRED(1055,"Repeat type is required"),
-    REMINDER_ALREADY_EXISTS(1056,"Reminder already exist"),
+    START_TIME_REQUIRED(1053, "Start time is required"),
+    END_TIME_REQUIRED(1054, "End time is required"),
+    REPEAT_TYPE_REQUIRED(1055, "Repeat type is required"),
+    REMINDER_ALREADY_EXISTS(1056, "Reminder already exist"),
     INVALID_DATE_FORMAT(1057, "Invalid date format, use YYYY-MM-DD"),
     INVALID_MONTH(1058, "Month must be between 1 and 12"),
     INVALID_DAY(1059, "Day does not exist for the given month and year"),
-    REMINDER_NOT_FOUND(1060,"Reminder is not found"),
+    REMINDER_NOT_FOUND(1060, "Reminder is not found"),
     ;
 
     int code;

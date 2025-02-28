@@ -2,7 +2,6 @@ package PNV.DareAndTruth.configuration;
 
 import java.io.IOException;
 
-import PNV.DareAndTruth.exception.AppException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,6 +14,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.service.CustomUserDetailsService;
 import PNV.DareAndTruth.service.JwtService;
 import lombok.AccessLevel;

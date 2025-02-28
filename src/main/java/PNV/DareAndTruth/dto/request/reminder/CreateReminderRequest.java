@@ -1,15 +1,16 @@
 package PNV.DareAndTruth.dto.request.reminder;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Getter
 @Setter
