@@ -30,18 +30,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final CustomUserDetailsService customUserDetailsService;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+        return path.equals("/auth/sign-up")
+                || path.equals("/auth/sign-in")
+                || path.equals("/auth/refresh-token")
+                || path.startsWith("/swagger-ui/")
+                || path.startsWith("/v3/");
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-
-        String requestPath = request.getServletPath();
-
-        // Ignore filter if it is public route
-        if (requestPath.equals("/auth/sign-up")
-                || requestPath.equals("/auth/sign-in")
-                || requestPath.equals("/auth/refresh-token")) {
-            chain.doFilter(request, response);
-            return;
-        }
 
         String authHeader = request.getHeader("Authorization");
 
