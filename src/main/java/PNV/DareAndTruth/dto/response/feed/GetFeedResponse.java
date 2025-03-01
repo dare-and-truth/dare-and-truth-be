@@ -27,4 +27,5 @@ public class GetFeedResponse {
     long likeCount;
     long commentCount;
     boolean isLiked;
+    boolean isJoined;
 }

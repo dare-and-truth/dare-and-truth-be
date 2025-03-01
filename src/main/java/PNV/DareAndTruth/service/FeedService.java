@@ -50,7 +50,9 @@ public class FeedService {
                         (String) row[9], // Username
                         ((Number) row[10]).intValue(), // Like Count
                         ((Number) row[11]).intValue(), // Comment Count
-                        (Boolean) row[12]))
+                        (Boolean) row[12],
+                        (Boolean) row[13])
+                )
                 .toList();
     }
 }
