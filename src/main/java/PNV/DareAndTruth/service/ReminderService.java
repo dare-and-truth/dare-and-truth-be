@@ -1,11 +1,14 @@
 package PNV.DareAndTruth.service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import PNV.DareAndTruth.dto.projection.user.UserWithIdProjection;
+import PNV.DareAndTruth.dto.response.hashtag.HashtagForDoChallengeResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -99,5 +102,18 @@ public class ReminderService {
         }
 
         reminderRepository.deleteById(reminderId);
+    }
+
+    public List<HashtagForDoChallengeResponse> getHashtagsForUserToday(String userEmail) {
+
+        Optional<UserWithIdProjection> exitingUser = userRepository.findByEmailAndIsDeletedFalse(userEmail);
+        if (exitingUser.isEmpty()) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+
+        LocalDate today = LocalDate.now(); // 2025-03-01
+        LocalDateTime startOfDay = today.atStartOfDay(); // 2025-03-01 00:00:00
+
+        return reminderRepository.findHashtagsForUserToday(exitingUser.get().getId(), today, startOfDay);
     }
 }
