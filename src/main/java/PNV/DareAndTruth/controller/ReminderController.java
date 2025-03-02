@@ -3,6 +3,8 @@ package PNV.DareAndTruth.controller;
 import java.util.List;
 import java.util.UUID;
 
+import PNV.DareAndTruth.dto.response.hashtag.HashtagForDoChallengeResponse;
+import PNV.DareAndTruth.repository.PostRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -101,10 +103,39 @@ public class ReminderController {
                                         examples = {
                                             @ExampleObject(
                                                     value =
-                                                            "[{\"id\": \"550e8400-e29b-41d4-a716-446655440000\", \"title\": \"Team Meeting\", \"hashtag\": \"#meeting\", "
-                                                                    + "\"startDate\": \"2025-03-01\", \"endDate\": \"2025-03-01\", \"reminderContent\": \"Prepare slides\", "
-                                                                    + "\"reminderTime\": \"08:00:00\", \"startTime\": \"09:00:00\", \"endTime\": \"10:00:00\", "
-                                                                    + "\"userId\": \"123e4567-e89b-12d3-a456-426614174000\"}]")
+                                                            """
+                                                                    {
+                                                                      "code": 1000,
+                                                                      "status": "success",
+                                                                      "message": "Reminders are getting successfully",
+                                                                      "data": [
+                                                                        {
+                                                                          "title": null,
+                                                                          "id": "e56a79ad-f0fe-456f-81e6-1732512f599b",
+                                                                          "userId": "2d76e0be-e529-48aa-b4a5-6ca3b43e7717",
+                                                                          "startDate": "2025-03-01",
+                                                                          "endDate": "2025-03-27",
+                                                                          "reminderContent": "Time to crush your # dodo challenge! 🏃‍♂️💨 Head to DoDo and let is make it happen! 🚀",
+                                                                          "hashtag": "dodo",
+                                                                          "startTime": null,
+                                                                          "reminderTime": "10:00:00",
+                                                                          "endTime": null
+                                                                        },
+                                                                        {
+                                                                          "title": null,
+                                                                          "id": "503046ce-7558-460d-9117-d2fefdd7b4b4",
+                                                                          "userId": "2d76e0be-e529-48aa-b4a5-6ca3b43e7717",
+                                                                          "startDate": "2025-03-01",
+                                                                          "endDate": "2025-03-20",
+                                                                          "reminderContent": "Time to crush your # check challenge! 🏃‍♂️💨 Head to DoDo and let is make it happen! 🚀",
+                                                                          "hashtag": "check",
+                                                                          "startTime": null,
+                                                                          "reminderTime": "10:00:00",
+                                                                          "endTime": null
+                                                                        }
+                                                                      ]
+                                                                    }
+                                                                    """)
                                         })),
                 @ApiResponse(
                         responseCode = "404",
@@ -241,5 +272,73 @@ public class ReminderController {
                 .status(ApiStatus.SUCCESS)
                 .message("Reminder deleted successfully")
                 .build());
+    }
+
+    @Operation(
+            summary = "Get hashtags to do challenges",
+            description = "Get hashtags to do challenges relies on user, start date, and end date")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Hashtags retrieved successfully",
+                            content =
+                            @Content(
+                                    mediaType = "application/json",
+                                    examples = {
+                                            @ExampleObject(
+                                                    value =
+                                                            """
+														{
+															"code": 1000,
+															"status": "success",
+															"message": "Hashtags retrieved successfully",
+															"data": [
+																{
+                                                                           "hashtag": "check",
+                                                                           "did": false
+                                                                         },
+                                                                         {
+                                                                           "hashtag": "dodo",
+                                                                           "did": false
+                                                                         }
+															]
+														}
+														""")
+                                    })),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "User not found",
+                            content =
+                            @Content(
+                                    mediaType = "application/json",
+                                    examples = {
+                                            @ExampleObject(
+                                                    value =
+                                                            "{\"code\": 1001, \"status\": \"fail\", \"message\": \"User not found\"}")
+                                    })),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Internal server error",
+                            content =
+                            @Content(
+                                    mediaType = "application/json",
+                                    examples =
+                                    @ExampleObject(
+                                            value =
+                                                    "{\"code\": 1001, \"status\": \"fail\", \"message\": \"An unexpected error occurred\"}")))
+            })
+    @GetMapping("/hashtags")
+    public ResponseEntity<AppApiResponse<List<HashtagForDoChallengeResponse>>> getHashtags(HttpServletRequest httpServletRequest) {
+        String token = jwtService.extractTokenFromHeader(httpServletRequest);
+        String userEmail = jwtService.extractEmail(token);
+        List<HashtagForDoChallengeResponse> hashtags = reminderService.getHashtagsForUserToday(userEmail);
+        return ResponseEntity.status(200)
+                .body(AppApiResponse.<List<HashtagForDoChallengeResponse>>builder()
+                        .code(1000)
+                        .status(ApiStatus.SUCCESS)
+                        .data(hashtags)
+                        .message("Hashtags retrieved successfully")
+                        .build());
     }
 }
