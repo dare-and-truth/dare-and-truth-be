@@ -28,8 +28,8 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SearchService {
-    ChallengeRepository challengeRepository;
-    UserRepository userRepository;
+    private final ChallengeRepository challengeRepository;
+    private final UserRepository userRepository;
 
     // Find the user by email and set their ID.
     // If the user is not found, throw an error.
@@ -75,7 +75,8 @@ public class SearchService {
                     word,
                     excludedIds,
                     ChallengeRepository.SPECIAL_CHARACTERS,
-                    ChallengeRepository.REPLACEMENT_CHARACTERS);
+                    ChallengeRepository.REPLACEMENT_CHARACTERS,
+                    userId); // Truyền userId
 
             newResults = wordResults.stream()
                     .filter(challenge -> !excludedIds.contains(challenge.getId()))
@@ -89,7 +90,8 @@ public class SearchService {
                 normalizedKeyword,
                 excludedIds,
                 ChallengeRepository.SPECIAL_CHARACTERS,
-                ChallengeRepository.REPLACEMENT_CHARACTERS);
+                ChallengeRepository.REPLACEMENT_CHARACTERS,
+                userId); // Truyền userId
 
         newResults = excludingResults.stream()
                 .filter(challenge -> !excludedIds.contains(challenge.getId()))
