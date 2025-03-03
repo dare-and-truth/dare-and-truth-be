@@ -109,10 +109,10 @@ public class SearchService {
                 userRepository.searchUsersByNormalizedKeyword(normalizedKeyword, currentUserId);
 
         List<UserWithRequestsResponse> results = normalizedResults.stream()
-                .filter(user -> !excludedIds.contains(user.getId())) // Loại bỏ trùng lặp
+                .filter(user -> !excludedIds.contains(user.getId())) // Remove duplicates
                 .map(user -> createUserWithRequestsResponse(user, currentUserId))
                 .collect(Collectors.toList());
-        normalizedResults.forEach(user -> excludedIds.add(user.getId())); // Cập nhật excludedIds
+        normalizedResults.forEach(user -> excludedIds.add(user.getId())); // Update excludedIds
 
         if (!results.isEmpty()) {
             return results;
