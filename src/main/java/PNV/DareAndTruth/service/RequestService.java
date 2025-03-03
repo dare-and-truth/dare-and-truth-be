@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import PNV.DareAndTruth.dto.projection.request.FriendDetailProjection;
-import PNV.DareAndTruth.dto.projection.request.RequestDetailProjection;
 import PNV.DareAndTruth.dto.request.request.CreateRequestRequest;
 import PNV.DareAndTruth.entity.Request;
 import PNV.DareAndTruth.entity.User;
@@ -93,7 +92,7 @@ public class RequestService {
     }
 
     @Transactional(readOnly = true)
-    public List<RequestDetailProjection> getAllAddFriendRequests(String userEmail) {
+    public List<FriendDetailProjection> getAllAddFriendRequests(String userEmail) {
         UUID existingUserId = getUserIdFromEmail(userEmail);
 
         if (!userRepository.existsByIdAndIsDeletedFalse(existingUserId)) {

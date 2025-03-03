@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import PNV.DareAndTruth.dto.projection.request.FriendDetailProjection;
-import PNV.DareAndTruth.dto.projection.request.RequestDetailProjection;
 import PNV.DareAndTruth.dto.request.request.CreateRequestRequest;
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
@@ -178,12 +177,12 @@ public class RequestController {
 												""")))
             })
     @GetMapping()
-    public ResponseEntity<AppApiResponse<List<RequestDetailProjection>>> getAllAddFriendRequests(
+    public ResponseEntity<AppApiResponse<List<FriendDetailProjection>>> getAllAddFriendRequests(
             HttpServletRequest httpServletRequest) {
         String token = jwtService.extractTokenFromHeader(httpServletRequest);
         String userEmail = jwtService.extractEmail(token);
-        List<RequestDetailProjection> requests = requestService.getAllAddFriendRequests(userEmail);
-        return ResponseEntity.ok(AppApiResponse.<List<RequestDetailProjection>>builder()
+        List<FriendDetailProjection> requests = requestService.getAllAddFriendRequests(userEmail);
+        return ResponseEntity.ok(AppApiResponse.<List<FriendDetailProjection>>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
                 .message("Fetched requests successfully")

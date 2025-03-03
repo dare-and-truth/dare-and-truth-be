@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import PNV.DareAndTruth.dto.projection.request.FriendDetailProjection;
 import PNV.DareAndTruth.dto.projection.user.UserDetailProjection;
 import PNV.DareAndTruth.dto.projection.user.UserSummaryProjection;
 import PNV.DareAndTruth.dto.projection.user.UserWithIdAndUsernameProjection;
@@ -49,4 +50,13 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             @Param("word") String word,
             @Param("currentUserId") UUID currentUserId,
             @Param("excludedIds") List<UUID> excludedIds);
+
+    @Query(
+            """
+			SELECT r
+			FROM Request r
+			WHERE (r.user.id = :userId OR r.follower.id = :userId)
+			ORDER BY r.followedAt DESC
+			""")
+    List<FriendDetailProjection> findRequestsByUserId(@Param("userId") UUID userId);
 }

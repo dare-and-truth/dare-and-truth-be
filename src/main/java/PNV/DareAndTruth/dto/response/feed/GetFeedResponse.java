@@ -26,6 +26,6 @@ public class GetFeedResponse {
     String username;
     long likeCount;
     long commentCount;
-    boolean isLiked;
-    boolean isJoined;
+    boolean liked;
+    boolean joined;
 }

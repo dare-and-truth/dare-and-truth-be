@@ -8,7 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import PNV.DareAndTruth.dto.projection.request.FriendDetailProjection;
-import PNV.DareAndTruth.dto.projection.request.RequestDetailProjection;
 import PNV.DareAndTruth.entity.Request;
 import PNV.DareAndTruth.entity.User;
 
@@ -33,6 +32,6 @@ public interface RequestRepository extends JpaRepository<Request, UUID> {
 			WHERE (r.user.id = :existingUserId OR r.follower.id = :existingUserId1)
 			AND r.isAccepted = false
 			""")
-    List<RequestDetailProjection> findAllByUserIdOrFollowerIdAndIsAcceptedFalse(
+    List<FriendDetailProjection> findAllByUserIdOrFollowerIdAndIsAcceptedFalse(
             UUID existingUserId, UUID existingUserId1);
 }

@@ -7,8 +7,10 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import PNV.DareAndTruth.dto.projection.challenge.ChallengeSummaryProjection;
+import PNV.DareAndTruth.dto.projection.request.FriendDetailProjection;
 import PNV.DareAndTruth.dto.projection.user.UserWithIdAndUsernameProjection;
+import PNV.DareAndTruth.dto.response.feed.GetFeedResponse;
+import PNV.DareAndTruth.dto.response.user.UserWithRequestsResponse;
 import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
@@ -26,11 +28,15 @@ import lombok.experimental.FieldDefaults;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SearchService {
-    ChallengeRepository challengeRepository;
-    UserRepository userRepository;
+    private final ChallengeRepository challengeRepository;
+    private final UserRepository userRepository;
 
     // Find the user by email and set their ID.
     // If the user is not found, throw an error.
+    private String removeDiacritics(String input) {
+        return Normalizer.normalize(input, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+    }
+
     private UUID getUserIdFromEmail(String userEmail) {
         return userRepository
                 .findByEmail(userEmail)
@@ -38,75 +44,112 @@ public class SearchService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
-    // Remove accents from a string.
-    private String removeDiacritics(String input) {
-        return Normalizer.normalize(input, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-    }
+    public List<GetFeedResponse> searchChallenges(String keyword, String userEmail) {
+        UUID userId = getUserIdFromEmail(userEmail);
+        String normalizedKeyword = removeDiacritics(keyword.toLowerCase()).replaceAll("\\s+", "");
+        List<UUID> excludedIds = new ArrayList<>();
 
-    // Convert a keyword into a list of words, remove accents, and remove empty words.
-    private List<String> getNormalizedWords(String keyword) {
-        return Arrays.stream(keyword.toLowerCase().split("\\s+"))
-                .map(this::removeDiacritics)
+        List<GetFeedResponse> normalizedResults = challengeRepository.searchChallengesByNormalizedKeyword(
+                normalizedKeyword,
+                userId,
+                ChallengeRepository.SPECIAL_CHARACTERS,
+                ChallengeRepository.REPLACEMENT_CHARACTERS);
+
+        List<GetFeedResponse> results = normalizedResults.stream()
+                .filter(challenge -> !excludedIds.contains(challenge.getId()))
+                .collect(Collectors.toList());
+        normalizedResults.forEach(challenge -> excludedIds.add(challenge.getId()));
+
+        if (!results.isEmpty()) {
+            return results;
+        }
+
+        List<String> words = Arrays.stream(keyword.split("\\s+"))
+                .map(word -> removeDiacritics(word.toLowerCase()))
                 .filter(word -> !word.isEmpty())
                 .collect(Collectors.toList());
-    }
 
-    // Combine two lists and remove duplicates based on the ID.
-    private <T> List<T> combineResults(
-            List<T> firstResults, List<T> secondResults, java.util.function.Function<T, UUID> getIdFunction) {
-        Set<UUID> seenIds = new HashSet<>();
-        List<T> combinedResults = new ArrayList<>();
+        List<GetFeedResponse> newResults;
+        for (String word : words) {
+            List<GetFeedResponse> wordResults = challengeRepository.searchChallengesBySingleWord(
+                    word,
+                    excludedIds,
+                    ChallengeRepository.SPECIAL_CHARACTERS,
+                    ChallengeRepository.REPLACEMENT_CHARACTERS,
+                    userId); // Truyền userId
 
-        for (T result : firstResults) {
-            if (seenIds.add(getIdFunction.apply(result))) {
-                combinedResults.add(result);
-            }
+            newResults = wordResults.stream()
+                    .filter(challenge -> !excludedIds.contains(challenge.getId()))
+                    .collect(Collectors.toList());
+
+            results.addAll(newResults);
+            newResults.forEach(result -> excludedIds.add(result.getId()));
         }
 
-        for (T result : secondResults) {
-            if (seenIds.add(getIdFunction.apply(result))) {
-                combinedResults.add(result);
-            }
+        List<GetFeedResponse> excludingResults = challengeRepository.searchChallengesExcludingIds(
+                normalizedKeyword,
+                excludedIds,
+                ChallengeRepository.SPECIAL_CHARACTERS,
+                ChallengeRepository.REPLACEMENT_CHARACTERS,
+                userId); // Truyền userId
+
+        newResults = excludingResults.stream()
+                .filter(challenge -> !excludedIds.contains(challenge.getId()))
+                .collect(Collectors.toList());
+
+        results.addAll(newResults);
+
+        return results.stream().distinct().collect(Collectors.toList());
+    }
+
+    public List<UserWithRequestsResponse> searchUsers(String keyword, String userEmail) {
+        UUID currentUserId = getUserIdFromEmail(userEmail);
+        String normalizedKeyword = removeDiacritics(keyword.toLowerCase()).replaceAll("\\s+", "");
+        List<UUID> excludedIds = new ArrayList<>();
+
+        List<UserWithIdAndUsernameProjection> normalizedResults =
+                userRepository.searchUsersByNormalizedKeyword(normalizedKeyword, currentUserId);
+
+        List<UserWithRequestsResponse> results = normalizedResults.stream()
+                .filter(user -> !excludedIds.contains(user.getId())) // Remove duplicates
+                .map(user -> createUserWithRequestsResponse(user, currentUserId))
+                .collect(Collectors.toList());
+        normalizedResults.forEach(user -> excludedIds.add(user.getId())); // Update excludedIds
+
+        if (!results.isEmpty()) {
+            return results;
         }
 
-        return combinedResults;
-    }
-
-    // Search for users based on a keyword.
-    // First, find exact matches. Then, search for partial matches word by word.
-    public List<UserWithIdAndUsernameProjection> searchUsers(String keyword, String userEmail) {
-        UUID existingUserId = getUserIdFromEmail(userEmail);
-        String normalizedKeyword = removeDiacritics(keyword.toLowerCase()).replaceAll("\\s+", "");
-
-        List<UserWithIdAndUsernameProjection> firstSearchResults =
-                userRepository.searchUsersByNormalizedKeyword(normalizedKeyword, existingUserId);
-
-        List<UserWithIdAndUsernameProjection> secondSearchResults = getNormalizedWords(keyword).stream()
-                .flatMap(word -> userRepository
-                        .searchUsersBySingleWord(
-                                word,
-                                existingUserId,
-                                firstSearchResults.stream()
-                                        .map(UserWithIdAndUsernameProjection::getId)
-                                        .collect(Collectors.toList()))
-                        .stream())
+        List<String> words = Arrays.stream(keyword.split("\\s+"))
+                .map(word -> removeDiacritics(word.toLowerCase()))
+                .filter(word -> !word.isEmpty())
                 .collect(Collectors.toList());
 
-        return combineResults(firstSearchResults, secondSearchResults, UserWithIdAndUsernameProjection::getId);
+        for (String word : words) {
+            List<UserWithIdAndUsernameProjection> wordResults =
+                    userRepository.searchUsersBySingleWord(word, currentUserId, excludedIds);
+
+            List<UserWithRequestsResponse> newResults = wordResults.stream()
+                    .filter(user -> !excludedIds.contains(user.getId()))
+                    .map(user -> createUserWithRequestsResponse(user, currentUserId))
+                    .collect(Collectors.toList());
+
+            results.addAll(newResults);
+            newResults.forEach(result -> excludedIds.add(result.getUser().getId()));
+        }
+
+        return results.stream().distinct().collect(Collectors.toList());
     }
 
-    // Search for challenges based on a keyword.
-    // First, find exact matches. Then, search for partial matches word by word.
-    public List<ChallengeSummaryProjection> searchChallenges(String keyword) {
-        String normalizedKeyword = removeDiacritics(keyword.toLowerCase()).replaceAll("\\s+", "");
+    private UserWithRequestsResponse createUserWithRequestsResponse(
+            UserWithIdAndUsernameProjection user, UUID currentUserId) {
+        List<FriendDetailProjection> requests = userRepository.findRequestsByUserId(currentUserId);
 
-        List<ChallengeSummaryProjection> firstSearchResults =
-                challengeRepository.searchChallengesByNormalizedKeyword(normalizedKeyword, new ArrayList<>());
-
-        List<ChallengeSummaryProjection> secondSearchResults = getNormalizedWords(keyword).stream()
-                .flatMap(word -> challengeRepository.searchChallengesBySingleWord(word).stream())
+        List<FriendDetailProjection> userRequests = requests.stream()
+                .filter(r -> r.getUser().getId().equals(user.getId())
+                        || r.getFollower().getId().equals(user.getId()))
                 .collect(Collectors.toList());
 
-        return combineResults(firstSearchResults, secondSearchResults, ChallengeSummaryProjection::getId);
+        return new UserWithRequestsResponse(user, userRequests);
     }
 }
