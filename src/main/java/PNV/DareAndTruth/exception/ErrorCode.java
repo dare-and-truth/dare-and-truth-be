@@ -69,6 +69,7 @@ public enum ErrorCode {
     INVALID_MONTH(1058, "Month must be between 1 and 12"),
     INVALID_DAY(1059, "Day does not exist for the given month and year"),
     REMINDER_NOT_FOUND(1060, "Reminder is not found"),
+    MAPPING_FEED_ERROR(1061, "Error mapping GetFeedResponser"),
     ;
 
     int code;
