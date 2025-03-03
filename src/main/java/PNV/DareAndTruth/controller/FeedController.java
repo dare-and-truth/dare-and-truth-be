@@ -5,10 +5,7 @@ import java.util.List;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
@@ -91,4 +88,24 @@ public class FeedController {
                         .message("Feed retrieved successfully")
                         .build());
     }
+
+	@GetMapping({"/{userId}","/"})
+	public ResponseEntity<AppApiResponse<List<GetFeedResponse>>> getChallengeAndPostByUser(
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size,
+			@RequestParam(defaultValue = "challenge") String type,
+			@PathVariable(required = false) String userId,
+			HttpServletRequest httpServletRequest) {
+		String token = jwtService.extractTokenFromHeader(httpServletRequest);
+		String userEmail = jwtService.extractEmail(token);
+
+		List<GetFeedResponse> feed = feedService.getFeedByUser(userId, type,page, size, userEmail);
+		return ResponseEntity.status(200)
+				.body(AppApiResponse.<List<GetFeedResponse>>builder()
+						.code(1000)
+						.status(ApiStatus.SUCCESS)
+						.data(feed)
+						.message("Feed retrieved successfully")
+						.build());
+	}
 }
