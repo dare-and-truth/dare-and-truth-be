@@ -2,6 +2,8 @@ package PNV.DareAndTruth.controller;
 
 import java.util.Set;
 
+import PNV.DareAndTruth.service.JwtService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -28,7 +30,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
     UserService userService;
-
+    JwtService jwtService;
     @Operation(summary = "Get all users", description = "Retrieve a list of all users")
     @ApiResponses(
             value = {
@@ -110,9 +112,11 @@ public class UserController {
                                                                 + "\"message\": \"User does not find\""
                                                                 + "}")))
             })
-    @GetMapping("/{id}")
-    public ResponseEntity<AppApiResponse<UserDetailProjection>> getUserById(@PathVariable String id) {
-        UserDetailProjection user = userService.getUserDetailById(id);
+    @GetMapping({"/{userId}","/"})
+    public ResponseEntity<AppApiResponse<UserDetailProjection>> getUserById(@PathVariable(required = false) String userId, HttpServletRequest httpServletRequest) {
+        String token = jwtService.extractTokenFromHeader(httpServletRequest);
+        String userEmail = jwtService.extractEmail(token);
+        UserDetailProjection user = userService.getUserDetailById(userId, userEmail);
         return ResponseEntity.ok(AppApiResponse.<UserDetailProjection>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
@@ -153,10 +157,13 @@ public class UserController {
                                                                 + "\"message\": \"User does not find\""
                                                                 + "}")))
             })
-    @PatchMapping("/{id}")
+    @PatchMapping({"/{userId}","/"})
     public ResponseEntity<AppApiResponse<Void>> updateUser(
-            @PathVariable String id, @RequestBody @Valid UpdateUserRequest request) {
-        userService.updateUser(id, request);
+            @PathVariable(required = false) String userId,
+            @RequestBody @Valid UpdateUserRequest request,HttpServletRequest httpServletRequest) {
+        String token = jwtService.extractTokenFromHeader(httpServletRequest);
+        String userEmail = jwtService.extractEmail(token);
+        userService.updateUser(userEmail, request, userId);
         return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
