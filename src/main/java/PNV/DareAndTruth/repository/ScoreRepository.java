@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface ScoreRepository extends JpaRepository<Score, UUID> {
   List<Score> findByUserId(UUID userId);
 
-  @Query("SELECT new PNV.DareAndTruth.dto.projection.score.ScoreSummaryProjection(s.user.id, SUM(s.scoreReceived)) " +
+  @Query("SELECT s.user.id AS userId, SUM(s.scoreReceived) AS totalScore " +
           "FROM Score s " +
           "WHERE s.user.id = :userId " +
           "GROUP BY s.user.id")
