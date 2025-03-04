@@ -7,14 +7,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import PNV.DareAndTruth.dto.response.hashtag.HashtagForDoChallengeResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import PNV.DareAndTruth.dto.projection.reminder.ReminderSummaryProjection;
+import PNV.DareAndTruth.dto.response.hashtag.HashtagForDoChallengeResponse;
 import PNV.DareAndTruth.entity.Reminder;
 import PNV.DareAndTruth.entity.User;
-import org.springframework.data.repository.query.Param;
 
 public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
 
@@ -33,16 +33,17 @@ public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
             + "FROM Reminder r WHERE r.user = :user AND :date BETWEEN r.startDate AND r.endDate")
     List<ReminderSummaryProjection> findByUserAndDate(User user, LocalDate date);
 
-    @Query("SELECT new PNV.DareAndTruth.dto.response.hashtag.HashtagForDoChallengeResponse(r.hashtag, CASE WHEN COUNT(p.id) > 0 THEN true ELSE false END) " +
-            "FROM Reminder r " +
-            "LEFT JOIN Post p ON r.hashtag = p.hashtag " +
-            "AND p.createdAt >= :startOfDay " +
-            "AND p.isActive = true " +
-            "AND p.isDeleted = false " +
-            "WHERE r.user.id = :userId " +
-            "AND :today BETWEEN r.startDate AND r.endDate " +
-            "AND r.hashtag IS NOT NULL " +
-            "GROUP BY r.hashtag")
+    @Query(
+            "SELECT new PNV.DareAndTruth.dto.response.hashtag.HashtagForDoChallengeResponse(r.hashtag, CASE WHEN COUNT(p.id) > 0 THEN true ELSE false END) "
+                    + "FROM Reminder r "
+                    + "LEFT JOIN Post p ON r.hashtag = p.hashtag "
+                    + "AND p.createdAt >= :startOfDay "
+                    + "AND p.isActive = true "
+                    + "AND p.isDeleted = false "
+                    + "WHERE r.user.id = :userId "
+                    + "AND :today BETWEEN r.startDate AND r.endDate "
+                    + "AND r.hashtag IS NOT NULL "
+                    + "GROUP BY r.hashtag")
     List<HashtagForDoChallengeResponse> findHashtagsForUserToday(
             @Param("userId") UUID userId,
             @Param("today") LocalDate today,
