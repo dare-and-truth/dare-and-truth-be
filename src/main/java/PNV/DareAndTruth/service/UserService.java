@@ -1,10 +1,13 @@
 package PNV.DareAndTruth.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import PNV.DareAndTruth.dto.projection.user.UserWithIdProjection;
+import PNV.DareAndTruth.entity.Score;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,7 @@ public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
+    ScoreService scoreService;
 
     private UUID getUserIdFromEmail(String userEmail) {
         return userRepository
@@ -113,4 +117,6 @@ public class UserService {
         existingUser.setIsDeleted(true);
         userRepository.save(existingUser);
     }
+
+
 }

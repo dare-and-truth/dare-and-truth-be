@@ -142,4 +142,10 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
             @Param("specialChars") String specialChars,
             @Param("replaceChars") String replaceChars,
             @Param("userId") UUID userId);
+
+	// Tìm Challenge có hashtag cụ thể và thời gian chứa ngày hiện tại
+	Optional<Challenge> findByHashtagAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndIsDeletedFalse(
+			String hashtag, LocalDate startDate, LocalDate endDate);
+
+    List<Challenge> findByEndDateAndIsDeletedFalse(LocalDate localDate);
 }

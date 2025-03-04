@@ -13,10 +13,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -27,12 +24,6 @@ import java.util.UUID;
 public class ScoreController {
     ScoreService scoreService;
 
-    /**
-     * Retrieves the total score (monster score) for a user based on their userId.
-     *
-     * @param userId The ID of the user.
-     * @return ResponseEntity containing the total score of the user.
-     */
     @Operation(summary = "Get total score of a monster (user)", description = "Retrieve the total accumulated points for a user based on their userId")
     @ApiResponses(
             value = {
