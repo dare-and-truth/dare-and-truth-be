@@ -2,7 +2,6 @@ package PNV.DareAndTruth.controller;
 
 import java.util.Set;
 
-import PNV.DareAndTruth.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -14,6 +13,7 @@ import PNV.DareAndTruth.dto.projection.user.UserSummaryProjection;
 import PNV.DareAndTruth.dto.request.user.UpdateUserRequest;
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
+import PNV.DareAndTruth.service.JwtService;
 import PNV.DareAndTruth.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,6 +31,7 @@ import lombok.experimental.FieldDefaults;
 public class UserController {
     UserService userService;
     JwtService jwtService;
+
     @Operation(summary = "Get all users", description = "Retrieve a list of all users")
     @ApiResponses(
             value = {
@@ -112,8 +113,9 @@ public class UserController {
                                                                 + "\"message\": \"User does not find\""
                                                                 + "}")))
             })
-    @GetMapping({"/{userId}","/"})
-    public ResponseEntity<AppApiResponse<UserDetailProjection>> getUserById(@PathVariable(required = false) String userId, HttpServletRequest httpServletRequest) {
+    @GetMapping({"/{userId}", "/"})
+    public ResponseEntity<AppApiResponse<UserDetailProjection>> getUserById(
+            @PathVariable(required = false) String userId, HttpServletRequest httpServletRequest) {
         String token = jwtService.extractTokenFromHeader(httpServletRequest);
         String userEmail = jwtService.extractEmail(token);
         UserDetailProjection user = userService.getUserDetailById(userId, userEmail);
@@ -157,10 +159,11 @@ public class UserController {
                                                                 + "\"message\": \"User does not find\""
                                                                 + "}")))
             })
-    @PatchMapping({"/{userId}","/"})
+    @PatchMapping({"/{userId}", "/"})
     public ResponseEntity<AppApiResponse<Void>> updateUser(
             @PathVariable(required = false) String userId,
-            @RequestBody @Valid UpdateUserRequest request,HttpServletRequest httpServletRequest) {
+            @RequestBody @Valid UpdateUserRequest request,
+            HttpServletRequest httpServletRequest) {
         String token = jwtService.extractTokenFromHeader(httpServletRequest);
         String userEmail = jwtService.extractEmail(token);
         userService.updateUser(userEmail, request, userId);

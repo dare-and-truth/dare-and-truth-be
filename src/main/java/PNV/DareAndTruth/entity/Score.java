@@ -1,12 +1,14 @@
 package PNV.DareAndTruth.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-import org.springframework.data.annotation.CreatedDate;
-
 import java.time.LocalDateTime;
 import java.util.Objects;
+
+import jakarta.persistence.*;
+
+import org.springframework.data.annotation.CreatedDate;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 /**
  * Represents a score record for a user, associated with activities like challenges, posts, or other actions.
@@ -63,7 +65,11 @@ public class Score extends BaseEntity {
         if (this == o) return true;
         if (!(o instanceof Score score)) return false;
         if (!super.equals(o)) return false;
-        return scoreReceived == score.scoreReceived && scoreType == score.scoreType && Objects.equals(user, score.user) && Objects.equals(createdAt, score.createdAt) && Objects.equals(challenge, score.challenge);
+        return scoreReceived == score.scoreReceived
+                && scoreType == score.scoreType
+                && Objects.equals(user, score.user)
+                && Objects.equals(createdAt, score.createdAt)
+                && Objects.equals(challenge, score.challenge);
     }
 
     @Override

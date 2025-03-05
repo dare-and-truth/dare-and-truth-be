@@ -5,12 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import PNV.DareAndTruth.entity.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import PNV.DareAndTruth.dto.projection.user.UserWithIdProjection;
 import PNV.DareAndTruth.dto.response.feed.GetFeedResponse;
+import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
 import PNV.DareAndTruth.repository.FeedRepository;
@@ -69,15 +69,15 @@ public class FeedService {
                 .toList();
     }
 
-    public List<GetFeedResponse> getFeedByUser(String id, String type,int page, int size, String userEmail){
+    public List<GetFeedResponse> getFeedByUser(String id, String type, int page, int size, String userEmail) {
         UUID userId;
-        if(id != null){
+        if (id != null) {
             try {
                 userId = UUID.fromString(id);
             } catch (IllegalArgumentException e) {
                 throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
             }
-        }else{
+        } else {
             userId = getUserIdFromEmail(userEmail);
         }
 
@@ -88,7 +88,7 @@ public class FeedService {
 
         int offset = page * size;
         List<Object[]> results =
-                feedRepository.getFeedWithCountsAndType(exitingUser.get().getId(), size, offset,type);
+                feedRepository.getFeedWithCountsAndType(exitingUser.get().getId(), size, offset, type);
 
         return results.stream()
                 .map(row -> new GetFeedResponse(

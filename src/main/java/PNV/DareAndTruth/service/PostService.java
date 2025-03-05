@@ -1,14 +1,10 @@
 package PNV.DareAndTruth.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import PNV.DareAndTruth.entity.Challenge;
-import PNV.DareAndTruth.entity.Score;
-import PNV.DareAndTruth.repository.ScoreRepository;
 import jakarta.transaction.Transactional;
 
 import org.springframework.http.HttpStatus;
@@ -16,12 +12,15 @@ import org.springframework.stereotype.Service;
 
 import PNV.DareAndTruth.dto.projection.post.PostSummaryProjection;
 import PNV.DareAndTruth.dto.request.post.CreatePostRequest;
+import PNV.DareAndTruth.entity.Challenge;
 import PNV.DareAndTruth.entity.Post;
+import PNV.DareAndTruth.entity.Score;
 import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
 import PNV.DareAndTruth.repository.ChallengeRepository;
 import PNV.DareAndTruth.repository.PostRepository;
+import PNV.DareAndTruth.repository.ScoreRepository;
 import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -53,29 +52,23 @@ public class PostService {
                 .build();
 
         postRepository.save(post);
-        // 1️⃣ Tìm challenge theo hashtag và trạng thái active
         Optional<Challenge> activeChallengeOpt = challengeRepository.findByHashtagAndIsActiveTrue(post.getHashtag());
 
         if (activeChallengeOpt.isPresent()) {
             Challenge activeChallenge = activeChallengeOpt.get();
 
-            LocalDateTime todayStart = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+            LocalDateTime todayStart =
+                    LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-            // 2️⃣ Kiểm tra xem đã nhận điểm cho challenge này chưa (trong ngày)
             boolean scoreExists = scoreRepository.existsByUserIdAndScoreTypeAndChallengeIdAndCreatedAtAfter(
-                    existingUser.get().getId(),
-                    2,
-                    activeChallenge.getId(),
-                    todayStart
-            );
+                    existingUser.get().getId(), 2, activeChallenge.getId(), todayStart);
 
-            // 3️⃣ Nếu chưa có điểm cho challenge này, thì thêm điểm
             if (!scoreExists) {
                 Score score = Score.builder()
                         .user(existingUser.get())
-                        .scoreReceived(10)  // Điểm cho việc đăng bài
-                        .scoreType(2)       // Loại điểm cho đăng bài
-                        .challenge(activeChallenge) // Lưu Challenge ID
+                        .scoreReceived(10)
+                        .scoreType(2)
+                        .challenge(activeChallenge)
                         .createdAt(LocalDateTime.now())
                         .build();
 
