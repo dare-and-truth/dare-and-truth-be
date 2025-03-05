@@ -15,4 +15,6 @@ public interface UserDetailProjection {
     LocalDateTime getCreatedAt();
 
     LocalDateTime getUpdatedAt();
+
+    String getAvatarUrl();
 }

@@ -29,6 +29,9 @@ public class User extends BaseEntityAudit {
     @Column(name = "email", unique = true, nullable = false)
     String email;
 
+    @Column(name = "avatar_url")
+    String avatarUrl;
+
     @Column(name = "password", nullable = false)
     String password;
 

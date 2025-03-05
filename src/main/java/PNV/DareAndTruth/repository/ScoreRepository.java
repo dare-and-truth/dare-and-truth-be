@@ -11,7 +11,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import PNV.DareAndTruth.dto.projection.score.ScoreSummaryProjection;
+import PNV.DareAndTruth.entity.Challenge;
 import PNV.DareAndTruth.entity.Score;
+import PNV.DareAndTruth.entity.User;
 
 @Repository
 public interface ScoreRepository extends JpaRepository<Score, UUID> {
@@ -22,8 +24,8 @@ public interface ScoreRepository extends JpaRepository<Score, UUID> {
             + "GROUP BY s.user.id")
     Optional<ScoreSummaryProjection> findTotalScoreByUserId(@Param("userId") UUID userId);
 
-    boolean existsByUserIdAndScoreTypeAndCreatedAtAfter(UUID id, int i, LocalDateTime todayStart);
-
     boolean existsByUserIdAndScoreTypeAndChallengeIdAndCreatedAtAfter(
             UUID id, int i, UUID id1, LocalDateTime todayStart);
+
+    boolean existsByUserAndChallengeAndScoreType(User user, Challenge challenge, int i);
 }

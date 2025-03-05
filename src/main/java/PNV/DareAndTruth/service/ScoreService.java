@@ -43,8 +43,8 @@ public class ScoreService {
 
     @Transactional
     public void calculateAndSaveChallengeScores() {
-        // Find completed challenges from Reminder
         List<Challenge> remindedChallenges = reminderRepository.findEndedChallengesInReminder();
+
         for (Challenge challenge : remindedChallenges) {
 
             LocalDate startDate = challenge.getStartDate();
@@ -53,7 +53,9 @@ public class ScoreService {
             int participantCount = reminderRepository.countParticipantsByHashtagAndDateRange(
                     challenge.getHashtag(), startDate, endDate);
 
-            if (participantCount > 0) {
+            boolean exists = scoreRepository.existsByUserAndChallengeAndScoreType(challenge.getUser(), challenge, 4);
+
+            if (!exists && participantCount > 0) {
                 int challengeScore = calculateChallengeScore(participantCount);
 
                 Score score = Score.builder()
@@ -72,12 +74,7 @@ public class ScoreService {
     private int calculateChallengeScore(int participants) {
         if (participants >= 10000) return 100;
         if (participants >= 100) return 50;
-        if (participants >= 2) return 30;
+        if (participants >= 1) return 30;
         return 10;
-    }
-
-    public List<Challenge> getChallengesEndedToday() {
-        LocalDate today = LocalDate.now();
-        return challengeRepository.findByEndDateAndIsDeletedFalse(today);
     }
 }
