@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 
 import PNV.DareAndTruth.dto.projection.reminder.ReminderSummaryProjection;
 import PNV.DareAndTruth.dto.response.hashtag.HashtagForDoChallengeResponse;
+import PNV.DareAndTruth.entity.Challenge;
 import PNV.DareAndTruth.entity.Reminder;
 import PNV.DareAndTruth.entity.User;
 
@@ -48,4 +49,22 @@ public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
             @Param("userId") UUID userId,
             @Param("today") LocalDate today,
             @Param("startOfDay") LocalDateTime startOfDay);
+
+    @Query(
+            """
+		SELECT c FROM Challenge c
+		JOIN Reminder r ON c.hashtag = r.hashtag
+		WHERE c.startDate = r.startDate
+		AND c.endDate = r.endDate
+		AND c.endDate <= CURRENT_DATE
+		""")
+    List<Challenge> findEndedChallengesInReminder();
+
+    @Query("SELECT COUNT(DISTINCT r.user.id) FROM Reminder r " + "WHERE r.hashtag = :hashtag "
+            + "AND r.startDate = :startDate "
+            + "AND r.endDate = :endDate")
+    int countParticipantsByHashtagAndDateRange(
+            @Param("hashtag") String hashtag,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 }
