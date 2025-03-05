@@ -5,10 +5,7 @@ import java.util.List;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
@@ -83,6 +80,74 @@ public class FeedController {
         String userEmail = jwtService.extractEmail(token);
 
         List<GetFeedResponse> feed = feedService.getFeed(page, size, userEmail);
+        return ResponseEntity.status(200)
+                .body(AppApiResponse.<List<GetFeedResponse>>builder()
+                        .code(1000)
+                        .status(ApiStatus.SUCCESS)
+                        .data(feed)
+                        .message("Feed retrieved successfully")
+                        .build());
+    }
+
+    @Operation(
+            summary = "Get user-specific feeds including posts and challenges",
+            description =
+                    "Retrieve a list of user-specific challenges and posts with optional type filtering and pagination")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Challenges retrieved successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+											{
+												"code": 1000,
+												"status": "success",
+												"message": "Challenge retrieved successfully",
+												"data": [
+													{
+													"id": "e3196817-5751-4359-9f3e-dcafef4f2b16",
+													"hashtag": "LearningChallenge",
+													"type":"challenge",
+													"content": "Learn new technologies to grow up yourself !!!",
+													"mediaUrl": "https://ldzbpqvspnjrhgfgigev.supabase.co/storage/v1/object/public/uploads/f20fa22c-9327-42bc-b21a-8f43aa9b3fd8.png",
+													"startDate": "2025-02-22",
+													"endDate": "2025-02-28",
+													"createdAt": "2025-02-22T12:31:41.338293",
+													"userId": "2d76e0be-e529-48aa-b4a5-6ca3b43e7717",
+													"username": "Admin",
+													"likeCount": 0,
+													"commentCount": 1,
+													"liked": false
+													}
+												]
+											}
+											"""))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "User not found",
+                        content = @Content(mediaType = "application/json")),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal server error",
+                        content = @Content(mediaType = "application/json"))
+            })
+    @GetMapping({"/{userId}", "/"})
+    public ResponseEntity<AppApiResponse<List<GetFeedResponse>>> getChallengeAndPostByUser(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "challenge") String type,
+            @PathVariable(required = false) String userId,
+            HttpServletRequest httpServletRequest) {
+        String token = jwtService.extractTokenFromHeader(httpServletRequest);
+        String userEmail = jwtService.extractEmail(token);
+
+        List<GetFeedResponse> feed = feedService.getFeedByUser(userId, type, page, size, userEmail);
         return ResponseEntity.status(200)
                 .body(AppApiResponse.<List<GetFeedResponse>>builder()
                         .code(1000)

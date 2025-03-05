@@ -10,4 +10,6 @@ public interface UserSummaryProjection {
     String getEmail();
 
     String getIsActive();
+
+    String getAvatarUrl();
 }

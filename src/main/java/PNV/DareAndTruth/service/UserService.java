@@ -30,6 +30,14 @@ public class UserService {
     UserRepository userRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
+    ScoreService scoreService;
+
+    private UUID getUserIdFromEmail(String userEmail) {
+        return userRepository
+                .findByEmail(userEmail)
+                .map(User::getId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+    }
 
     public void createUser(SignUpRequest request) {
         Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
@@ -50,25 +58,22 @@ public class UserService {
         return userRepository.findAllByIsDeletedFalse();
     }
 
-    public User getUserById(String id) {
-        UUID userId;
-        try {
-            userId = UUID.fromString(id);
-        } catch (IllegalArgumentException e) {
-            throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
-        }
-
+    public User getUserById(UUID userId) {
         return userRepository
                 .findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
-    public UserDetailProjection getUserDetailById(String id) {
+    public UserDetailProjection getUserDetailById(String id, String userEmail) {
         UUID userId;
-        try {
-            userId = UUID.fromString(id);
-        } catch (IllegalArgumentException e) {
-            throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
+        if (id != null) {
+            try {
+                userId = UUID.fromString(id);
+            } catch (IllegalArgumentException e) {
+                throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            userId = getUserIdFromEmail(userEmail);
         }
 
         return userRepository
@@ -76,15 +81,33 @@ public class UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
-    public void updateUser(String id, UpdateUserRequest request) {
-        User existingUser = getUserById(id);
+    public void updateUser(String userEmail, UpdateUserRequest request, String id) {
+        UUID userId;
+        if (id != null) {
+            try {
+                userId = UUID.fromString(id);
+            } catch (IllegalArgumentException e) {
+                throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            userId = getUserIdFromEmail(userEmail);
+        }
+
+        User existingUser = getUserById(userId);
 
         userMapper.mapUserFromUpdateUserRequest(existingUser, request);
         userRepository.save(existingUser);
     }
 
     public void deleteUser(String id) {
-        User existingUser = getUserById(id);
+        UUID userId;
+        try {
+            userId = UUID.fromString(id);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
+        }
+
+        User existingUser = getUserById(userId);
 
         existingUser.setIsDeleted(true);
         userRepository.save(existingUser);

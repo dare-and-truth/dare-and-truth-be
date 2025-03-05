@@ -1,5 +1,6 @@
 package PNV.DareAndTruth.service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -11,12 +12,15 @@ import org.springframework.stereotype.Service;
 
 import PNV.DareAndTruth.dto.projection.post.PostSummaryProjection;
 import PNV.DareAndTruth.dto.request.post.CreatePostRequest;
+import PNV.DareAndTruth.entity.Challenge;
 import PNV.DareAndTruth.entity.Post;
+import PNV.DareAndTruth.entity.Score;
 import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
 import PNV.DareAndTruth.repository.ChallengeRepository;
 import PNV.DareAndTruth.repository.PostRepository;
+import PNV.DareAndTruth.repository.ScoreRepository;
 import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -29,16 +33,17 @@ public class PostService {
     PostRepository postRepository;
     UserRepository userRepository;
     ChallengeRepository challengeRepository;
+    ScoreRepository scoreRepository;
 
     @Transactional
     public void createPost(CreatePostRequest request, String userEmail) {
-        Optional<User> exitingUser = userRepository.findByEmail(userEmail);
-        if (exitingUser.isEmpty()) {
+        Optional<User> existingUser = userRepository.findByEmail(userEmail);
+        if (existingUser.isEmpty()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
         Post post = Post.builder()
-                .user(exitingUser.get())
+                .user(existingUser.get())
                 .hashtag(request.getHashtag())
                 .content(request.getContent())
                 .mediaUrl(request.getMediaUrl())
@@ -47,6 +52,29 @@ public class PostService {
                 .build();
 
         postRepository.save(post);
+        Optional<Challenge> activeChallengeOpt = challengeRepository.findByHashtagAndIsActiveTrue(post.getHashtag());
+
+        if (activeChallengeOpt.isPresent()) {
+            Challenge activeChallenge = activeChallengeOpt.get();
+
+            LocalDateTime todayStart =
+                    LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+
+            boolean scoreExists = scoreRepository.existsByUserIdAndScoreTypeAndChallengeIdAndCreatedAtAfter(
+                    existingUser.get().getId(), 2, activeChallenge.getId(), todayStart);
+
+            if (!scoreExists) {
+                Score score = Score.builder()
+                        .user(existingUser.get())
+                        .scoreReceived(10)
+                        .scoreType(2)
+                        .challenge(activeChallenge)
+                        .createdAt(LocalDateTime.now())
+                        .build();
+
+                scoreRepository.save(score);
+            }
+        }
     }
 
     public Set<PostSummaryProjection> getPosts() {
