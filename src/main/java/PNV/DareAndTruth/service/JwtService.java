@@ -83,7 +83,7 @@ public class JwtService {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
-            throw new AppException(ErrorCode.TOKEN_ALREADY_INVALID, HttpStatus.UNAUTHORIZED);
+            throw new AppException(ErrorCode.TOKEN_ALREADY_INVALID, HttpStatus.FORBIDDEN);
         } catch (MalformedJwtException | SecurityException e) {
             throw new AppException(ErrorCode.INVALID_REFRESH_TOKEN, HttpStatus.BAD_REQUEST);
         }
@@ -109,7 +109,7 @@ public class JwtService {
         String authorizationHeader = request.getHeader("Authorization");
 
         if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
-            throw new AppException(ErrorCode.UNAUTHORIZED, HttpStatus.UNAUTHORIZED);
+            throw new AppException(ErrorCode.UNAUTHORIZED, HttpStatus.FORBIDDEN);
         }
 
         return authorizationHeader.substring(7); // Cắt "Bearer " để lấy token thực sự
