@@ -35,46 +35,4 @@ public class ScoreService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_SCORES_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
-
-    // Tính và lưu điểm cho thử thách khi kết thúc
-    @Transactional
-    public void calculateAndSaveChallengeScore(UUID challengeId) {
-        // Lấy thông tin challenge
-        Challenge challenge = challengeRepository.findById(challengeId)
-                .orElseThrow(() -> new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.NOT_FOUND));
-
-        // Kiểm tra xem đã tính điểm cho challenge này chưa
-        if (scoreRepository.existsByChallengeIdAndScoreType(challengeId, 4)) {
-            return; // Nếu đã tồn tại điểm với scoreType = 4, không tính lại
-        }
-
-        // Đếm số người tham gia duy nhất
-        LocalDateTime startDate = challenge.getStartDate().atStartOfDay();
-        LocalDateTime endDate = challenge.getEndDate().atTime(23, 59, 59);
-        long participantCount = scoreRepository.countUniqueParticipantsByHashtagAndDateRange(
-                challenge.getHashtag(), startDate, endDate);
-
-        // Tính điểm dựa trên số người tham gia
-        int scoreReceived = calculateScore(participantCount);
-
-        // Lưu điểm vào bảng scores
-        Score score = Score.builder()
-                .user(challenge.getUser())
-                .scoreReceived(scoreReceived)
-                .scoreType(4)
-                .createdAt(LocalDateTime.now())
-                .challenge(challenge)
-                .build();
-
-        scoreRepository.save(score);
-    }
-
-    // Phương thức tính điểm dựa trên số người tham gia
-    private int calculateScore(long participantCount) {
-        if (participantCount >= 10000) return 100;
-        if (participantCount >= 100) return 50;
-        if (participantCount >= 10) return 30;
-        if (participantCount >= 1) return 10;
-        return 0; // Không có người tham gia
-    }
 }

@@ -53,44 +53,37 @@ public class PostService {
                 .build();
 
         postRepository.save(post);
-        checkAndAwardChallengeCompletionPoints(post, existingUser.get());
-    }
+        // 1️⃣ Tìm challenge theo hashtag và trạng thái active
+        Optional<Challenge> activeChallengeOpt = challengeRepository.findByHashtagAndIsActiveTrue(post.getHashtag());
 
-    // Phương thức kiểm tra và cộng điểm
-    private void checkAndAwardChallengeCompletionPoints(Post post, User user) {
-        // Lấy ngày hiện tại
-        LocalDate today = LocalDate.now();
-        LocalDateTime startOfDay = today.atStartOfDay();
-        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
+        if (activeChallengeOpt.isPresent()) {
+            Challenge activeChallenge = activeChallengeOpt.get();
 
-        // Tìm Challenge có hashtag tương ứng và thời gian chứa ngày hiện tại
-        Optional<Challenge> challengeOpt = challengeRepository.findByHashtagAndStartDateLessThanEqualAndEndDateGreaterThanEqualAndIsDeletedFalse(
-                post.getHashtag(), today, today);
+            LocalDateTime todayStart = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
 
-        if (challengeOpt.isPresent()) {
-            Challenge challenge = challengeOpt.get();
+            // 2️⃣ Kiểm tra xem đã nhận điểm cho challenge này chưa (trong ngày)
+            boolean scoreExists = scoreRepository.existsByUserIdAndScoreTypeAndChallengeIdAndCreatedAtAfter(
+                    existingUser.get().getId(),
+                    2,
+                    activeChallenge.getId(),
+                    todayStart
+            );
 
-            // Kiểm tra xem đây có phải lần tạo Post đầu tiên trong ngày của user cho Challenge này không
-            long postCount = scoreRepository.countPostsByUserAndHashtagAndDate(
-                    user.getId(), challenge.getHashtag(), today, today.plusDays(1));
-
-            // Nếu chưa có Post nào trong ngày và chưa nhận điểm cho challenge này trong ngày
-            if (postCount == 0 && !scoreRepository.existsByUserIdAndChallengeIdAndScoreTypeAndCreatedAtDate(
-                    user.getId(), challenge.getId(), 2, today)) {
-
-                // Cộng 10 điểm cho việc hoàn thành thử thách hàng ngày (scoreType = 2)
+            // 3️⃣ Nếu chưa có điểm cho challenge này, thì thêm điểm
+            if (!scoreExists) {
                 Score score = Score.builder()
-                        .user(user)
-                        .scoreReceived(10) // Theo tiêu chí: posted: 10
-                        .scoreType(2) // Daily challenge completion
+                        .user(existingUser.get())
+                        .scoreReceived(10)  // Điểm cho việc đăng bài
+                        .scoreType(2)       // Loại điểm cho đăng bài
+                        .challenge(activeChallenge) // Lưu Challenge ID
                         .createdAt(LocalDateTime.now())
-                        .challenge(challenge)
                         .build();
 
                 scoreRepository.save(score);
             }
         }
     }
+
     public Set<PostSummaryProjection> getPosts() {
         return postRepository.findAllByIsDeletedFalse();
     }

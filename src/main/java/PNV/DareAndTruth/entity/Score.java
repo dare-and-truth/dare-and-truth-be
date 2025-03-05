@@ -3,6 +3,7 @@ package PNV.DareAndTruth.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -46,6 +47,7 @@ public class Score extends BaseEntity {
      * The timestamp when the score was created.
      */
     @Column(name = "created_at", nullable = false)
+    @CreatedDate
     LocalDateTime createdAt;
 
     /**
@@ -56,24 +58,16 @@ public class Score extends BaseEntity {
     @ToString.Exclude
     Challenge challenge;
 
-    /**
-     * The post associated with this score, if applicable (e.g., for post-related activities).
-     */
-    @ManyToOne
-    @JoinColumn(name = "post_id")
-    @ToString.Exclude
-    Post post;
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Score score)) return false;
         if (!super.equals(o)) return false;
-        return scoreReceived == score.scoreReceived && scoreType == score.scoreType && Objects.equals(user, score.user) && Objects.equals(createdAt, score.createdAt) && Objects.equals(challenge, score.challenge) && Objects.equals(post, score.post);
+        return scoreReceived == score.scoreReceived && scoreType == score.scoreType && Objects.equals(user, score.user) && Objects.equals(createdAt, score.createdAt) && Objects.equals(challenge, score.challenge);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), user, scoreReceived, scoreType, createdAt, challenge, post);
+        return Objects.hash(super.hashCode(), user, scoreReceived, scoreType, createdAt, challenge);
     }
 }
