@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import PNV.DareAndTruth.dto.projection.request.FriendDetailProjection;
 import PNV.DareAndTruth.dto.projection.user.UserDetailProjection;
 import PNV.DareAndTruth.dto.projection.user.UserSummaryProjection;
-import PNV.DareAndTruth.dto.projection.user.UserWithIdAndUsernameProjection;
+import PNV.DareAndTruth.dto.projection.user.UserWithIdAndUsernameAndAvatarProjection;
 import PNV.DareAndTruth.dto.projection.user.UserWithIdProjection;
 import PNV.DareAndTruth.entity.User;
 
@@ -39,14 +39,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
             + "', '"
             + REPLACEMENT_CHARACTERS
             + "'), ' ', '')) ILIKE LOWER(CONCAT('%', :normalizedKeyword, '%')) AND u.id <> :currentUserId")
-    List<UserWithIdAndUsernameProjection> searchUsersByNormalizedKeyword(
+    List<UserWithIdAndUsernameAndAvatarProjection> searchUsersByNormalizedKeyword(
             @Param("normalizedKeyword") String normalizedKeyword, @Param("currentUserId") UUID currentUserId);
 
     @Query("SELECT u FROM User u WHERE LOWER(TRANSLATE(u.username, '" + SPECIAL_CHARACTERS
             + "', '"
             + REPLACEMENT_CHARACTERS
             + "')) ILIKE LOWER(CONCAT('%', :word, '%')) AND u.id <> :currentUserId AND u.id NOT IN :excludedIds")
-    List<UserWithIdAndUsernameProjection> searchUsersBySingleWord(
+    List<UserWithIdAndUsernameAndAvatarProjection> searchUsersBySingleWord(
             @Param("word") String word,
             @Param("currentUserId") UUID currentUserId,
             @Param("excludedIds") List<UUID> excludedIds);
@@ -59,4 +59,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 			ORDER BY r.followedAt DESC
 			""")
     List<FriendDetailProjection> findRequestsByUserId(@Param("userId") UUID userId);
+
+    Optional<UserWithIdAndUsernameAndAvatarProjection> findBasicDetailById(UUID userId);
 }

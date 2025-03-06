@@ -137,17 +137,13 @@ public class FeedController {
                         description = "Internal server error",
                         content = @Content(mediaType = "application/json"))
             })
-    @GetMapping({"/{userId}", "/"})
+    @GetMapping("/{userId}")
     public ResponseEntity<AppApiResponse<List<GetFeedResponse>>> getChallengeAndPostByUser(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "challenge") String type,
-            @PathVariable(required = false) String userId,
-            HttpServletRequest httpServletRequest) {
-        String token = jwtService.extractTokenFromHeader(httpServletRequest);
-        String userEmail = jwtService.extractEmail(token);
-
-        List<GetFeedResponse> feed = feedService.getFeedByUser(userId, type, page, size, userEmail);
+            @PathVariable String userId) {
+        List<GetFeedResponse> feed = feedService.getFeedByUser(userId, type, page, size);
         return ResponseEntity.status(200)
                 .body(AppApiResponse.<List<GetFeedResponse>>builder()
                         .code(1000)
