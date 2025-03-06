@@ -8,5 +8,4 @@ public interface UserWithIdAndUsernameAndAvatarProjection {
     String getUsername();
 
     String getAvatarUrl();
-
 }

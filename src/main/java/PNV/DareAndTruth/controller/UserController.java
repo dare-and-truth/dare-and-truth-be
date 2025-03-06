@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import PNV.DareAndTruth.dto.projection.user.UserDetailProjection;
 import PNV.DareAndTruth.dto.projection.user.UserSummaryProjection;
 import PNV.DareAndTruth.dto.request.user.UpdateUserRequest;
 import PNV.DareAndTruth.dto.response.ApiStatus;

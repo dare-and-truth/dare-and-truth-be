@@ -71,11 +71,11 @@ public class FeedService {
 
     public List<GetFeedResponse> getFeedByUser(String id, String type, int page, int size) {
         UUID userId;
-            try {
-                userId = UUID.fromString(id);
-            } catch (IllegalArgumentException e) {
-                throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
-            }
+        try {
+            userId = UUID.fromString(id);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
+        }
         Optional<User> exitingUser = userRepository.findByIdAndIsDeletedFalse(userId);
         if (exitingUser.isEmpty()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);

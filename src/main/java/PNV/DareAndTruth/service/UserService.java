@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import PNV.DareAndTruth.dto.projection.user.UserDetailProjection;
 import PNV.DareAndTruth.dto.projection.user.UserSummaryProjection;
 import PNV.DareAndTruth.dto.request.auth.SignUpRequest;
 import PNV.DareAndTruth.dto.request.user.UpdateUserRequest;
@@ -76,10 +75,12 @@ public class UserService {
         UUID currentUserId = getUserIdFromEmail(userEmail);
 
         if (userId.equals(currentUserId)) {
-            return userRepository.findDetailById(userId)
+            return userRepository
+                    .findDetailById(userId)
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
         } else {
-            return userRepository.findBasicDetailById(userId)
+            return userRepository
+                    .findBasicDetailById(userId)
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
         }
     }
@@ -95,7 +96,8 @@ public class UserService {
         UUID currentUserId = getUserIdFromEmail(userEmail);
 
         // Lấy thông tin user đăng nhập để kiểm tra quyền
-        User currentUser = userRepository.findByEmail(userEmail)
+        User currentUser = userRepository
+                .findByEmail(userEmail)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         // Nếu userId != currentUserId và user không phải admin → Không cho cập nhật
@@ -108,7 +110,6 @@ public class UserService {
         userMapper.mapUserFromUpdateUserRequest(existingUser, request);
         userRepository.save(existingUser);
     }
-
 
     public void deleteUser(String id) {
         UUID userId;
