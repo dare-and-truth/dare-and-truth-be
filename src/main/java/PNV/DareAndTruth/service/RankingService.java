@@ -26,7 +26,7 @@ public class RankingService {
     public List<UserRankingResponse> getRankingOfChallenge(String challengeId) {
         UUID currentChallengeId = UUID.fromString(challengeId);
 
-        // Lấy thông tin challenge (hashtag, startDate, endDate)
+        // Lấy thông tin challenge
         var challenge = challengeRepository.findByIdAndIsDeletedFalse(currentChallengeId)
                 .orElseThrow(() -> new RuntimeException("Challenge not found"));
 
@@ -56,6 +56,4 @@ public class RankingService {
 
         return rankings;
     }
-
-
 }

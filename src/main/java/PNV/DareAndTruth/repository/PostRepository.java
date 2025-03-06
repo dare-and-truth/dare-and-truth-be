@@ -18,14 +18,19 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
 
     Optional<PostSummaryProjection> findByIdAndIsDeletedFalse(UUID id);
 
+    //At the time Nhat or anyone fix type when save like, I will add this in to query "AND l.feedType = 'post', in second line "
     @Query("SELECT p.user.id, p.user.username, p.user.avatarUrl, COUNT(l.id) " +
-            "FROM Post p LEFT JOIN Like l ON l.feedId = p.id AND l.feedType = 'post' " +
+            "FROM Post p " +
+            "LEFT JOIN Like l ON l.feedId = p.id AND l.feedType = 'post' " +
             "WHERE p.hashtag = :hashtag " +
             "AND CAST(p.createdAt AS DATE) BETWEEN :startDate AND :endDate " +
+            "AND (CAST(l.likedAt AS DATE) BETWEEN :startDate AND :endDate OR l.likedAt IS NULL) " +
             "GROUP BY p.user.id, p.user.username, p.user.avatarUrl " +
             "ORDER BY COUNT(l.id) DESC")
-    List<Object[]> getPostByHashtagAndDate(@Param("hashtag") String hashtag,
-                                           @Param("startDate") LocalDate startDate,
-                                           @Param("endDate") LocalDate endDate);
+    List<Object[]> getPostByHashtagAndDate(
+            @Param("hashtag") String hashtag,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
 
 }

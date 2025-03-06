@@ -9,6 +9,8 @@ import jakarta.validation.constraints.NotNull;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Getter
@@ -18,6 +20,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Table(name = "likes")
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@EntityListeners(AuditingEntityListener.class)
 public class Like extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -29,6 +32,8 @@ public class Like extends BaseEntity {
     @Column(name = "feed_type") // "post" hoặc "challenge"
     String feedType;
 
+
+    @CreatedDate
     LocalDateTime likedAt;
 
     @Override

@@ -36,6 +36,7 @@ public class LikeService {
     public void likeFeed(LikeRequest request, String userEmail) {
         Optional<User> user = userRepository.findByEmail(userEmail);
         UUID feedId;
+        String feedType;
 
         if (user.isEmpty()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST);
@@ -49,15 +50,21 @@ public class LikeService {
             Optional<Challenge> challenge = challengeRepository.findById(UUID.fromString(request.getFeedId()));
             if (challenge.isEmpty()) {
                 throw new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.BAD_REQUEST);
-            } else feedId = challenge.get().getId();
+            } else{
+                feedId = challenge.get().getId();
+                feedType = "challenge";
+            }
         } else {
             Optional<Post> post = postRepository.findById(UUID.fromString(request.getFeedId()));
             if (post.isEmpty()) {
                 throw new AppException(ErrorCode.POST_NOT_FOUND, HttpStatus.BAD_REQUEST);
-            } else feedId = post.get().getId();
+            } else {
+                feedId = post.get().getId();
+                feedType = "post";
+            }
         }
 
-        Like like = Like.builder().user(user.get()).feedId(feedId).build();
+        Like like = Like.builder().user(user.get()).feedId(feedId).feedType(feedType).build();
 
         likeRepository.save(like);
     }

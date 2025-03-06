@@ -1,5 +1,6 @@
 package PNV.DareAndTruth.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 public class ScoreSchedulerService {
     ScoreService scoreService;
 
-    @Scheduled(cron = "0 59 23 * * ?")
+    @Scheduled(cron = "00 02 01 * * ?")
     public void scheduleChallengeScoreCalculation() {
         scoreService.calculateAndSaveChallengeScores();
     }
