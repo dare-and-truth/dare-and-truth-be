@@ -113,13 +113,13 @@ public class UserController {
                                                                 + "\"message\": \"User does not find\""
                                                                 + "}")))
             })
-    @GetMapping({"/{userId}", "/"})
-    public ResponseEntity<AppApiResponse<UserDetailProjection>> getUserById(
-            @PathVariable(required = false) String userId, HttpServletRequest httpServletRequest) {
+    @GetMapping("/{userId}")
+    public ResponseEntity<AppApiResponse<Object>> getUserById(
+            @PathVariable String userId, HttpServletRequest httpServletRequest) {
         String token = jwtService.extractTokenFromHeader(httpServletRequest);
         String userEmail = jwtService.extractEmail(token);
-        UserDetailProjection user = userService.getUserDetailById(userId, userEmail);
-        return ResponseEntity.ok(AppApiResponse.<UserDetailProjection>builder()
+        Object user = userService.getUserDetailById(userId, userEmail);
+        return ResponseEntity.ok(AppApiResponse.<Object>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
                 .message("User retrieved successfully")
@@ -159,9 +159,9 @@ public class UserController {
                                                                 + "\"message\": \"User does not find\""
                                                                 + "}")))
             })
-    @PatchMapping({"/{userId}", "/"})
+    @PatchMapping("/{userId}")
     public ResponseEntity<AppApiResponse<Void>> updateUser(
-            @PathVariable(required = false) String userId,
+            @PathVariable String userId,
             @RequestBody @Valid UpdateUserRequest request,
             HttpServletRequest httpServletRequest) {
         String token = jwtService.extractTokenFromHeader(httpServletRequest);

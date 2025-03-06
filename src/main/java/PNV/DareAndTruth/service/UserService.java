@@ -64,33 +64,43 @@ public class UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 
-    public UserDetailProjection getUserDetailById(String id, String userEmail) {
+    public Object getUserDetailById(String id, String userEmail) {
         UUID userId;
-        if (id != null) {
-            try {
-                userId = UUID.fromString(id);
-            } catch (IllegalArgumentException e) {
-                throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
-            }
-        } else {
-            userId = getUserIdFromEmail(userEmail);
+        try {
+            userId = UUID.fromString(id);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
 
-        return userRepository
-                .findDetailById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+        // Lấy userId từ email token
+        UUID currentUserId = getUserIdFromEmail(userEmail);
+
+        if (userId.equals(currentUserId)) {
+            return userRepository.findDetailById(userId)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+        } else {
+            return userRepository.findBasicDetailById(userId)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+        }
     }
 
     public void updateUser(String userEmail, UpdateUserRequest request, String id) {
         UUID userId;
-        if (id != null) {
-            try {
-                userId = UUID.fromString(id);
-            } catch (IllegalArgumentException e) {
-                throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
-            }
-        } else {
-            userId = getUserIdFromEmail(userEmail);
+        try {
+            userId = UUID.fromString(id);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
+        }
+
+        UUID currentUserId = getUserIdFromEmail(userEmail);
+
+        // Lấy thông tin user đăng nhập để kiểm tra quyền
+        User currentUser = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        // Nếu userId != currentUserId và user không phải admin → Không cho cập nhật
+        if (!userId.equals(currentUserId) && (currentUser.getIsAdmin() == null || !currentUser.getIsAdmin())) {
+            throw new AppException(ErrorCode.PERMISSION_DENIED, HttpStatus.BAD_REQUEST);
         }
 
         User existingUser = getUserById(userId);
@@ -98,6 +108,7 @@ public class UserService {
         userMapper.mapUserFromUpdateUserRequest(existingUser, request);
         userRepository.save(existingUser);
     }
+
 
     public void deleteUser(String id) {
         UUID userId;

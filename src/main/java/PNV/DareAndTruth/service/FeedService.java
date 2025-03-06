@@ -69,18 +69,13 @@ public class FeedService {
                 .toList();
     }
 
-    public List<GetFeedResponse> getFeedByUser(String id, String type, int page, int size, String userEmail) {
+    public List<GetFeedResponse> getFeedByUser(String id, String type, int page, int size) {
         UUID userId;
-        if (id != null) {
             try {
                 userId = UUID.fromString(id);
             } catch (IllegalArgumentException e) {
                 throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
             }
-        } else {
-            userId = getUserIdFromEmail(userEmail);
-        }
-
         Optional<User> exitingUser = userRepository.findByIdAndIsDeletedFalse(userId);
         if (exitingUser.isEmpty()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);

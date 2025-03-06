@@ -29,10 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthService {
     UserRepository userRepository;
-    UserMapper userMapper;
     PasswordEncoder passwordEncoder;
-    AuthenticationManager authenticationManager;
-    UserDetailsService userDetailsService;
     JwtService jwtService;
 
     static final String ACCESS_TOKEN = "access_token";
@@ -66,10 +63,13 @@ public class AuthService {
         userRepository.save(user);
 
         Map<String, Object> response = new HashMap<>();
+        Map<String, Object> userInfo = new HashMap<>();
+        userInfo.put("id", user.getId());
+        userInfo.put("username", user.getUsername());
+        userInfo.put("avatar_url", user.getAvatarUrl());
+        response.put("user", userInfo);
         response.put(ACCESS_TOKEN, accessToken);
         response.put(REFRESH_TOKEN, refreshToken);
-        response.put("user", Map.of("id", user.getId(), "username", user.getUsername()));
-
         return response;
     }
 
@@ -94,8 +94,6 @@ public class AuthService {
         Map<String, Object> response = new HashMap<>();
         response.put(ACCESS_TOKEN, newAccessToken);
         response.put(REFRESH_TOKEN, refreshToken);
-        response.put("user", Map.of("id", user.getId(), "username", user.getUsername()));
-
         return response;
     }
 
