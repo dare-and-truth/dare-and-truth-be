@@ -14,6 +14,7 @@ import java.util.UUID;
 public class NotificationResponse {
     UUID id;
     String type;
+    String content;
     UserDTO sender;
     Boolean isRead;
     LocalDateTime createdAt;

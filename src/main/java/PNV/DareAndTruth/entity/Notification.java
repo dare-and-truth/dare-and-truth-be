@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -16,7 +18,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Table(name = "notifications")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Notification extends BaseEntity{
+public class Notification extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sender_id", nullable = false)
     User sender;
@@ -27,6 +29,9 @@ public class Notification extends BaseEntity{
 
     @Column(name = "type", nullable = false)
     String type;
+
+    @Column(name = "content")
+    String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
@@ -42,6 +47,7 @@ public class Notification extends BaseEntity{
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     Request request;
 
     @Column(name = "is_read", columnDefinition = "boolean default false")

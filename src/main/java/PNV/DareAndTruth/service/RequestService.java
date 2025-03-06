@@ -153,7 +153,9 @@ public class RequestService {
 
         request.setIsAccepted(true);
         request.setAcceptedAt(LocalDateTime.now());
+        request.setNotification(null);
         requestRepository.save(request);
+        notificationRepository.deleteByRequestId(request.getId());
     }
 
     @Transactional

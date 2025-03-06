@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import PNV.DareAndTruth.dto.response.feed.FeedResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -107,5 +108,10 @@ public class FeedService {
                         (Boolean) row[12],
                         (Boolean) row[13]))
                 .toList();
+    }
+
+    public FeedResponse getFeedById(String id, String type, String userEmail) {
+        UUID userId = getUserIdFromEmail(userEmail);
+        return feedRepository.findFeedByIdAndType(UUID.fromString(id), type, userId);
     }
 }

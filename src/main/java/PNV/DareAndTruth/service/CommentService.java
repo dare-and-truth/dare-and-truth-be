@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import PNV.DareAndTruth.dto.response.notification.CommentNotificationResponse;
-import PNV.DareAndTruth.dto.response.notification.FriendRequestNotificationResponse;
 import PNV.DareAndTruth.entity.*;
 import PNV.DareAndTruth.repository.*;
 import org.springframework.http.HttpStatus;
@@ -33,25 +32,37 @@ public class CommentService {
 
     public void createComment(CreateCommentRequest request, String userEmail) {
         Optional<User> user = userRepository.findByEmail(userEmail);
-        UUID feedId;
-        Notification notification;
-        CommentNotificationResponse commentNotificationResponse;
-
         if (user.isEmpty()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
+
+        UUID feedId;
+        Notification notification = null; // Initialize as null
+        CommentNotificationResponse commentNotificationResponse = null; // Initialize as null
+
+        User sender = user.get();
 
         if (request.isChallenge()) {
             Optional<Challenge> challenge = challengeRepository.findById(UUID.fromString(request.getFeedId()));
             if (challenge.isEmpty()) {
                 throw new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.BAD_REQUEST);
-            } else {
-                feedId = challenge.get().getId();
-                notification = Notification.builder().sender(user.get()).receiver(challenge.get().getUser()).challenge(challenge.get()).type("comment-challenge").build();
+            }
+
+            feedId = challenge.get().getId();
+            User receiver = challenge.get().getUser();
+
+            if (sender.getId() != receiver.getId()) {
+                notification = Notification.builder()
+                        .sender(sender)
+                        .receiver(receiver)
+                        .challenge(challenge.get())
+                        .type("comment-challenge")
+                        .content(request.getContent())
+                        .build();
                 commentNotificationResponse = CommentNotificationResponse.builder()
                         .type("comment-challenge")
-                        .senderId(notification.getSender().getId())
-                        .senderName(notification.getSender().getUsername())
+                        .senderId(sender.getId())
+                        .senderName(sender.getUsername())
                         .challengeId(feedId)
                         .hashtag(challenge.get().getHashtag())
                         .commentContent(request.getContent())
@@ -61,30 +72,42 @@ public class CommentService {
             Optional<Post> post = postRepository.findById(UUID.fromString(request.getFeedId()));
             if (post.isEmpty()) {
                 throw new AppException(ErrorCode.POST_NOT_FOUND, HttpStatus.BAD_REQUEST);
-            } else {
-                feedId = post.get().getId();
-                notification = Notification.builder().sender(user.get()).receiver(post.get().getUser()).post(post.get()).type("comment-post").build();
+            }
+
+            feedId = post.get().getId();
+            User receiver = post.get().getUser();
+
+            if (sender.getId() != receiver.getId()) {
+                notification = Notification.builder()
+                        .sender(sender)
+                        .receiver(receiver)
+                        .post(post.get())
+                        .type("comment-post")
+                        .content(request.getContent())
+                        .build();
                 commentNotificationResponse = CommentNotificationResponse.builder()
                         .type("comment-post")
-                        .senderId(notification.getSender().getId())
-                        .senderName(notification.getSender().getUsername())
+                        .senderId(sender.getId())
+                        .senderName(sender.getUsername())
+                        .postId(feedId)
                         .hashtag(post.get().getHashtag())
                         .commentContent(request.getContent())
-                        .postId(feedId)
                         .build();
             }
         }
 
-        notificationRepository.save(notification);
+        // Save notification and send via WebSocket if it exists
+        if (notification != null) {
+            notificationRepository.save(notification);
+            messagingTemplate.convertAndSend(
+                    "/topic/notifications/" + notification.getReceiver().getId(),
+                    commentNotificationResponse
+            );
+        }
 
-        // Gửi thông báo đến người nhận qua WebSocket
-        messagingTemplate.convertAndSend(
-                "/topic/notifications/" + notification.getReceiver().getId(),
-                commentNotificationResponse
-        );
-
-        var comment = Comment.builder()
-                .user(user.get())
+        // Create and save the comment
+        Comment comment = Comment.builder()
+                .user(sender)
                 .feedId(feedId)
                 .content(request.getContent())
                 .mediaUrl(request.getMediaUrl())
