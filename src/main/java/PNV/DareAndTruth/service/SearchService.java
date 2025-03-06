@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import PNV.DareAndTruth.dto.projection.request.FriendDetailProjection;
-import PNV.DareAndTruth.dto.projection.user.UserWithIdAndUsernameProjection;
+import PNV.DareAndTruth.dto.projection.user.UserWithIdAndUsernameAndAvatarProjection;
 import PNV.DareAndTruth.dto.response.feed.GetFeedResponse;
 import PNV.DareAndTruth.dto.response.user.UserWithRequestsResponse;
 import PNV.DareAndTruth.entity.User;
@@ -107,7 +107,7 @@ public class SearchService {
         String normalizedKeyword = removeDiacritics(keyword.toLowerCase()).replaceAll("\\s+", "");
         List<UUID> excludedIds = new ArrayList<>();
 
-        List<UserWithIdAndUsernameProjection> normalizedResults =
+        List<UserWithIdAndUsernameAndAvatarProjection> normalizedResults =
                 userRepository.searchUsersByNormalizedKeyword(normalizedKeyword, currentUserId);
 
         List<UserWithRequestsResponse> results = normalizedResults.stream()
@@ -126,7 +126,7 @@ public class SearchService {
                 .collect(Collectors.toList());
 
         for (String word : words) {
-            List<UserWithIdAndUsernameProjection> wordResults =
+            List<UserWithIdAndUsernameAndAvatarProjection> wordResults =
                     userRepository.searchUsersBySingleWord(word, currentUserId, excludedIds);
 
             List<UserWithRequestsResponse> newResults = wordResults.stream()
@@ -142,7 +142,7 @@ public class SearchService {
     }
 
     private UserWithRequestsResponse createUserWithRequestsResponse(
-            UserWithIdAndUsernameProjection user, UUID currentUserId) {
+            UserWithIdAndUsernameAndAvatarProjection user, UUID currentUserId) {
         List<FriendDetailProjection> requests = userRepository.findRequestsByUserId(currentUserId);
 
         List<FriendDetailProjection> userRequests = requests.stream()
