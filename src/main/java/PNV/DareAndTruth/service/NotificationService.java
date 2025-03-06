@@ -1,21 +1,23 @@
 package PNV.DareAndTruth.service;
 
+import java.util.UUID;
+
+import jakarta.transaction.Transactional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
 import PNV.DareAndTruth.dto.response.notification.NotificationResponse;
 import PNV.DareAndTruth.entity.Notification;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
 import PNV.DareAndTruth.mapper.NotificationMapper;
 import PNV.DareAndTruth.repository.NotificationRepository;
-import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +27,8 @@ public class NotificationService {
     NotificationMapper notificationMapper;
 
     public Page<NotificationResponse> getNotificationsForUser(String receiverId, Pageable pageable) {
-        Page<Notification> notifications = notificationRepository.findByReceiverId(UUID.fromString(receiverId), pageable);
+        Page<Notification> notifications =
+                notificationRepository.findByReceiverId(UUID.fromString(receiverId), pageable);
 
         return notifications.map(notification -> {
             NotificationResponse dto = notificationMapper.toNotificationResponse(notification);
@@ -53,7 +56,8 @@ public class NotificationService {
     // Đánh dấu thông báo là đã đọc
     @Transactional
     public void markNotificationAsRead(String notificationId) {
-        Notification notification = notificationRepository.findById(UUID.fromString(notificationId))
+        Notification notification = notificationRepository
+                .findById(UUID.fromString(notificationId))
                 .orElseThrow(() -> new AppException(ErrorCode.NOTIFICATION_NOT_FOUND, HttpStatus.BAD_REQUEST));
         notification.setIsRead(true);
     }

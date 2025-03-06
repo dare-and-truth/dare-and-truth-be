@@ -1,10 +1,11 @@
 package PNV.DareAndTruth.mapper;
 
-import PNV.DareAndTruth.dto.response.notification.NotificationResponse;
-import PNV.DareAndTruth.entity.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
+
+import PNV.DareAndTruth.dto.response.notification.NotificationResponse;
+import PNV.DareAndTruth.entity.*;
 
 @Mapper(componentModel = "spring")
 public interface NotificationMapper {

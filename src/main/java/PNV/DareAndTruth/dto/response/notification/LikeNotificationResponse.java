@@ -1,13 +1,13 @@
 package PNV.DareAndTruth.dto.response.notification;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Getter
 @Setter

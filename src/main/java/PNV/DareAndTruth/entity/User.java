@@ -23,7 +23,6 @@ public class User extends BaseEntityAudit {
     @Column(name = "username")
     String username;
 
-
     @Column(name = "email", unique = true, nullable = false)
     String email;
 

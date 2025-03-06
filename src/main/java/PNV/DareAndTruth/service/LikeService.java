@@ -3,10 +3,6 @@ package PNV.DareAndTruth.service;
 import java.util.Optional;
 import java.util.UUID;
 
-import PNV.DareAndTruth.dto.response.notification.CommentNotificationResponse;
-import PNV.DareAndTruth.dto.response.notification.LikeNotificationResponse;
-import PNV.DareAndTruth.entity.*;
-import PNV.DareAndTruth.repository.*;
 import jakarta.transaction.Transactional;
 
 import org.springframework.http.HttpStatus;
@@ -15,8 +11,11 @@ import org.springframework.stereotype.Service;
 
 import PNV.DareAndTruth.dto.request.like.LikeRequest;
 import PNV.DareAndTruth.dto.request.like.UnlikeRequest;
+import PNV.DareAndTruth.dto.response.notification.LikeNotificationResponse;
+import PNV.DareAndTruth.entity.*;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
+import PNV.DareAndTruth.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -68,7 +67,7 @@ public class LikeService {
                         .type("like-challenge")
                         .senderId(sender.getId())
                         .senderName(sender.getUsername())
-                        .challengeId(feedId)  // Correct field name
+                        .challengeId(feedId) // Correct field name
                         .hashtag(challenge.get().getHashtag())
                         .build();
             }
@@ -92,26 +91,21 @@ public class LikeService {
                         .type("like-post")
                         .senderId(sender.getId())
                         .senderName(sender.getUsername())
-                        .postId(feedId)  // Correct field name (was challengeId)
+                        .postId(feedId) // Correct field name (was challengeId)
                         .hashtag(post.get().getHashtag())
                         .build();
             }
         }
 
         // Save like regardless of notification
-        Like like = Like.builder()
-                .user(sender)
-                .feedId(feedId)
-                .build();
+        Like like = Like.builder().user(sender).feedId(feedId).build();
         likeRepository.save(like);
 
         // Save and send notification if it exists
         if (notification != null) {
             notificationRepository.save(notification);
             messagingTemplate.convertAndSend(
-                    "/topic/notifications/" + notification.getReceiver().getId(),
-                    likeNotificationResponse
-            );
+                    "/topic/notifications/" + notification.getReceiver().getId(), likeNotificationResponse);
         }
     }
 

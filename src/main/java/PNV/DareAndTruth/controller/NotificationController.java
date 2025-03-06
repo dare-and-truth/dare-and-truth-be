@@ -1,7 +1,5 @@
 package PNV.DareAndTruth.controller;
 
-import PNV.DareAndTruth.dto.response.notification.NotificationResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -12,15 +10,14 @@ import org.springframework.web.bind.annotation.*;
 
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
+import PNV.DareAndTruth.dto.response.notification.NotificationResponse;
 import PNV.DareAndTruth.service.JwtService;
 import PNV.DareAndTruth.service.NotificationService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -35,120 +32,110 @@ public class NotificationController {
     NotificationService notificationService;
     JwtService jwtService;
 
-    @Operation(summary = "Get user notifications", description = "Retrieve paginated notifications for the current user")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Notifications retrieved successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            value = "{\"code\": 1000, \"status\": \"success\", \"message\": \"Retrieved notifications successfully\"}"
-                                    )
-                            }
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Failed to retrieve notifications",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            value = "{\"code\": 1042, \"status\": \"fail\", \"message\": \"Unable to retrieve notifications\"}"
-                                    )
-                            }
-                    )
-            )
-    })
+    @Operation(
+            summary = "Get user notifications",
+            description = "Retrieve paginated notifications for the current user")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Notifications retrieved successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
+                                            @ExampleObject(
+                                                    value =
+                                                            "{\"code\": 1000, \"status\": \"success\", \"message\": \"Retrieved notifications successfully\"}")
+                                        })),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Failed to retrieve notifications",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
+                                            @ExampleObject(
+                                                    value =
+                                                            "{\"code\": 1042, \"status\": \"fail\", \"message\": \"Unable to retrieve notifications\"}")
+                                        }))
+            })
     @GetMapping("/user/{receiverId}")
     public ResponseEntity<AppApiResponse<Page<NotificationResponse>>> getUserNotifications(
-            @PathVariable String receiverId,
-            @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
-    ) {
+            @PathVariable String receiverId, @PageableDefault(size = 20, sort = "createdAt") Pageable pageable) {
         Page<NotificationResponse> notifications = notificationService.getNotificationsForUser(receiverId, pageable);
 
-        return ResponseEntity.ok(
-                AppApiResponse.<Page<NotificationResponse>>builder()
-                        .code(1000)
-                        .status(ApiStatus.SUCCESS)
-                        .message("Retrieved notifications successfully")
-                        .data(notifications)
-                        .build()
-        );
+        return ResponseEntity.ok(AppApiResponse.<Page<NotificationResponse>>builder()
+                .code(1000)
+                .status(ApiStatus.SUCCESS)
+                .message("Retrieved notifications successfully")
+                .data(notifications)
+                .build());
     }
 
-    @Operation(summary = "Get unread notifications count", description = "Retrieve count of unread notifications for the current user")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Unread notifications count retrieved successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            value = "{\"code\": 1000, \"status\": \"success\", \"message\": \"Retrieved unread notifications count successfully\"}"
-                                    )
-                            }
-                    )
-            )
-    })
+    @Operation(
+            summary = "Get unread notifications count",
+            description = "Retrieve count of unread notifications for the current user")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Unread notifications count retrieved successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
+                                            @ExampleObject(
+                                                    value =
+                                                            "{\"code\": 1000, \"status\": \"success\", \"message\": \"Retrieved unread notifications count successfully\"}")
+                                        }))
+            })
     @GetMapping("/user/{receiverId}/unread-count")
-    public ResponseEntity<AppApiResponse<Long>> getUnreadNotificationsCount(
-            @PathVariable String receiverId
-    ) {
+    public ResponseEntity<AppApiResponse<Long>> getUnreadNotificationsCount(@PathVariable String receiverId) {
         Long unreadCount = notificationService.countUnreadNotifications(receiverId);
 
-        return ResponseEntity.ok(
-                AppApiResponse.<Long>builder()
-                        .code(1000)
-                        .status(ApiStatus.SUCCESS)
-                        .message("Retrieved unread notifications count successfully")
-                        .data(unreadCount)
-                        .build()
-        );
+        return ResponseEntity.ok(AppApiResponse.<Long>builder()
+                .code(1000)
+                .status(ApiStatus.SUCCESS)
+                .message("Retrieved unread notifications count successfully")
+                .data(unreadCount)
+                .build());
     }
 
     @Operation(summary = "Mark notification as read", description = "Mark a specific notification as read")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Notification marked as read successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            value = "{\"code\": 1000, \"status\": \"success\", \"message\": \"Marked notification as read\"}"
-                                    )
-                            }
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Failed to mark notification as read",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = {
-                                    @ExampleObject(
-                                            value = "{\"code\": 1042, \"status\": \"fail\", \"message\": \"Notification not found\"}"
-                                    )
-                            }
-                    )
-            )
-    })
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Notification marked as read successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
+                                            @ExampleObject(
+                                                    value =
+                                                            "{\"code\": 1000, \"status\": \"success\", \"message\": \"Marked notification as read\"}")
+                                        })),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Failed to mark notification as read",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
+                                            @ExampleObject(
+                                                    value =
+                                                            "{\"code\": 1042, \"status\": \"fail\", \"message\": \"Notification not found\"}")
+                                        }))
+            })
     @PutMapping("/{notificationId}/read")
-    public ResponseEntity<AppApiResponse<Void>> markNotificationAsRead(
-            @PathVariable String notificationId
-    ) {
+    public ResponseEntity<AppApiResponse<Void>> markNotificationAsRead(@PathVariable String notificationId) {
         notificationService.markNotificationAsRead(notificationId);
 
-        return ResponseEntity.ok(
-                AppApiResponse.<Void>builder()
-                        .code(1000)
-                        .status(ApiStatus.SUCCESS)
-                        .message("Marked notification as read")
-                        .build()
-        );
+        return ResponseEntity.ok(AppApiResponse.<Void>builder()
+                .code(1000)
+                .status(ApiStatus.SUCCESS)
+                .message("Marked notification as read")
+                .build());
     }
 }

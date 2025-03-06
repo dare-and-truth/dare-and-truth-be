@@ -1,10 +1,10 @@
 package PNV.DareAndTruth.dto.response.notification;
 
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -26,18 +26,21 @@ public class NotificationResponse {
         UUID id;
         String username;
     }
+
     @Getter
     @Setter
     public static class PostDTO {
         UUID id;
         String hashtag;
     }
+
     @Getter
     @Setter
     public static class ChallengeDTO {
         UUID id;
         String hashtag;
     }
+
     @Getter
     @Setter
     public static class ReminderDTO {

@@ -4,9 +4,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import PNV.DareAndTruth.dto.response.notification.FriendRequestNotificationResponse;
-import PNV.DareAndTruth.entity.Notification;
-import PNV.DareAndTruth.repository.NotificationRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -14,10 +11,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import PNV.DareAndTruth.dto.projection.request.FriendDetailProjection;
 import PNV.DareAndTruth.dto.request.request.CreateRequestRequest;
+import PNV.DareAndTruth.dto.response.notification.FriendRequestNotificationResponse;
+import PNV.DareAndTruth.entity.Notification;
 import PNV.DareAndTruth.entity.Request;
 import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
+import PNV.DareAndTruth.repository.NotificationRepository;
 import PNV.DareAndTruth.repository.RequestRepository;
 import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
@@ -96,21 +96,24 @@ public class RequestService {
                 .build();
         var data = requestRepository.save(newRequest);
 
-        Notification notification = Notification.builder().sender(follower).receiver(user).type("friend-request").request(data).build();
+        Notification notification = Notification.builder()
+                .sender(follower)
+                .receiver(user)
+                .type("friend-request")
+                .request(data)
+                .build();
 
         notificationRepository.save(notification);
 
-        FriendRequestNotificationResponse friendRequestNotificationResponse = FriendRequestNotificationResponse.builder()
-                .type("friend-request")
-                .senderId(followerId)
-                .senderName(follower.getUsername())
-                .requestId(data.getId())
-                .build();
+        FriendRequestNotificationResponse friendRequestNotificationResponse =
+                FriendRequestNotificationResponse.builder()
+                        .type("friend-request")
+                        .senderId(followerId)
+                        .senderName(follower.getUsername())
+                        .requestId(data.getId())
+                        .build();
         // Gửi thông báo đến người nhận qua WebSocket
-        messagingTemplate.convertAndSend(
-                "/topic/notifications/" + userId,
-                friendRequestNotificationResponse
-        );
+        messagingTemplate.convertAndSend("/topic/notifications/" + userId, friendRequestNotificationResponse);
     }
 
     @Transactional(readOnly = true)

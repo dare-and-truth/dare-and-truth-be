@@ -53,7 +53,12 @@ public class SecurityConfiguration {
                 }))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz.requestMatchers(
-                                "/auth/sign-up", "/auth/sign-in", "/auth/refresh-token", "/swagger-ui/**", "v3/**", "/ws/**")
+                                "/auth/sign-up",
+                                "/auth/sign-in",
+                                "/auth/refresh-token",
+                                "/swagger-ui/**",
+                                "v3/**",
+                                "/ws/**")
                         .permitAll()
                         .requestMatchers("/admin/**", "/users")
                         .hasRole("ADMIN")

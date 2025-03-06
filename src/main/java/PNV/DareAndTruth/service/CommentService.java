@@ -4,17 +4,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import PNV.DareAndTruth.dto.response.notification.CommentNotificationResponse;
-import PNV.DareAndTruth.entity.*;
-import PNV.DareAndTruth.repository.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import PNV.DareAndTruth.dto.projection.comment.CommentSummaryProjection;
 import PNV.DareAndTruth.dto.request.comment.CreateCommentRequest;
+import PNV.DareAndTruth.dto.response.notification.CommentNotificationResponse;
+import PNV.DareAndTruth.entity.*;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
+import PNV.DareAndTruth.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -100,9 +100,7 @@ public class CommentService {
         if (notification != null) {
             notificationRepository.save(notification);
             messagingTemplate.convertAndSend(
-                    "/topic/notifications/" + notification.getReceiver().getId(),
-                    commentNotificationResponse
-            );
+                    "/topic/notifications/" + notification.getReceiver().getId(), commentNotificationResponse);
         }
 
         // Create and save the comment

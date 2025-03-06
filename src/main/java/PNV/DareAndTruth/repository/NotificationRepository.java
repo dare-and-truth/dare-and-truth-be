@@ -1,13 +1,15 @@
 package PNV.DareAndTruth.repository;
 
-import PNV.DareAndTruth.entity.Notification;
+import java.util.UUID;
+
 import jakarta.transaction.Transactional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 
-import java.util.UUID;
+import PNV.DareAndTruth.entity.Notification;
 
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
     Page<Notification> findByReceiverId(UUID receiverId, Pageable pageable);

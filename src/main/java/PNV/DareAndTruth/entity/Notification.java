@@ -1,14 +1,16 @@
 package PNV.DareAndTruth.entity;
 
+import java.time.LocalDateTime;
+import java.util.Objects;
+
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Entity
 @Getter
@@ -77,5 +79,4 @@ public class Notification extends BaseEntity {
     public int hashCode() {
         return Objects.hash(super.hashCode(), sender, receiver, type, post, reminder, isRead, challenge);
     }
-
 }
