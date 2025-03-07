@@ -36,7 +36,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 || path.equals("/auth/sign-in")
                 || path.equals("/auth/refresh-token")
                 || path.startsWith("/swagger-ui/")
-                || path.startsWith("/v3/");
+                || path.startsWith("/v3/")
+                || path.startsWith("/ws/");
     }
 
     @Override
@@ -46,7 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().write("Authorization header is missing or invalid!");
             return;
         }
@@ -54,7 +55,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String token = authHeader.substring(7);
 
         if (JwtService.isTokenInvalid(token)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.getWriter().write("Token has been disabled. Please log in again!");
             return;
         }
@@ -64,12 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             email = jwtService.extractEmail(token);
         } catch (AppException e) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
-            response.getWriter().write("Token is invalid or expired!");
-            return;
-        }
-
-        if (jwtService.isRefreshToken(token)) {
-            chain.doFilter(request, response);
+            response.getWriter().write("Token is expired!");
             return;
         }
 

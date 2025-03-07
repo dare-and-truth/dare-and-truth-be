@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
+import PNV.DareAndTruth.dto.response.feed.FeedResponse;
 import PNV.DareAndTruth.dto.response.feed.GetFeedResponse;
 import PNV.DareAndTruth.service.FeedService;
 import PNV.DareAndTruth.service.JwtService;
@@ -150,6 +151,105 @@ public class FeedController {
                         .status(ApiStatus.SUCCESS)
                         .data(feed)
                         .message("Feed retrieved successfully")
+                        .build());
+    }
+
+    @Operation(summary = "Get post by ID", description = "Retrieve a single post by its ID")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Post retrieved successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+													{
+														"code": 1000,
+														"status": "success",
+														"message": "Post retrieved successfully",
+														"data": {
+															"id": "12345",
+															"hashtag": "TechTalk",
+															"type":"post",
+															"content": "Join us for an amazing tech talk session!",
+															"mediaUrl": "https://example.com/media.png",
+															"createdAt": "2025-02-22T12:31:41.338293",
+															"userId": "67890",
+															"username": "Admin",
+															"likeCount": 10,
+															"commentCount": 5,
+															"liked": true
+														}
+													}
+													""")))
+            })
+    @GetMapping("/post/{id}")
+    public ResponseEntity<AppApiResponse<FeedResponse>> getPostById(
+            @PathVariable String id, HttpServletRequest httpServletRequest) {
+        String token = jwtService.extractTokenFromHeader(httpServletRequest);
+        String email = jwtService.extractEmail(token);
+
+        FeedResponse post = feedService.getFeedById(id, "post", email);
+        return ResponseEntity.status(200)
+                .body(AppApiResponse.<FeedResponse>builder()
+                        .code(1000)
+                        .status(ApiStatus.SUCCESS)
+                        .data(post)
+                        .message("Post retrieved successfully")
+                        .build());
+    }
+
+    @Operation(summary = "Get challenge by ID", description = "Retrieve a single challenge by its ID")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Challenge retrieved successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+													{
+														"code": 1000,
+														"status": "success",
+														"message": "Challenge retrieved successfully",
+														"data": {
+															"id": "54321",
+															"hashtag": "LearningChallenge",
+															"type":"challenge",
+															"content": "Learn new technologies to grow up yourself !!!",
+															"mediaUrl": "https://example.com/challenge.png",
+															"startDate": "2025-02-22",
+															"endDate": "2025-02-28",
+															"createdAt": "2025-02-22T12:31:41.338293",
+															"userId": "98765",
+															"username": "Admin",
+															"likeCount": 0,
+															"commentCount": 1,
+															"liked": false
+														}
+													}
+													""")))
+            })
+    @GetMapping("/challenge/{id}")
+    public ResponseEntity<AppApiResponse<FeedResponse>> getChallengeById(
+            @PathVariable String id, HttpServletRequest httpServletRequest) {
+        String token = jwtService.extractTokenFromHeader(httpServletRequest);
+        String email = jwtService.extractEmail(token);
+        FeedResponse challenge = feedService.getFeedById(id, "challenge", email);
+        return ResponseEntity.status(200)
+                .body(AppApiResponse.<FeedResponse>builder()
+                        .code(1000)
+                        .status(ApiStatus.SUCCESS)
+                        .data(challenge)
+                        .message("Challenge retrieved successfully")
                         .build());
     }
 }

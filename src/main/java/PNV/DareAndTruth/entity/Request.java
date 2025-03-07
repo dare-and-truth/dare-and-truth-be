@@ -37,6 +37,9 @@ public class Request extends BaseEntity {
     @Column(name = "accepted_at")
     LocalDateTime acceptedAt;
 
+    @OneToOne(mappedBy = "request", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    Notification notification;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import PNV.DareAndTruth.dto.projection.user.UserWithIdProjection;
+import PNV.DareAndTruth.dto.response.feed.FeedResponse;
 import PNV.DareAndTruth.dto.response.feed.GetFeedResponse;
 import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.exception.AppException;
@@ -102,5 +103,10 @@ public class FeedService {
                         (Boolean) row[12],
                         (Boolean) row[13]))
                 .toList();
+    }
+
+    public FeedResponse getFeedById(String id, String type, String userEmail) {
+        UUID userId = getUserIdFromEmail(userEmail);
+        return feedRepository.findFeedByIdAndType(UUID.fromString(id), type, userId);
     }
 }

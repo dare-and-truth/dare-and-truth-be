@@ -68,6 +68,12 @@ public class User extends BaseEntityAudit {
     @ToString.Exclude
     private Set<Request> sentRequests; // Requests sent
 
+    @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY)
+    private Set<Notification> myNotifications;
+
+    @OneToMany(mappedBy = "sender", fetch = FetchType.LAZY)
+    private Set<Notification> mySendingNotifications;
+
     // implement equals and hashCode
     @Override
     public boolean equals(Object o) {
