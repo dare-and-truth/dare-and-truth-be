@@ -38,9 +38,24 @@ public class ScoreService {
     RankingService rankingService;
 
     public ScoreSummaryProjection calculateTotalScoreForUser(UUID userId) {
-        return scoreRepository
-                .findTotalScoreByUserId(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.USER_SCORES_NOT_FOUND, HttpStatus.NOT_FOUND));
+        return scoreRepository.findTotalScoreByUserId(userId)
+                .orElseGet(() -> {
+                    if (!userRepository.existsByIdAndIsDeletedFalse(userId)) {
+                        throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+                    }
+                    return new ScoreSummaryProjection() {
+                        @Override
+                        public UUID getUserId() {
+                            return null;
+                        }
+
+                        @Override
+                        public int getTotalScore() {
+                            return 0;
+                        }
+                    };
+                }
+        );
     }
 
     @Transactional
@@ -95,19 +110,17 @@ public class ScoreService {
                     };
 
             userRepository.findById(ranking.getUserId()).ifPresent(user -> {
-                boolean scoreExists = scoreRepository.existsByUserAndChallengeAndScoreType(user, challenge, 1);
-                if (!scoreExists) {
-                    try {
-                        scoreRepository.save(Score.builder()
-                                .user(user)
-                                .scoreReceived(score)
-                                .scoreType(1)
-                                .challenge(challenge)
-                                .createdAt(LocalDateTime.now())
-                                .build());
-                    } catch (Exception ignored) {
-                    }
+                if (scoreRepository.existsByUserAndChallengeAndScoreType(user, challenge, 1)) {
+                    throw new AppException(ErrorCode.SCORE_ALREADY_EXISTS, HttpStatus.CONFLICT);
                 }
+
+                scoreRepository.save(Score.builder()
+                        .user(user)
+                        .scoreReceived(score)
+                        .scoreType(1)
+                        .challenge(challenge)
+                        .createdAt(LocalDateTime.now())
+                        .build());
             });
         }
     }

@@ -30,7 +30,7 @@ public class Like extends BaseEntity {
     @NotNull
     UUID feedId;
 
-    @Column(name = "feed_type") // "post" hoặc "challenge"
+    @Column(name = "feed_type") // "post" or "challenge"
     String feedType;
 
     @CreatedDate
