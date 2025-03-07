@@ -20,7 +20,7 @@ public class Post extends BaseEntityAudit {
     @Column(name = "hashtag", nullable = false)
     String hashtag;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", nullable = false, columnDefinition = "TEXT")
     String content;
 
     @Column(name = "media_url", nullable = false)
