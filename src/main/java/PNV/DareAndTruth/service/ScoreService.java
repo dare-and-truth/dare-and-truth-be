@@ -5,12 +5,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import PNV.DareAndTruth.dto.response.ranking.UserRankingResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import PNV.DareAndTruth.dto.projection.score.ScoreSummaryProjection;
+import PNV.DareAndTruth.dto.response.ranking.UserRankingResponse;
 import PNV.DareAndTruth.entity.Challenge;
 import PNV.DareAndTruth.entity.Score;
 import PNV.DareAndTruth.exception.AppException;
@@ -57,8 +57,8 @@ public class ScoreService {
         LocalDate startDate = challenge.getStartDate();
         LocalDate endDate = challenge.getEndDate();
 
-        int participantCount = reminderRepository.countParticipantsByHashtagAndDateRange(
-                challenge.getHashtag(), startDate, endDate);
+        int participantCount =
+                reminderRepository.countParticipantsByHashtagAndDateRange(challenge.getHashtag(), startDate, endDate);
 
         boolean exists = scoreRepository.existsByUserAndChallengeAndScoreType(challenge.getUser(), challenge, 4);
         if (!exists && participantCount > 0) {
@@ -74,7 +74,6 @@ public class ScoreService {
         }
     }
 
-
     private int calculateChallengeScore(int participants) {
         if (participants >= 10000) return 100;
         if (participants >= 100) return 50;
@@ -83,15 +82,17 @@ public class ScoreService {
     }
 
     private void processRankingScores(Challenge challenge) {
-        List<UserRankingResponse> rankings = rankingService.getRankingOfChallenge(challenge.getId().toString());
+        List<UserRankingResponse> rankings =
+                rankingService.getRankingOfChallenge(challenge.getId().toString());
 
         for (UserRankingResponse ranking : rankings) {
-            int score = switch (ranking.getRank()) {
-                case 1 -> 100;
-                case 2 -> 70;
-                case 3 -> 50;
-                default -> 30;
-            };
+            int score =
+                    switch (ranking.getRank()) {
+                        case 1 -> 100;
+                        case 2 -> 70;
+                        case 3 -> 50;
+                        default -> 30;
+                    };
 
             userRepository.findById(ranking.getUserId()).ifPresent(user -> {
                 boolean scoreExists = scoreRepository.existsByUserAndChallengeAndScoreType(user, challenge, 1);

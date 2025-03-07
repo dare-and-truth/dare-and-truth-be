@@ -50,7 +50,7 @@ public class LikeService {
             Optional<Challenge> challenge = challengeRepository.findById(UUID.fromString(request.getFeedId()));
             if (challenge.isEmpty()) {
                 throw new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.BAD_REQUEST);
-            } else{
+            } else {
                 feedId = challenge.get().getId();
                 feedType = "challenge";
             }
@@ -64,7 +64,11 @@ public class LikeService {
             }
         }
 
-        Like like = Like.builder().user(user.get()).feedId(feedId).feedType(feedType).build();
+        Like like = Like.builder()
+                .user(user.get())
+                .feedId(feedId)
+                .feedType(feedType)
+                .build();
 
         likeRepository.save(like);
     }

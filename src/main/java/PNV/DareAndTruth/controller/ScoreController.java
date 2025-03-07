@@ -66,6 +66,4 @@ public class ScoreController {
                 .data(scoreSummary)
                 .build());
     }
-
-
 }
