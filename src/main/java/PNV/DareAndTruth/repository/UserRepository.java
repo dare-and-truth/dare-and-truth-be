@@ -62,9 +62,9 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     Optional<UserWithIdAndUsernameAndAvatarProjection> findBasicDetailById(UUID userId);
 
-    @Query("SELECT u.id, u.username, u.avatarUrl, COALESCE(SUM(s.score), 0) "
+    @Query("SELECT u.id, u.username, u.avatarUrl, COALESCE(SUM(s.scoreReceived), 0) "
             + "FROM User u LEFT JOIN Score s ON u.id = s.user.id "
             + "GROUP BY u.id, u.username, u.avatarUrl "
-            + "ORDER BY SUM(s.score) DESC")
+            + "ORDER BY SUM(s.scoreReceived) DESC")
     List<Object[]> getAllUsersWithScores();
 }
