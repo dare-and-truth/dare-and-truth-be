@@ -46,7 +46,7 @@ public class ScoreService {
                     return new ScoreSummaryProjection() {
                         @Override
                         public UUID getUserId() {
-                            return null;
+                            return userId;
                         }
 
                         @Override
