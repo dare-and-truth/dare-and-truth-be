@@ -13,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 public class ScoreSchedulerService {
     ScoreService scoreService;
 
-    @Scheduled(cron = "0 59 23 * * ?")
+    @Scheduled(cron = "00 59 23 * * ?")
     public void scheduleChallengeScoreCalculation() {
         scoreService.calculateAndSaveChallengeScores();
     }

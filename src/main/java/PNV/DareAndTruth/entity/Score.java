@@ -10,9 +10,6 @@ import org.springframework.data.annotation.CreatedDate;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-/**
- * Represents a score record for a user, associated with activities like challenges, posts, or other actions.
- */
 @Entity
 @Getter
 @Setter
@@ -24,17 +21,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Score extends BaseEntity {
 
-    /**
-     * The user associated with this score.
-     */
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @ToString.Exclude
     User user;
 
-    /**
-     * The points received by the user for an action or activity.
-     */
     @Column(name = "score_received", nullable = false)
     int scoreReceived;
 
@@ -45,16 +36,10 @@ public class Score extends BaseEntity {
     @Column(name = "score_type", nullable = false)
     int scoreType;
 
-    /**
-     * The timestamp when the score was created.
-     */
     @Column(name = "created_at", nullable = false)
     @CreatedDate
     LocalDateTime createdAt;
 
-    /**
-     * The challenge associated with this score, if applicable (e.g., for challenge completion).
-     */
     @ManyToOne
     @JoinColumn(name = "challenge_id")
     @ToString.Exclude

@@ -33,11 +33,13 @@ public class LikeService {
 
     public void likeFeed(LikeRequest request, String userEmail) {
         Optional<User> user = userRepository.findByEmail(userEmail);
+        UUID feedId;
+        String feedType;
+
         if (user.isEmpty()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
 
-        UUID feedId;
         Notification notification = null; // Initialize as null
         LikeNotificationResponse likeNotificationResponse = null; // Initialize as null
         User sender = user.get();
@@ -51,9 +53,11 @@ public class LikeService {
             Optional<Challenge> challenge = challengeRepository.findById(UUID.fromString(request.getFeedId()));
             if (challenge.isEmpty()) {
                 throw new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.BAD_REQUEST);
+            } else {
+                feedId = challenge.get().getId();
+                feedType = "challenge";
             }
 
-            feedId = challenge.get().getId();
             User receiver = challenge.get().getUser();
 
             if (sender.getId() != receiver.getId()) { // Only create notification if sender != receiver
@@ -75,30 +79,32 @@ public class LikeService {
             Optional<Post> post = postRepository.findById(UUID.fromString(request.getFeedId()));
             if (post.isEmpty()) {
                 throw new AppException(ErrorCode.POST_NOT_FOUND, HttpStatus.BAD_REQUEST);
-            }
-
-            feedId = post.get().getId();
-            User receiver = post.get().getUser();
-
-            if (sender.getId() != receiver.getId()) { // Only create notification if sender != receiver
-                notification = Notification.builder()
-                        .sender(sender)
-                        .receiver(receiver)
-                        .post(post.get())
-                        .type("like-post")
-                        .build();
-                likeNotificationResponse = LikeNotificationResponse.builder()
-                        .type("like-post")
-                        .senderId(sender.getId())
-                        .senderName(sender.getUsername())
-                        .postId(feedId) // Correct field name (was challengeId)
-                        .hashtag(post.get().getHashtag())
-                        .build();
+            } else {
+                feedId = post.get().getId();
+                feedType = "post";
+                User receiver = post.get().getUser();
+                if (sender.getId() != receiver.getId()) { // Only create notification if sender != receiver
+                    notification = Notification.builder()
+                            .sender(sender)
+                            .receiver(receiver)
+                            .post(post.get())
+                            .type("like-post")
+                            .build();
+                    likeNotificationResponse = LikeNotificationResponse.builder()
+                            .type("like-post")
+                            .senderId(sender.getId())
+                            .senderName(sender.getUsername())
+                            .postId(feedId) // Correct field name (was challengeId)
+                            .hashtag(post.get().getHashtag())
+                            .build();
+                }
             }
         }
 
+        Like like =
+                Like.builder().feedId(feedId).feedType(feedType).user(sender).build();
+
         // Save like regardless of notification
-        Like like = Like.builder().user(sender).feedId(feedId).build();
         likeRepository.save(like);
 
         // Save and send notification if it exists
