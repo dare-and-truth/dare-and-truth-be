@@ -64,13 +64,14 @@ public class RankingService {
                         (UUID) row[0], // userId
                         (String) row[1], // username
                         (String) row[2], // avatarUrl
-                        row[3] != null ? ((Number) row[3]).intValue() : 0,
-                        0 // rank
+                        row[3] != null ? ((Number) row[3]).intValue() : 0, // totalScore
+                        0 // rank (sẽ set sau)
                         ))
                 .sorted(Comparator.comparingInt(UserRankingWithScoreResponse::getTotalScore)
                         .reversed())
                 .collect(Collectors.toList());
 
+        // Gán rank
         for (int i = 0; i < rankings.size(); i++) {
             rankings.get(i).setRank(i + 1);
         }

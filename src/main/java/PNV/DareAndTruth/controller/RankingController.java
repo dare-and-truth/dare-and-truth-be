@@ -34,7 +34,7 @@ public class RankingController {
             value = {
                 @ApiResponse(
                         responseCode = "200",
-                        description = "Users retrieved successfully",
+                        description = "Challenge ranking retrieved successfully",
                         content =
                                 @Content(
                                         mediaType = "application/json",
@@ -70,7 +70,7 @@ public class RankingController {
                 .build());
     }
 
-    @Operation(summary = "Get ranking of challenge", description = "Retrieve a list of users in ranking of challenge")
+    @Operation(summary = "Get ranking of server", description = "Retrieve a list of users in ranking of server")
     @ApiResponses(
             value = {
                 @ApiResponse(
