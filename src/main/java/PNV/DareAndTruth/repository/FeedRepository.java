@@ -18,7 +18,7 @@ public interface FeedRepository extends JpaRepository<Post, UUID> {
                     """
 					SELECT f.id, f.type, f.hashtag, f.content, f.media_url,
 						f.start_date, f.end_date, f.created_at,
-						f.user_id, u.username,
+						f.user_id, u.username, u.avatar_url,
 						COALESCE(l.like_count, 0) AS like_count,
 						COALESCE(c.comment_count, 0) AS comment_count,
 						CASE WHEN ul.user_id IS NOT NULL THEN TRUE ELSE FALSE END AS is_like,
@@ -61,7 +61,7 @@ public interface FeedRepository extends JpaRepository<Post, UUID> {
                     """
 					SELECT f.id, f.type, f.hashtag, f.content, f.media_url,
 						f.start_date, f.end_date, f.created_at,
-						f.user_id, u.username,
+						f.user_id, u.username, u.avatar_url,
 						COALESCE(l.like_count, 0) AS like_count,
 						COALESCE(c.comment_count, 0) AS comment_count,
 						CASE WHEN ul.user_id IS NOT NULL THEN TRUE ELSE FALSE END AS is_like,
@@ -109,7 +109,7 @@ public interface FeedRepository extends JpaRepository<Post, UUID> {
                     """
 		SELECT f.id, f.type, f.hashtag, f.content, f.media_url,
 			f.start_date, f.end_date, f.created_at,
-			f.user_id, u.username,
+			f.user_id, u.username, u.avatar_url,
 			COALESCE(l.like_count, 0) AS like_count,
 			COALESCE(c.comment_count, 0) AS comment_count,
 			CASE WHEN ul.user_id IS NOT NULL THEN TRUE ELSE FALSE END AS liked,

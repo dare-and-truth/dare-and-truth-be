@@ -25,6 +25,8 @@ public interface FeedResponse {
 
     String getUsername();
 
+    String getAvatarUrl();
+
     int getLikeCount();
 
     int getCommentCount();
@@ -32,4 +34,5 @@ public interface FeedResponse {
     boolean getLiked();
 
     boolean getJoined();
+
 }

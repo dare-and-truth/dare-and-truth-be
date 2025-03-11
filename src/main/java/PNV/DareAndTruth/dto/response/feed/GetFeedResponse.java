@@ -24,6 +24,7 @@ public class GetFeedResponse {
     LocalDateTime createdAt;
     UUID userId;
     String username;
+    String avatarUrl;
     long likeCount;
     long commentCount;
     boolean liked;

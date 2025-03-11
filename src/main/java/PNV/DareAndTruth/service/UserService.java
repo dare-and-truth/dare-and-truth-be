@@ -90,6 +90,7 @@ public class UserService {
     }
 
     public void updateUser(String userEmail, UpdateUserRequest request, String id) {
+        log.info("Updated request in DB: {}", request.getAvatarUrl());
         UUID userId;
         try {
             userId = UUID.fromString(id);
@@ -111,7 +112,12 @@ public class UserService {
 
         User existingUser = getUserById(userId);
 
+        if (request.getAvatarUrl() != null) {
+            existingUser.setAvatarUrl(request.getAvatarUrl());
+        }
+
         userMapper.mapUserFromUpdateUserRequest(existingUser, request);
+        log.info("Updated avatarUrl in DB: {}", existingUser.getAvatarUrl());
         userRepository.save(existingUser);
     }
 

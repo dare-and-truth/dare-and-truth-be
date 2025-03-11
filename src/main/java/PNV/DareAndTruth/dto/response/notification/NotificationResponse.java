@@ -25,6 +25,7 @@ public class NotificationResponse {
     public static class UserDTO {
         UUID id;
         String username;
+        String senderAvatarUrl;
     }
 
     @Getter
