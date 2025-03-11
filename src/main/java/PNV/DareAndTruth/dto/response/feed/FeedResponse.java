@@ -34,5 +34,4 @@ public interface FeedResponse {
     boolean getLiked();
 
     boolean getJoined();
-
 }

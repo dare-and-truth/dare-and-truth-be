@@ -4,9 +4,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import PNV.DareAndTruth.dto.response.user.UserWithTypeOfRequest;
-import PNV.DareAndTruth.entity.Request;
-import PNV.DareAndTruth.repository.RequestRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,10 +11,13 @@ import org.springframework.stereotype.Service;
 import PNV.DareAndTruth.dto.projection.user.UserSummaryProjection;
 import PNV.DareAndTruth.dto.request.auth.SignUpRequest;
 import PNV.DareAndTruth.dto.request.user.UpdateUserRequest;
+import PNV.DareAndTruth.dto.response.user.UserWithTypeOfRequest;
+import PNV.DareAndTruth.entity.Request;
 import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
 import PNV.DareAndTruth.mapper.UserMapper;
+import PNV.DareAndTruth.repository.RequestRepository;
 import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -75,7 +75,6 @@ public class UserService {
             throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
 
-        // Lấy userId từ email token
         UUID currentUserId = getUserIdFromEmail(userEmail);
 
         if (userId.equals(currentUserId)) {
@@ -100,12 +99,10 @@ public class UserService {
 
         UUID currentUserId = getUserIdFromEmail(userEmail);
 
-        // Lấy thông tin user đăng nhập để kiểm tra quyền
         User currentUser = userRepository
                 .findByEmail(userEmail)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        // Nếu userId != currentUserId và user không phải admin → Không cho cập nhật
         if (!userId.equals(currentUserId) && (currentUser.getIsAdmin() == null || !currentUser.getIsAdmin())) {
             throw new AppException(ErrorCode.PERMISSION_DENIED, HttpStatus.BAD_REQUEST);
         }
@@ -145,7 +142,8 @@ public class UserService {
         }
 
         // Retrieve the logged-in user's id
-        UUID loggedInUserId = userRepository.findByEmail(loggedInUserEmail)
+        UUID loggedInUserId = userRepository
+                .findByEmail(loggedInUserEmail)
                 .map(User::getId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
@@ -155,37 +153,45 @@ public class UserService {
         }
 
         // Retrieve target user (friend) entity from repository
-        User friendUser = userRepository.findByIdAndIsDeletedFalse(friendId)
+        User friendUser = userRepository
+                .findByIdAndIsDeletedFalse(friendId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        User loggedInUser = userRepository.findByIdAndIsDeletedFalse(loggedInUserId)
+        User loggedInUser = userRepository
+                .findByIdAndIsDeletedFalse(loggedInUserId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         // Now check for requests in both roles:
-        // 1. Check if the logged-in user is the recipient (i.e. request.user equals loggedInUser) and request is pending.
+        // 1. Check if the logged-in user is the recipient (i.e. request.user equals loggedInUser) and request is
+        // pending.
         Optional<Request> requestAsRecipient = requestRepository.findByUserAndFollower(loggedInUser, friendUser);
-        // 2. Check if the logged-in user is the sender (i.e. request.follower equals loggedInUser) and request is pending.
+        // 2. Check if the logged-in user is the sender (i.e. request.follower equals loggedInUser) and request is
+        // pending.
         Optional<Request> requestAsSender = requestRepository.findByUserAndFollower(friendUser, loggedInUser);
 
         UserWithTypeOfRequest result = new UserWithTypeOfRequest();
 
         // If a request exists where the logged-in user is the recipient and is not accepted, type = NeedAccept.
-        if (requestAsRecipient.isPresent() && Boolean.FALSE.equals(requestAsRecipient.get().getIsAccepted())) {
+        if (requestAsRecipient.isPresent()
+                && Boolean.FALSE.equals(requestAsRecipient.get().getIsAccepted())) {
             result.setTypeOfRequest("NeedAccept");
             result.setRequestId(requestAsRecipient.get().getId().toString());
             return result;
         }
 
         // If any request between the two users is accepted, then type = Friend.
-        if ((requestAsRecipient.isPresent() && Boolean.TRUE.equals(requestAsRecipient.get().getIsAccepted())) ||
-                (requestAsSender.isPresent() && Boolean.TRUE.equals(requestAsSender.get().getIsAccepted()))) {
+        if ((requestAsRecipient.isPresent()
+                        && Boolean.TRUE.equals(requestAsRecipient.get().getIsAccepted()))
+                || (requestAsSender.isPresent()
+                        && Boolean.TRUE.equals(requestAsSender.get().getIsAccepted()))) {
             result.setTypeOfRequest("Friend");
             result.setRequestId(null);
             return result;
         }
 
         // If a request exists where the logged-in user is the sender and is still pending, type = WaitingForAccept.
-        if (requestAsSender.isPresent() && Boolean.FALSE.equals(requestAsSender.get().getIsAccepted())) {
+        if (requestAsSender.isPresent()
+                && Boolean.FALSE.equals(requestAsSender.get().getIsAccepted())) {
             result.setTypeOfRequest("WaitingForAccept");
             result.setRequestId(requestAsSender.get().getId().toString());
             return result;

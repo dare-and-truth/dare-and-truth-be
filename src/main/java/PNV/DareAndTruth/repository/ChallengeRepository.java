@@ -39,7 +39,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
 						SELECT new PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountAndCommentCountResponse(
 							c.id, c.hashtag, c.content, c.mediaUrl,
 							c.startDate, c.endDate, c.createdAt,
-							c.user.id, c.user.username, c.user.avatarUrl, 
+							c.user.id, c.user.username, c.user.avatarUrl,
 							COUNT(DISTINCT l.id),
 							COUNT(DISTINCT cm.id),
 							CASE WHEN COUNT(DISTINCT likedByUser.id) > 0 THEN true ELSE false END

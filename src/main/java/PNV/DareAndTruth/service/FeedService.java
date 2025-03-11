@@ -67,8 +67,7 @@ public class FeedService {
                         ((Number) row[11]).intValue(), // Like Count
                         ((Number) row[12]).intValue(), // Comment Count
                         (Boolean) row[13],
-                        (Boolean) row[14]
-                        ))
+                        (Boolean) row[14]))
                 .toList();
     }
 
@@ -104,8 +103,7 @@ public class FeedService {
                         ((Number) row[11]).intValue(), // Like Count
                         ((Number) row[12]).intValue(), // Comment Count
                         (Boolean) row[13],
-                        (Boolean) row[14]
-                ))
+                        (Boolean) row[14]))
                 .toList();
     }
 
