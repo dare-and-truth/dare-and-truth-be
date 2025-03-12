@@ -18,5 +18,7 @@ public interface CommentSummaryProjection {
         String getUsername();
 
         UUID getId();
+
+        String getAvatarUrl();
     }
 }

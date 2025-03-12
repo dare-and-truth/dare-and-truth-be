@@ -1,17 +1,19 @@
 package PNV.DareAndTruth.entity;
 
+import java.time.Instant;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import jakarta.persistence.Id;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.time.Instant;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -20,7 +22,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Document(collection = "conversations")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Conversation{
+public class Conversation {
     @Id
     ObjectId id;
 
@@ -37,7 +39,11 @@ public class Conversation{
     @Field(name = "updated_at")
     Instant updatedAt;
 
-    @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class MessagePreview {
         String content;
         UUID senderId;

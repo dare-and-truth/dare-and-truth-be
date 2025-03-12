@@ -1,16 +1,18 @@
 package PNV.DareAndTruth.entity;
 
+import java.time.Instant;
+import java.util.Set;
+import java.util.UUID;
+
 import jakarta.persistence.Id;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.time.Instant;
-import java.util.Set;
-import java.util.UUID;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter

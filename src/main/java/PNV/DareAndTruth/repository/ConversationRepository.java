@@ -1,12 +1,13 @@
 package PNV.DareAndTruth.repository;
 
-import PNV.DareAndTruth.entity.Conversation;
+import java.util.*;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import PNV.DareAndTruth.entity.Conversation;
 
 @Repository
 public interface ConversationRepository extends MongoRepository<Conversation, ObjectId> {
@@ -14,5 +15,4 @@ public interface ConversationRepository extends MongoRepository<Conversation, Ob
 
     @Query("{'participants': {$all: ?0}}")
     Optional<Conversation> findByParticipants(Set<UUID> participants);
-
 }

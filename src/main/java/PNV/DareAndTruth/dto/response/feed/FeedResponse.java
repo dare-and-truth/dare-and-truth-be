@@ -25,6 +25,8 @@ public interface FeedResponse {
 
     String getUsername();
 
+    String getAvatarUrl();
+
     int getLikeCount();
 
     int getCommentCount();

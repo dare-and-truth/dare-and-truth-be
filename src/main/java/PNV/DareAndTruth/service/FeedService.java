@@ -19,9 +19,11 @@ import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FeedService {
     FeedRepository feedRepository;
@@ -63,10 +65,11 @@ public class FeedService {
                         ((Timestamp) row[7]).toLocalDateTime(),
                         (UUID) row[8], // User ID
                         (String) row[9], // Username
-                        ((Number) row[10]).intValue(), // Like Count
-                        ((Number) row[11]).intValue(), // Comment Count
-                        (Boolean) row[12],
-                        (Boolean) row[13]))
+                        (String) row[10],
+                        ((Number) row[11]).intValue(), // Like Count
+                        ((Number) row[12]).intValue(), // Comment Count
+                        (Boolean) row[13],
+                        (Boolean) row[14]))
                 .toList();
     }
 
@@ -98,15 +101,53 @@ public class FeedService {
                         ((Timestamp) row[7]).toLocalDateTime(),
                         (UUID) row[8], // User ID
                         (String) row[9], // Username
-                        ((Number) row[10]).intValue(), // Like Count
-                        ((Number) row[11]).intValue(), // Comment Count
-                        (Boolean) row[12],
-                        (Boolean) row[13]))
+                        (String) row[10],
+                        ((Number) row[11]).intValue(), // Like Count
+                        ((Number) row[12]).intValue(), // Comment Count
+                        (Boolean) row[13],
+                        (Boolean) row[14]))
                 .toList();
     }
 
     public FeedResponse getFeedById(String id, String type, String userEmail) {
         UUID userId = getUserIdFromEmail(userEmail);
         return feedRepository.findFeedByIdAndType(UUID.fromString(id), type, userId);
+    }
+
+    public List<GetFeedResponse> getFeedLovedByUserId(String userId) {
+        UUID userUUID;
+        try {
+            userUUID = UUID.fromString(userId);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
+        }
+
+        Optional<User> existingUser = userRepository.findByIdAndIsDeletedFalse(userUUID);
+        if (existingUser.isEmpty()) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+
+        List<Object[]> results = feedRepository.getFeedsLovedByUser(userUUID);
+
+        // Chuyển đổi kết quả từ query thành danh sách GetFeedResponse
+        return results.stream()
+                .map(row -> new GetFeedResponse(
+                        (UUID) row[0], // ID
+                        (String) row[1], // Type (post/challenge)
+                        (String) row[2], // Hashtag
+                        (String) row[3], // Content
+                        (String) row[4], // Media URL
+                        row[5] != null ? row[5].toString() : null, // Start Date (for challenge)
+                        row[6] != null ? row[6].toString() : null, // End Date (for challenge)
+                        ((Timestamp) row[7]).toLocalDateTime(), // Created At
+                        (UUID) row[8], // User ID
+                        (String) row[9], // Username
+                        (String) row[10], // Avatar URL
+                        ((Number) row[11]).intValue(), // Like Count
+                        ((Number) row[12]).intValue(), // Comment Count
+                        (Boolean) row[13], // is_like
+                        (Boolean) row[14] // is_joined
+                        ))
+                .toList();
     }
 }

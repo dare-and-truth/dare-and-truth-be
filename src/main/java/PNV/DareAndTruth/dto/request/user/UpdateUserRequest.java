@@ -20,5 +20,7 @@ public class UpdateUserRequest {
     @Size(min = 8, message = "PASSWORD_INVALID")
     String password;
 
+    String avatarUrl;
+
     Boolean isActive;
 }

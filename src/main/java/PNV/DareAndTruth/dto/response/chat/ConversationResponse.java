@@ -1,5 +1,8 @@
 package PNV.DareAndTruth.dto.response.chat;
 
+import java.time.Instant;
+import java.util.Set;
+
 import PNV.DareAndTruth.dto.response.user.UserInfo;
 import PNV.DareAndTruth.entity.Conversation;
 import lombok.AccessLevel;
@@ -7,9 +10,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-
-import java.time.Instant;
-import java.util.Set;
 
 @Getter
 @Setter

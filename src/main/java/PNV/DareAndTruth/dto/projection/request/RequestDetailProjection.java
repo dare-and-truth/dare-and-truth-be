@@ -16,5 +16,7 @@ public interface RequestDetailProjection {
         UUID getId();
 
         String getUsername();
+
+        String getAvatarUrl();
     }
 }

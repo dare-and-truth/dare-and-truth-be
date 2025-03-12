@@ -1,5 +1,13 @@
 package PNV.DareAndTruth.service;
 
+import java.util.*;
+
+import org.bson.types.ObjectId;
+import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import PNV.DareAndTruth.dto.request.message.SendMessageRequest;
 import PNV.DareAndTruth.dto.response.message.MessageResponse;
 import PNV.DareAndTruth.entity.Conversation;
@@ -13,13 +21,6 @@ import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.bson.types.ObjectId;
-import org.springframework.http.HttpStatus;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -93,9 +94,7 @@ public class MessageService {
                     .build();
         }
 
-        messagingTemplate.convertAndSend(
-                "/topic/messages/" + receiverId, messageResponse);
-
+        messagingTemplate.convertAndSend("/topic/messages/" + receiverId, messageResponse);
 
         // update Conversation
         if (conversation.getUnreadCounts() == null) {
@@ -106,7 +105,9 @@ public class MessageService {
                 .senderId(message.getSenderId())
                 .build());
         // Increment the number of unread messages of receiver
-        conversation.getUnreadCounts().put(receiverId, conversation.getUnreadCounts().getOrDefault(receiverId, 0) + 1);
+        conversation
+                .getUnreadCounts()
+                .put(receiverId, conversation.getUnreadCounts().getOrDefault(receiverId, 0) + 1);
         // Set read for the sender
         conversation.getUnreadCounts().put(senderId, 0);
         conversationRepository.save(conversation);

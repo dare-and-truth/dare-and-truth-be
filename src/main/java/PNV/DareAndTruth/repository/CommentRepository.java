@@ -9,5 +9,6 @@ import PNV.DareAndTruth.dto.projection.comment.CommentSummaryProjection;
 import PNV.DareAndTruth.entity.Comment;
 
 public interface CommentRepository extends JpaRepository<Comment, UUID> {
+
     Set<CommentSummaryProjection> findAllByFeedIdOrderByCreatedAtDesc(UUID feedId);
 }

@@ -38,24 +38,22 @@ public class ScoreService {
     RankingService rankingService;
 
     public ScoreSummaryProjection calculateTotalScoreForUser(UUID userId) {
-        return scoreRepository.findTotalScoreByUserId(userId)
-                .orElseGet(() -> {
-                    if (!userRepository.existsByIdAndIsDeletedFalse(userId)) {
-                        throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
-                    }
-                    return new ScoreSummaryProjection() {
-                        @Override
-                        public UUID getUserId() {
-                            return null;
-                        }
-
-                        @Override
-                        public int getTotalScore() {
-                            return 0;
-                        }
-                    };
+        return scoreRepository.findTotalScoreByUserId(userId).orElseGet(() -> {
+            if (!userRepository.existsByIdAndIsDeletedFalse(userId)) {
+                throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+            }
+            return new ScoreSummaryProjection() {
+                @Override
+                public UUID getUserId() {
+                    return userId;
                 }
-        );
+
+                @Override
+                public int getTotalScore() {
+                    return 0;
+                }
+            };
+        });
     }
 
     @Transactional

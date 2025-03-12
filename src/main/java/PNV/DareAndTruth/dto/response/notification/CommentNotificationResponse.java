@@ -17,6 +17,7 @@ public class CommentNotificationResponse {
     String type;
     UUID senderId;
     String senderName;
+    String senderAvatarUrl;
     UUID postId;
     String hashtag;
     String commentContent;

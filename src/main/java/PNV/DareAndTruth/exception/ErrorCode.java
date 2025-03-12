@@ -69,10 +69,11 @@ public enum ErrorCode {
     REMINDER_NOT_FOUND(1058, "Reminder is not found"),
     NOTIFICATION_NOT_FOUND(1059, "Notification is not found"),
     USER_SCORES_NOT_FOUND(1060, "No scores found for user with user ID"),
-    SCORE_ALREADY_EXISTS(1061,"The score already exist"),
-    RECEIVER_ID_REQUIRED(1062,"Receiver ID cannot be null"),
-    CONVERSATION_NOT_FOUND(1063,"Conversation is not found"),
-    MESSAGE_NOT_FOUND(1064,"Message is not found"),
+    SCORE_ALREADY_EXISTS(1061, "The score already exist"),
+    RECEIVER_ID_REQUIRED(1062, "Receiver ID cannot be null"),
+    CONVERSATION_NOT_FOUND(1063, "Conversation is not found"),
+    MESSAGE_NOT_FOUND(1064, "Message is not found"),
+    FAIL_TO_CHECK_REQUEST_YOURSELF(1065, "You can not check type of request with yourself"),
     ;
 
     int code;

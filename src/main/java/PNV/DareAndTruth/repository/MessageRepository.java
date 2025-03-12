@@ -1,14 +1,15 @@
 package PNV.DareAndTruth.repository;
 
-import PNV.DareAndTruth.entity.Message;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
+import PNV.DareAndTruth.entity.Message;
 
 public interface MessageRepository extends MongoRepository<Message, ObjectId> {
     List<Message> findByConversationId(ObjectId conversationId, Pageable pageable);

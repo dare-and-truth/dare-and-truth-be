@@ -11,10 +11,13 @@ import org.springframework.stereotype.Service;
 import PNV.DareAndTruth.dto.projection.user.UserSummaryProjection;
 import PNV.DareAndTruth.dto.request.auth.SignUpRequest;
 import PNV.DareAndTruth.dto.request.user.UpdateUserRequest;
+import PNV.DareAndTruth.dto.response.user.UserWithTypeOfRequest;
+import PNV.DareAndTruth.entity.Request;
 import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
 import PNV.DareAndTruth.mapper.UserMapper;
+import PNV.DareAndTruth.repository.RequestRepository;
 import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,7 @@ public class UserService {
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
     ScoreService scoreService;
+    RequestRepository requestRepository;
 
     private UUID getUserIdFromEmail(String userEmail) {
         return userRepository
@@ -71,7 +75,6 @@ public class UserService {
             throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
 
-        // Lấy userId từ email token
         UUID currentUserId = getUserIdFromEmail(userEmail);
 
         if (userId.equals(currentUserId)) {
@@ -86,6 +89,7 @@ public class UserService {
     }
 
     public void updateUser(String userEmail, UpdateUserRequest request, String id) {
+        log.info("Updated request in DB: {}", request.getAvatarUrl());
         UUID userId;
         try {
             userId = UUID.fromString(id);
@@ -95,19 +99,22 @@ public class UserService {
 
         UUID currentUserId = getUserIdFromEmail(userEmail);
 
-        // Lấy thông tin user đăng nhập để kiểm tra quyền
         User currentUser = userRepository
                 .findByEmail(userEmail)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        // Nếu userId != currentUserId và user không phải admin → Không cho cập nhật
         if (!userId.equals(currentUserId) && (currentUser.getIsAdmin() == null || !currentUser.getIsAdmin())) {
             throw new AppException(ErrorCode.PERMISSION_DENIED, HttpStatus.BAD_REQUEST);
         }
 
         User existingUser = getUserById(userId);
 
+        if (request.getAvatarUrl() != null) {
+            existingUser.setAvatarUrl(request.getAvatarUrl());
+        }
+
         userMapper.mapUserFromUpdateUserRequest(existingUser, request);
+        log.info("Updated avatarUrl in DB: {}", existingUser.getAvatarUrl());
         userRepository.save(existingUser);
     }
 
@@ -123,5 +130,76 @@ public class UserService {
 
         existingUser.setIsDeleted(true);
         userRepository.save(existingUser);
+    }
+
+    public UserWithTypeOfRequest getUserWithTypeOfRequest(String loggedInUserEmail, String targetUserId) {
+        // Convert targetUserId to UUID
+        UUID friendId;
+        try {
+            friendId = UUID.fromString(targetUserId);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
+        }
+
+        // Retrieve the logged-in user's id
+        UUID loggedInUserId = userRepository
+                .findByEmail(loggedInUserEmail)
+                .map(User::getId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        // Prevent checking your own friend request status
+        if (friendId.equals(loggedInUserId)) {
+            throw new AppException(ErrorCode.FAIL_TO_CHECK_REQUEST_YOURSELF, HttpStatus.BAD_REQUEST);
+        }
+
+        // Retrieve target user (friend) entity from repository
+        User friendUser = userRepository
+                .findByIdAndIsDeletedFalse(friendId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        User loggedInUser = userRepository
+                .findByIdAndIsDeletedFalse(loggedInUserId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        // Now check for requests in both roles:
+        // 1. Check if the logged-in user is the recipient (i.e. request.user equals loggedInUser) and request is
+        // pending.
+        Optional<Request> requestAsRecipient = requestRepository.findByUserAndFollower(loggedInUser, friendUser);
+        // 2. Check if the logged-in user is the sender (i.e. request.follower equals loggedInUser) and request is
+        // pending.
+        Optional<Request> requestAsSender = requestRepository.findByUserAndFollower(friendUser, loggedInUser);
+
+        UserWithTypeOfRequest result = new UserWithTypeOfRequest();
+
+        // If a request exists where the logged-in user is the recipient and is not accepted, type = NeedAccept.
+        if (requestAsRecipient.isPresent()
+                && Boolean.FALSE.equals(requestAsRecipient.get().getIsAccepted())) {
+            result.setTypeOfRequest("NeedAccept");
+            result.setRequestId(requestAsRecipient.get().getId().toString());
+            return result;
+        }
+
+        // If any request between the two users is accepted, then type = Friend.
+        if ((requestAsRecipient.isPresent()
+                        && Boolean.TRUE.equals(requestAsRecipient.get().getIsAccepted()))
+                || (requestAsSender.isPresent()
+                        && Boolean.TRUE.equals(requestAsSender.get().getIsAccepted()))) {
+            result.setTypeOfRequest("Friend");
+            result.setRequestId(null);
+            return result;
+        }
+
+        // If a request exists where the logged-in user is the sender and is still pending, type = WaitingForAccept.
+        if (requestAsSender.isPresent()
+                && Boolean.FALSE.equals(requestAsSender.get().getIsAccepted())) {
+            result.setTypeOfRequest("WaitingForAccept");
+            result.setRequestId(requestAsSender.get().getId().toString());
+            return result;
+        }
+
+        // If no request exists between the users, you might choose to return a default type or throw an error.
+        result.setTypeOfRequest("Stranger");
+        result.setRequestId(null);
+        return result;
     }
 }

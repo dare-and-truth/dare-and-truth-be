@@ -20,11 +20,15 @@ public interface FriendDetailProjection {
         UUID getId();
 
         String getUsername();
+
+        String getAvatarUrl();
     }
 
     interface User {
         UUID getId();
 
         String getUsername();
+
+        String getAvatarUrl();
     }
 }
