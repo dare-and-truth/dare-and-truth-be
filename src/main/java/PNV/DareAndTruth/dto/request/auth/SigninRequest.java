@@ -12,7 +12,6 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Data
 public class SigninRequest {
 
     @NotBlank(message = "EMAIL_REQUIRED")

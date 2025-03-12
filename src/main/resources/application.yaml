@@ -11,6 +11,14 @@ spring:
       ddl-auto: update
     properties:
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+  data:
+    mongodb:
+      uri: ${MONGODB_URL}
+      database: ${MONGODB_DB:dodo}
+
+logging:
+  level:
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
 
 server:
   port: 8080
