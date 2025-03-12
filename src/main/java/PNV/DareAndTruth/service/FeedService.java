@@ -109,4 +109,43 @@ public class FeedService {
         UUID userId = getUserIdFromEmail(userEmail);
         return feedRepository.findFeedByIdAndType(UUID.fromString(id), type, userId);
     }
+
+    public List<GetFeedResponse> getFeedLovedByUserId(String userId) {
+        UUID userUUID;
+        try {
+            userUUID = UUID.fromString(userId);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
+        }
+
+        // Kiểm tra user có tồn tại không
+        Optional<User> existingUser = userRepository.findByIdAndIsDeletedFalse(userUUID);
+        if (existingUser.isEmpty()) {
+            throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+
+        // Lấy danh sách feed đã được user thả tim
+        List<Object[]> results = feedRepository.getFeedsLovedByUser(userUUID);
+
+        // Chuyển đổi kết quả từ query thành danh sách GetFeedResponse
+        return results.stream()
+                .map(row -> new GetFeedResponse(
+                        (UUID) row[0], // ID
+                        (String) row[1], // Type (post/challenge)
+                        (String) row[2], // Hashtag
+                        (String) row[3], // Content
+                        (String) row[4], // Media URL
+                        row[5] != null ? row[5].toString() : null, // Start Date (for challenge)
+                        row[6] != null ? row[6].toString() : null, // End Date (for challenge)
+                        ((Timestamp) row[7]).toLocalDateTime(), // Created At
+                        (UUID) row[8], // User ID
+                        (String) row[9], // Username
+                        ((Number) row[10]).intValue(), // Like Count
+                        ((Number) row[11]).intValue(), // Comment Count
+                        (Boolean) row[12], // is_like
+                        (Boolean) row[13] // is_joined
+                ))
+                .toList();
+    }
+
 }

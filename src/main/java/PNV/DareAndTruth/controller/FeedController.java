@@ -252,4 +252,17 @@ public class FeedController {
                         .message("Challenge retrieved successfully")
                         .build());
     }
+
+	@GetMapping("loved/user/{userId}")
+	public ResponseEntity<AppApiResponse<List<GetFeedResponse>>> getFeedLovedByUserId(
+			@PathVariable String userId){
+		List<GetFeedResponse> feed = feedService.getFeedLovedByUserId(userId);
+		return ResponseEntity.status(200)
+				.body(AppApiResponse.<List<GetFeedResponse>>builder()
+						.code(1000)
+						.status(ApiStatus.SUCCESS)
+						.data(feed)
+						.message("Feeds retrieved successfully")
+						.build());
+	}
 }
