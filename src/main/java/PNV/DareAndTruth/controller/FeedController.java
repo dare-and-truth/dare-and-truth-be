@@ -253,16 +253,60 @@ public class FeedController {
                         .build());
     }
 
-	@GetMapping("loved/user/{userId}")
-	public ResponseEntity<AppApiResponse<List<GetFeedResponse>>> getFeedLovedByUserId(
-			@PathVariable String userId){
-		List<GetFeedResponse> feed = feedService.getFeedLovedByUserId(userId);
-		return ResponseEntity.status(200)
-				.body(AppApiResponse.<List<GetFeedResponse>>builder()
-						.code(1000)
-						.status(ApiStatus.SUCCESS)
-						.data(feed)
-						.message("Feeds retrieved successfully")
-						.build());
-	}
+    @Operation(summary = "Get feeds loved by user", description = "Retrieve a list of feeds that a user has liked")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Feeds retrieved successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+										{
+											"code": 1000,
+											"status": "success",
+											"message": "Feeds retrieved successfully",
+											"data": [
+												{
+													"id": "e3196817-5751-4359-9f3e-dcafef4f2b16",
+													"hashtag": "LearningChallenge",
+													"type": "challenge",
+													"content": "Learn new technologies to grow up yourself !!!",
+													"mediaUrl": "https://example.com/challenge.png",
+													"startDate": "2025-02-22",
+													"endDate": "2025-02-28",
+													"createdAt": "2025-02-22T12:31:41.338293",
+													"userId": "2d76e0be-e529-48aa-b4a5-6ca3b43e7717",
+													"username": "Admin",
+													"likeCount": 10,
+													"commentCount": 3,
+													"liked": true
+												}
+											]
+										}
+										"""))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "User not found",
+                        content = @Content(mediaType = "application/json")),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal server error",
+                        content = @Content(mediaType = "application/json"))
+            })
+    @GetMapping("loved/user/{userId}")
+    public ResponseEntity<AppApiResponse<List<GetFeedResponse>>> getFeedLovedByUserId(@PathVariable String userId) {
+        List<GetFeedResponse> feed = feedService.getFeedLovedByUserId(userId);
+        return ResponseEntity.status(200)
+                .body(AppApiResponse.<List<GetFeedResponse>>builder()
+                        .code(1000)
+                        .status(ApiStatus.SUCCESS)
+                        .data(feed)
+                        .message("Feeds retrieved successfully")
+                        .build());
+    }
 }

@@ -19,9 +19,11 @@ import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FeedService {
     FeedRepository feedRepository;
@@ -120,13 +122,11 @@ public class FeedService {
             throw new AppException(ErrorCode.USER_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
 
-        // Kiểm tra user có tồn tại không
         Optional<User> existingUser = userRepository.findByIdAndIsDeletedFalse(userUUID);
         if (existingUser.isEmpty()) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
-        // Lấy danh sách feed đã được user thả tim
         List<Object[]> results = feedRepository.getFeedsLovedByUser(userUUID);
 
         // Chuyển đổi kết quả từ query thành danh sách GetFeedResponse
@@ -142,12 +142,12 @@ public class FeedService {
                         ((Timestamp) row[7]).toLocalDateTime(), // Created At
                         (UUID) row[8], // User ID
                         (String) row[9], // Username
-                        ((Number) row[10]).intValue(), // Like Count
-                        ((Number) row[11]).intValue(), // Comment Count
-                        (Boolean) row[12], // is_like
-                        (Boolean) row[13] // is_joined
-                ))
+                        (String) row[10], // Avatar URL
+                        ((Number) row[11]).intValue(), // Like Count
+                        ((Number) row[12]).intValue(), // Comment Count
+                        (Boolean) row[13], // is_like
+                        (Boolean) row[14] // is_joined
+                        ))
                 .toList();
     }
-
 }
