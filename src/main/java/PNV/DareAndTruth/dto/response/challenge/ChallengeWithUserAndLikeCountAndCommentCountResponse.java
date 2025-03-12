@@ -21,6 +21,7 @@ public class ChallengeWithUserAndLikeCountAndCommentCountResponse {
     LocalDateTime createdAt;
     UUID userId;
     String username;
+    String avatarUrl;
     Long likeCount;
     Long commentCount;
     Boolean isLiked;

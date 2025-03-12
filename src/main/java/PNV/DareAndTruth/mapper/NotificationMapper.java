@@ -20,6 +20,7 @@ public interface NotificationMapper {
         NotificationResponse.UserDTO userDTO = new NotificationResponse.UserDTO();
         userDTO.setId(user.getId());
         userDTO.setUsername(user.getUsername());
+        userDTO.setSenderAvatarUrl(user.getAvatarUrl());
         return userDTO;
     }
 

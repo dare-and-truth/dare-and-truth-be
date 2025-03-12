@@ -17,6 +17,7 @@ public class LikeNotificationResponse {
     String type;
     UUID senderId;
     String senderName;
+    String senderAvatarUrl;
     UUID postId;
     String hashtag;
     UUID challengeId;

@@ -17,6 +17,7 @@ public class FriendRequestNotificationResponse {
     String type;
     UUID senderId;
     String senderName;
+    String senderAvatarUrl;
     UUID requestId;
     LocalDateTime createdAt;
 }
