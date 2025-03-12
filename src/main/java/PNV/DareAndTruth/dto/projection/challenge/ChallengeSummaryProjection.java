@@ -27,5 +27,7 @@ public interface ChallengeSummaryProjection {
         UUID getId();
 
         String getUsername();
+
+        String getAvatarUrl();
     }
 }

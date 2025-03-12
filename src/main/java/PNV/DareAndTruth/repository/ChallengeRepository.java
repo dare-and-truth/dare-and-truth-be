@@ -39,7 +39,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
 						SELECT new PNV.DareAndTruth.dto.response.challenge.ChallengeWithUserAndLikeCountAndCommentCountResponse(
 							c.id, c.hashtag, c.content, c.mediaUrl,
 							c.startDate, c.endDate, c.createdAt,
-							c.user.id, c.user.username,
+							c.user.id, c.user.username, c.user.avatarUrl,
 							COUNT(DISTINCT l.id),
 							COUNT(DISTINCT cm.id),
 							CASE WHEN COUNT(DISTINCT likedByUser.id) > 0 THEN true ELSE false END
@@ -58,7 +58,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
     @Query("SELECT new PNV.DareAndTruth.dto.response.feed.GetFeedResponse("
             + "c.id, 'challenge', c.hashtag, c.content, c.mediaUrl, "
             + "CAST(c.startDate AS string), CAST(c.endDate AS string), c.createdAt, "
-            + "c.user.id, c.user.username, "
+            + "c.user.id, c.user.username, c.user.avatarUrl, "
             + "COALESCE(COUNT(DISTINCT l.id), 0), COALESCE(COUNT(DISTINCT cm.id), 0), "
             + "CASE WHEN COUNT(DISTINCT likedByUser.id) > 0 THEN true ELSE false END, "
             + "CASE WHEN COUNT(DISTINCT r.user.id) > 0 THEN true ELSE false END) "
@@ -75,7 +75,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
             + "LIKE LOWER(CONCAT('%', :normalizedKeyword, '%')) "
             + "OR LOWER(REPLACE(TRANSLATE(c.content, :specialChars, :replaceChars), ' ', '')) "
             + "LIKE LOWER(CONCAT('%', :normalizedKeyword, '%'))) "
-            + "GROUP BY c.id, c.hashtag, c.content, c.mediaUrl, c.startDate, c.endDate, c.createdAt, c.user.id, c.user.username "
+            + "GROUP BY c.id, c.hashtag, c.content, c.mediaUrl, c.startDate, c.endDate, c.createdAt, c.user.id, c.user.username,c.user.avatarUrl "
             + "ORDER BY c.createdAt DESC")
     List<GetFeedResponse> searchChallengesByNormalizedKeyword(
             @Param("normalizedKeyword") String normalizedKeyword,
@@ -86,7 +86,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
     @Query("SELECT new PNV.DareAndTruth.dto.response.feed.GetFeedResponse("
             + "c.id, 'challenge', c.hashtag, c.content, c.mediaUrl, "
             + "CAST(c.startDate AS string), CAST(c.endDate AS string), c.createdAt, "
-            + "c.user.id, c.user.username, "
+            + "c.user.id, c.user.username, c.user.avatarUrl, "
             + "COALESCE(COUNT(DISTINCT l.id), 0), COALESCE(COUNT(DISTINCT cm.id), 0), "
             + "CASE WHEN COUNT(DISTINCT likedByUser.id) > 0 THEN true ELSE false END, "
             + "CASE WHEN COUNT(DISTINCT r.user.id) > 0 THEN true ELSE false END) "
@@ -104,7 +104,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
             + "LIKE LOWER(CONCAT('%', :word, '%')) "
             + "OR LOWER(TRANSLATE(c.content, :specialChars, :replaceChars)) "
             + "LIKE LOWER(CONCAT('%', :word, '%'))) "
-            + "GROUP BY c.id, c.hashtag, c.content, c.mediaUrl, c.startDate, c.endDate, c.createdAt, c.user.id, c.user.username "
+            + "GROUP BY c.id, c.hashtag, c.content, c.mediaUrl, c.startDate, c.endDate, c.createdAt, c.user.id, c.user.username, c.user.avatarUrl "
             + "ORDER BY c.createdAt DESC")
     List<GetFeedResponse> searchChallengesBySingleWord(
             @Param("word") String word,
@@ -116,7 +116,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
     @Query("SELECT new PNV.DareAndTruth.dto.response.feed.GetFeedResponse("
             + "c.id, 'challenge', c.hashtag, c.content, c.mediaUrl, "
             + "CAST(c.startDate AS string), CAST(c.endDate AS string), c.createdAt, "
-            + "c.user.id, c.user.username, "
+            + "c.user.id, c.user.username, c.user.avatarUrl, "
             + "COALESCE(COUNT(DISTINCT l.id), 0), COALESCE(COUNT(DISTINCT cm.id), 0), "
             + "CASE WHEN COUNT(DISTINCT likedByUser.id) > 0 THEN true ELSE false END, "
             + "CASE WHEN COUNT(DISTINCT r.user.id) > 0 THEN true ELSE false END) "
@@ -134,7 +134,7 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
             + "LIKE LOWER(CONCAT('%', :normalizedKeyword, '%')) "
             + "OR LOWER(REPLACE(TRANSLATE(c.content, :specialChars, :replaceChars), ' ', '')) "
             + "LIKE LOWER(CONCAT('%', :normalizedKeyword, '%'))) "
-            + "GROUP BY c.id, c.hashtag, c.content, c.mediaUrl, c.startDate, c.endDate, c.createdAt, c.user.id, c.user.username "
+            + "GROUP BY c.id, c.hashtag, c.content, c.mediaUrl, c.startDate, c.endDate, c.createdAt, c.user.id, c.user.username, c.user.avatarUrl "
             + "ORDER BY c.createdAt DESC")
     List<GetFeedResponse> searchChallengesExcludingIds(
             @Param("normalizedKeyword") String normalizedKeyword,

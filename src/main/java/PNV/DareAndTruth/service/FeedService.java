@@ -63,10 +63,11 @@ public class FeedService {
                         ((Timestamp) row[7]).toLocalDateTime(),
                         (UUID) row[8], // User ID
                         (String) row[9], // Username
-                        ((Number) row[10]).intValue(), // Like Count
-                        ((Number) row[11]).intValue(), // Comment Count
-                        (Boolean) row[12],
-                        (Boolean) row[13]))
+                        (String) row[10],
+                        ((Number) row[11]).intValue(), // Like Count
+                        ((Number) row[12]).intValue(), // Comment Count
+                        (Boolean) row[13],
+                        (Boolean) row[14]))
                 .toList();
     }
 
@@ -98,10 +99,11 @@ public class FeedService {
                         ((Timestamp) row[7]).toLocalDateTime(),
                         (UUID) row[8], // User ID
                         (String) row[9], // Username
-                        ((Number) row[10]).intValue(), // Like Count
-                        ((Number) row[11]).intValue(), // Comment Count
-                        (Boolean) row[12],
-                        (Boolean) row[13]))
+                        (String) row[10],
+                        ((Number) row[11]).intValue(), // Like Count
+                        ((Number) row[12]).intValue(), // Comment Count
+                        (Boolean) row[13],
+                        (Boolean) row[14]))
                 .toList();
     }
 

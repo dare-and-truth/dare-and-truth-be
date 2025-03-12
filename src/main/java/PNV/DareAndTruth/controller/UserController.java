@@ -2,7 +2,6 @@ package PNV.DareAndTruth.controller;
 
 import java.util.Set;
 
-import PNV.DareAndTruth.dto.response.user.UserWithTypeOfRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -13,6 +12,7 @@ import PNV.DareAndTruth.dto.projection.user.UserSummaryProjection;
 import PNV.DareAndTruth.dto.request.user.UpdateUserRequest;
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
+import PNV.DareAndTruth.dto.response.user.UserWithTypeOfRequest;
 import PNV.DareAndTruth.service.JwtService;
 import PNV.DareAndTruth.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -188,41 +188,39 @@ public class UserController {
 
     @Operation(
             summary = "Get friend request type by user",
-            description = "Returns the type of friend request for a target user based on the relationship between the logged-in user and the target user. \n\n" +
-                    "- **NeedAccept:** The logged-in user is the recipient and has pending friend requests.\n" +
-                    "- **Friend:** The friend request is accepted (either the logged-in user is the recipient or the sender).\n" +
-                    "- **WaitingForAccept:** The logged-in user is the sender and the request is still pending."+
-                    "-Stranger: The logged-in user doesn't have any request to targetusser or target user doesn't have any request to the logged-in user"
-    )
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Friend request type retrieved successfully",
-                    content = @Content(
-                            mediaType = "application/json",
-                            examples = @ExampleObject(
-                                    value = "{\n  \"code\": 1000,\n  \"status\": \"success\",\n  \"message\": \"Friend request type retrieved successfully\",\n  \"data\": { \"typeOfRequest\": \"NeedAccept\" }\n}"
-                            )
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "User not found or no friend requests available",
-                    content = @Content(mediaType = "application/json")
-            ),
-            @ApiResponse(
-                    responseCode = "500",
-                    description = "Internal server error",
-                    content = @Content(mediaType = "application/json")
-            )
-    })
+            description =
+                    "Returns the type of friend request for a target user based on the relationship between the logged-in user and the target user. \n\n"
+                            + "- **NeedAccept:** The logged-in user is the recipient and has pending friend requests.\n"
+                            + "- **Friend:** The friend request is accepted (either the logged-in user is the recipient or the sender).\n"
+                            + "- **WaitingForAccept:** The logged-in user is the sender and the request is still pending."
+                            + "-Stranger: The logged-in user doesn't have any request to targetusser or target user doesn't have any request to the logged-in user")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Friend request type retrieved successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples =
+                                                @ExampleObject(
+                                                        value =
+                                                                "{\n  \"code\": 1000,\n  \"status\": \"success\",\n  \"message\": \"Friend request type retrieved successfully\",\n  \"data\": { \"typeOfRequest\": \"NeedAccept\" }\n}"))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "User not found or no friend requests available",
+                        content = @Content(mediaType = "application/json")),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal server error",
+                        content = @Content(mediaType = "application/json"))
+            })
     @GetMapping("request/user/{targetUserId}")
     public ResponseEntity<AppApiResponse<UserWithTypeOfRequest>> getUserWithRequestByUserId(
-            @PathVariable String targetUserId,
-            HttpServletRequest httpServletRequest) {
+            @PathVariable String targetUserId, HttpServletRequest httpServletRequest) {
         String token = jwtService.extractTokenFromHeader(httpServletRequest);
         String userEmail = jwtService.extractEmail(token);
-        UserWithTypeOfRequest typeOfRequest =  userService.getUserWithTypeOfRequest(userEmail, targetUserId);
+        UserWithTypeOfRequest typeOfRequest = userService.getUserWithTypeOfRequest(userEmail, targetUserId);
         return ResponseEntity.ok(AppApiResponse.<UserWithTypeOfRequest>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
