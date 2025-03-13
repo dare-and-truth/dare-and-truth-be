@@ -1,6 +1,8 @@
 package PNV.DareAndTruth.repository;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -190,5 +192,49 @@ public interface FeedRepository extends JpaRepository<Post, UUID> {
 	List<Object[]> getFeedsLovedByUser(
 			@Param("userId") UUID userId,
 			@Param("limit") int limit,
+			@Param("offset") int offset);
+
+	@Query("""
+    SELECT f.id, f.type, f.hashtag, f.content, f.mediaUrl, 
+           f.startDate, f.endDate, f.createdAt, u.id, u.username, u.avatarUrl,
+           COALESCE(l.like_count, 0) AS likeCount, 
+           COALESCE(c.comment_count, 0) AS commentCount,
+           COUNT(*) OVER() AS totalPosts,
+           CASE WHEN ul.user_id IS NOT NULL THEN TRUE ELSE FALSE END AS is_like,
+           CASE WHEN f.type = 'challenge' AND r.user_id IS NOT NULL THEN TRUE ELSE FALSE END AS is_joined
+    FROM (
+        SELECT p.id, 'post' AS type, p.hashtag, p.content, p.media_url AS mediaUrl, 
+               NULL AS startDate, NULL AS endDate, p.created_at AS createdAt, p.user_id
+        FROM posts p 
+        WHERE p.is_deleted = FALSE AND p.hashtag = :hashtag
+        UNION ALL
+        SELECT c.id, 'challenge' AS type, c.hashtag, c.content, c.media_url AS mediaUrl, 
+               c.start_date AS startDate, c.end_date AS endDate, c.created_at AS createdAt, c.user_id
+        FROM challenges c 
+        WHERE c.is_deleted = FALSE AND c.hashtag = :hashtag 
+              AND c.start_date >= :startDate AND c.end_date <= :endDate
+    ) AS f
+    JOIN users u ON f.user_id = u.id
+    LEFT JOIN (
+        SELECT feed_id, COUNT(*) AS like_count FROM likes GROUP BY feed_id
+    ) AS l ON f.id = l.feed_id
+    LEFT JOIN (
+        SELECT feed_id, COUNT(*) AS comment_count FROM comments GROUP BY feed_id
+    ) AS c ON f.id = c.feed_id
+    LEFT JOIN likes ul ON f.id = ul.feed_id AND ul.user_id = :userId
+    LEFT JOIN reminders r ON f.type = 'challenge'
+        AND f.hashtag = r.hashtag
+        AND f.startDate = r.start_date
+        AND f.endDate = r.end_date
+        AND r.user_id = :userId
+    ORDER BY f.type ASC, f.createdAt DESC
+    LIMIT :size OFFSET :offset
+""")
+	List<Object[]> getFeedDetailByHashtagAndDate(
+			@Param("hashtag") String hashtag,
+			@Param("startDate") LocalDate startDate,
+			@Param("endDate") LocalDate endDate,
+			@Param("userId") UUID userId,
+			@Param("size") int size,
 			@Param("offset") int offset);
 }

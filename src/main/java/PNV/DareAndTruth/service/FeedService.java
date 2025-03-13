@@ -1,10 +1,10 @@
 package PNV.DareAndTruth.service;
 
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.util.*;
 
+import PNV.DareAndTruth.mapper.FeedMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class FeedService {
     FeedRepository feedRepository;
     UserRepository userRepository;
+    FeedMapper feedMapper;
 
     public User getUserById(UUID userId) {
         return userRepository
@@ -154,4 +155,31 @@ public class FeedService {
                 ))
                 .toList();
     }
+
+    public Map<String, Object> getFeedDetailByHashtagAndDate(
+            String hashtag, String startDate, String endDate, int page, int size) {
+
+        LocalDate startLocalDate = LocalDate.parse(startDate);
+        LocalDate endLocalDate = LocalDate.parse(endDate);
+        int offset = page * size;
+
+        // Lấy danh sách bài viết
+        List<Object[]> results = feedRepository.getFeedDetailByHashtagAndDate(
+                hashtag, startLocalDate, endLocalDate, size, offset);
+
+        // Dùng mapper để chuyển đổi dữ liệu
+        List<GetFeedResponse> feeds = results.stream()
+                .map(feedMapper::mapToFeedResponse)
+                .toList();
+
+        // Lấy tổng số bài viết từ query (dữ liệu ở cột cuối cùng)
+        Long totalPosts = results.isEmpty() ? 0 : ((Number) results.get(0)[10]).longValue();
+
+        // Gửi response dưới dạng JSON object chứa cả danh sách bài viết và tổng số bài viết
+        Map<String, Object> response = new HashMap<>();
+        response.put("feeds", feeds);
+        response.put("totalPosts", totalPosts);
+        return response;
+    }
+
 }
