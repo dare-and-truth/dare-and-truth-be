@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.*;
 
-import PNV.DareAndTruth.mapper.FeedMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 public class FeedService {
     FeedRepository feedRepository;
     UserRepository userRepository;
-    FeedMapper feedMapper;
 
     public User getUserById(UUID userId) {
         return userRepository
@@ -157,29 +155,53 @@ public class FeedService {
     }
 
     public Map<String, Object> getFeedDetailByHashtagAndDate(
-            String hashtag, String startDate, String endDate, int page, int size) {
+            String hashtag, String startDate, String endDate, int page, int size, UUID userId) {
 
-        LocalDate startLocalDate = LocalDate.parse(startDate);
-        LocalDate endLocalDate = LocalDate.parse(endDate);
+        LocalDate localStartDate = LocalDate.parse(startDate);
+        LocalDate localEndDate = LocalDate.parse(endDate);
+
+        Timestamp startDateTime = Timestamp.valueOf(localStartDate.atStartOfDay());
+        Timestamp endDateTime = Timestamp.valueOf(localEndDate.atTime(23, 59, 59));
+
         int offset = page * size;
 
-        // Lấy danh sách bài viết
-        List<Object[]> results = feedRepository.getFeedDetailByHashtagAndDate(
-                hashtag, startLocalDate, endLocalDate, size, offset);
+        List<Object[]> challengeResults = feedRepository.getChallengeFeed(hashtag, localStartDate, localEndDate, userId, size, offset);
+        List<Object[]> postResults = feedRepository.getPostFeed(hashtag, startDateTime, endDateTime, userId, size, offset);
 
-        // Dùng mapper để chuyển đổi dữ liệu
-        List<GetFeedResponse> feeds = results.stream()
-                .map(feedMapper::mapToFeedResponse)
+        List<Object[]> combinedResults = new ArrayList<>();
+        combinedResults.addAll(challengeResults);
+        combinedResults.addAll(postResults);
+
+        List<GetFeedResponse> feeds = combinedResults.stream()
+                .map(row -> {
+                        return new GetFeedResponse(
+                                (UUID) row[0], // ID
+                                (String) row[1], // Type (post/challenge)
+                                (String) row[2], // Hashtag
+                                (String) row[3], // Content
+                                (String) row[4], // Media URL
+                                row[5] != null ? row[5].toString() : null, // Start Date (for challenge)
+                                row[6] != null ? row[6].toString() : null, // End Date (for challenge)
+                                ((Timestamp) row[7]).toLocalDateTime(), // Created At
+                                (UUID) row[8], // User ID
+                                (String) row[9], // Username
+                                (String) row[10], // Avatar URL
+                                ((Number) row[11]).intValue(), // Like Count
+                                ((Number) row[12]).intValue(), // Comment Count
+                                (row[13] instanceof Number) ? ((Number) row[13]).intValue() == 1 : (Boolean) row[13], // is_like
+                                (row[14] instanceof Number) ? ((Number) row[14]).intValue() == 1 : (Boolean) row[14]  // is_joined
+                        );
+
+                })
+                .filter(Objects::nonNull)
                 .toList();
 
-        // Lấy tổng số bài viết từ query (dữ liệu ở cột cuối cùng)
-        Long totalPosts = results.isEmpty() ? 0 : ((Number) results.get(0)[10]).longValue();
+        Long totalPosts = (postResults.isEmpty()) ? 0L : (long) postResults.size();
 
-        // Gửi response dưới dạng JSON object chứa cả danh sách bài viết và tổng số bài viết
         Map<String, Object> response = new HashMap<>();
         response.put("feeds", feeds);
         response.put("totalPosts", totalPosts);
+
         return response;
     }
-
 }

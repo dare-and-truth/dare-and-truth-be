@@ -2,6 +2,7 @@ package PNV.DareAndTruth.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -382,9 +383,8 @@ public class FeedController {
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size ,
 			HttpServletRequest httpServletRequest) {
-		String token = jwtService.extractTokenFromHeader(httpServletRequest);
-		String email = jwtService.extractEmail();
-		Map<String, Object> feedData = feedService.getFeedDetailByHashtagAndDate(hashtag, startDate, endDate, page, size);
+		UUID userId = jwtService.extractUserIdFromHeader(httpServletRequest);
+		Map<String, Object> feedData = feedService.getFeedDetailByHashtagAndDate(hashtag, startDate, endDate, page, size, userId);
 
 		return ResponseEntity.status(200)
 				.body(AppApiResponse.<Map<String, Object>>builder()
