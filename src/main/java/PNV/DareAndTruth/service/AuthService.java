@@ -53,8 +53,8 @@ public class AuthService {
 
         String role = Boolean.TRUE.equals(user.getIsAdmin()) ? "admin" : "user";
 
-        String accessToken = jwtService.createToken(user.getEmail(), role, false);
-        String refreshToken = jwtService.createToken(user.getEmail(), role, true);
+        String accessToken = jwtService.createToken(user.getId(), user.getEmail(), role, false);
+        String refreshToken = jwtService.createToken(user.getId(), user.getEmail(), role, true);
 
         user.setRefreshToken(refreshToken);
         userRepository.save(user);
@@ -86,7 +86,7 @@ public class AuthService {
         }
 
         String newAccessToken = jwtService.createToken(
-                user.getEmail(), Boolean.TRUE.equals(user.getIsAdmin()) ? "admin" : "user", false);
+                user.getId(), user.getEmail(), Boolean.TRUE.equals(user.getIsAdmin()) ? "admin" : "user", false);
 
         Map<String, Object> response = new HashMap<>();
         response.put(ACCESS_TOKEN, newAccessToken);
