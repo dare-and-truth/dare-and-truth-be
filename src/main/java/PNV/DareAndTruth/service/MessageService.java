@@ -33,6 +33,11 @@ public class MessageService {
 
     @Transactional
     public void sendMessage(UUID senderId, SendMessageRequest request) {
+
+        if (request.getMediaUrl() == null && request.getContent() == null) {
+            throw new AppException(ErrorCode.CONTENT_OR_MEDIA_URL_REQUIRE, HttpStatus.BAD_REQUEST);
+        }
+
         UUID receiverId = request.getReceiverId();
         if (!userRepository.existsById(receiverId)) {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
@@ -64,11 +69,18 @@ public class MessageService {
         });
 
         // Tạo tin nhắn
-        Message message = Message.builder()
+        Message message;
+        message = Message.builder()
                 .conversationId(conversation.getId())
                 .content(request.getContent())
                 .senderId(senderId)
                 .build();
+        if (request.getMediaUrl() != null) {
+            message.setMediaUrl(request.getMediaUrl());
+        }
+        if (request.getContent() != null) {
+            message.setContent(request.getContent());
+        }
 
         Message newMessage = messageRepository.save(message);
 

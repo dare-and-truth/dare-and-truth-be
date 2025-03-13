@@ -16,6 +16,5 @@ public class ChatResponse {
     private String conversationId;
     private UserInfo otherUser;
     private List<MessageResponse> messages;
-    private String lastMessageId;
-    private boolean hasMore;
+    private String nextMessageId;
 }

@@ -180,11 +180,11 @@ public class ConversationController {
             @RequestParam String otherUserId,
             @RequestParam(defaultValue = "20") int limit,
             @RequestParam(required = false) String conversationId,
-            @RequestParam(required = false) String lastMessageId) {
+            @RequestParam(required = false) String nextMessageId) {
         UUID userId = jwtService.extractUserIdFromHeader(request);
 
-        // Convert String lastMessageId to ObjectId if it's not null
-        ObjectId objectIdLastMessage = lastMessageId != null ? new ObjectId(lastMessageId) : null;
+        // Convert String nextMessageId to ObjectId if it's not null
+        ObjectId objectIdLastMessage = nextMessageId != null ? new ObjectId(nextMessageId) : null;
 
         ChatResponse chatResponse = conversationService.getChatBetweenUsers(
                 userId, otherUserId, conversationId, limit, objectIdLastMessage);

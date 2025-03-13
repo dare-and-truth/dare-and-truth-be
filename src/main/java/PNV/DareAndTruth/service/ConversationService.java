@@ -75,7 +75,7 @@ public class ConversationService {
     }
 
     public ChatResponse getChatBetweenUsers(
-            UUID userId, String otherUserId, String conversationId, int limit, ObjectId lastMessageId) {
+            UUID userId, String otherUserId, String conversationId, int limit, ObjectId nextMessageId) {
         UUID otherUserUUID = UUID.fromString(otherUserId);
         User otherUser = userRepository
                 .findById(otherUserUUID)
@@ -101,18 +101,18 @@ public class ConversationService {
 
         Conversation conversation = conversationOpt.get();
 
-        // Get messages base on lastMessageId
+        // Get messages based on nextMessageId
         List<Message> messages;
-        boolean hasMore = false; // Mặc định không còn tin nhắn để tải
+        ObjectId newNextMessageId = null; // Mặc định không có tin nhắn cũ hơn
 
-        if (lastMessageId == null) {
+        if (nextMessageId == null) {
             // Truy vấn lần đầu, lấy tin nhắn mới nhất
             Pageable pageable = PageRequest.of(0, limit + 1, Sort.by(Sort.Direction.DESC, "sentAt"));
             messages = messageRepository.findByConversationId(conversation.getId(), pageable);
         } else {
-            // Tìm tin nhắn tương ứng với lastMessageId để lấy thời gian gửi
-            Optional<Message> lastMessageOpt = messageRepository.findById(lastMessageId);
-            Instant lastSentAt = lastMessageOpt
+            // Tìm tin nhắn tương ứng với nextMessageId để lấy thời gian gửi
+            Optional<Message> nextMessageOpt = messageRepository.findById(nextMessageId);
+            Instant lastSentAt = nextMessageOpt
                     .orElseThrow(() -> new AppException(ErrorCode.MESSAGE_NOT_FOUND, HttpStatus.NOT_FOUND))
                     .getSentAt();
 
@@ -122,36 +122,30 @@ public class ConversationService {
 
         // Kiểm tra xem có còn tin nhắn để tải không
         if (messages.size() > limit) {
-            hasMore = true;
+            newNextMessageId = messages.get(limit).getId(); // ID của tin nhắn tiếp theo
             messages = messages.subList(0, limit); // Giữ lại số lượng đúng theo limit
         }
 
         List<MessageResponse> messageResponses = messages.stream()
                 .map(msg -> new MessageResponse(
-                        msg.getId().toString(), msg.getContent(), msg.getSenderId(), msg.getSentAt()))
+                        msg.getId().toString(), msg.getContent(), msg.getMediaUrl(), msg.getSenderId(), msg.getSentAt()))
                 .toList();
 
-        // Nếu danh sách tin nhắn không rỗng, lấy ID của tin nhắn cuối cùng
-        ObjectId newLastMessageId = messages.isEmpty() ? null : messages.get(messages.size() - 1).getId();
-
-        if (lastMessageId == null) {
+        if (nextMessageId == null) {
             // Trả về thêm conversationId & thông tin người dùng cho request đầu tiên
             UserInfo otherUserInfo = new UserInfo(otherUser.getId(), otherUser.getUsername(), otherUser.getAvatarUrl());
             return ChatResponse.builder()
                     .conversationId(conversation.getId().toString())
                     .otherUser(otherUserInfo)
                     .messages(messageResponses)
-                    .lastMessageId(newLastMessageId != null ? newLastMessageId.toString() : null)
-                    .hasMore(hasMore)
+                    .nextMessageId(newNextMessageId != null ? newNextMessageId.toString() : null)
                     .build();
         } else {
-            // Các request tiếp theo -> chỉ trả messages & lastMessageId & hasMore
+            // Các request tiếp theo -> chỉ trả messages & nextMessageId
             return ChatResponse.builder()
                     .messages(messageResponses)
-                    .lastMessageId(newLastMessageId != null ? newLastMessageId.toString() : null)
-                    .hasMore(hasMore)
+                    .nextMessageId(newNextMessageId != null ? newNextMessageId.toString() : null)
                     .build();
         }
     }
-
 }

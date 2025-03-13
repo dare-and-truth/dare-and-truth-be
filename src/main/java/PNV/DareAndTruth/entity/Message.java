@@ -34,6 +34,9 @@ public class Message {
     @Field(name = "content")
     String content;
 
+    @Field(name = "media_url")
+    String mediaUrl;
+
     @CreatedDate
     @Field(name = "sent_at")
     Instant sentAt;
