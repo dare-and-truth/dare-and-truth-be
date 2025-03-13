@@ -299,8 +299,11 @@ public class FeedController {
                         content = @Content(mediaType = "application/json"))
             })
     @GetMapping("loved/user/{userId}")
-    public ResponseEntity<AppApiResponse<List<GetFeedResponse>>> getFeedLovedByUserId(@PathVariable String userId) {
-        List<GetFeedResponse> feed = feedService.getFeedLovedByUserId(userId);
+    public ResponseEntity<AppApiResponse<List<GetFeedResponse>>> getFeedLovedByUserId(
+			@PathVariable String userId,
+			@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size) {
+        List<GetFeedResponse> feed = feedService.getFeedLovedByUserId(userId,page, size);
         return ResponseEntity.status(200)
                 .body(AppApiResponse.<List<GetFeedResponse>>builder()
                         .code(1000)

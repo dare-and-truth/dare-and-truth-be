@@ -114,7 +114,7 @@ public class FeedService {
         return feedRepository.findFeedByIdAndType(UUID.fromString(id), type, userId);
     }
 
-    public List<GetFeedResponse> getFeedLovedByUserId(String userId) {
+    public List<GetFeedResponse> getFeedLovedByUserId(String userId, int page, int size) {
         UUID userUUID;
         try {
             userUUID = UUID.fromString(userId);
@@ -127,7 +127,11 @@ public class FeedService {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
-        List<Object[]> results = feedRepository.getFeedsLovedByUser(userUUID);
+        // Tính toán offset từ page và size
+        int offset = page * size;
+
+        // Gọi repository với phân trang
+        List<Object[]> results = feedRepository.getFeedsLovedByUser(userUUID, size, offset);
 
         // Chuyển đổi kết quả từ query thành danh sách GetFeedResponse
         return results.stream()
@@ -146,8 +150,8 @@ public class FeedService {
                         ((Number) row[11]).intValue(), // Like Count
                         ((Number) row[12]).intValue(), // Comment Count
                         (Boolean) row[13], // is_like
-                        (Boolean) row[14] // is_joined
-                        ))
+                        (Boolean) row[14]// is_joined
+                ))
                 .toList();
     }
 }
