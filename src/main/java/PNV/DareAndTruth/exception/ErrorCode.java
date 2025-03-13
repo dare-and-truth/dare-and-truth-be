@@ -70,7 +70,11 @@ public enum ErrorCode {
     NOTIFICATION_NOT_FOUND(1059, "Notification is not found"),
     USER_SCORES_NOT_FOUND(1060, "No scores found for user with user ID"),
     SCORE_ALREADY_EXISTS(1061, "The score already exist"),
-    FAIL_TO_CHECK_REQUEST_YOURSELF(1062, "You can not check type of request with yourself"),
+    RECEIVER_ID_REQUIRED(1062, "Receiver ID cannot be null"),
+    CONVERSATION_NOT_FOUND(1063, "Conversation is not found"),
+    MESSAGE_NOT_FOUND(1064, "Message is not found"),
+    FAIL_TO_CHECK_REQUEST_YOURSELF(1065, "You can not check type of request with yourself"),
+    CONTENT_OR_MEDIA_URL_REQUIRE(1066, "Content or media URL is required")
     ;
 
     int code;

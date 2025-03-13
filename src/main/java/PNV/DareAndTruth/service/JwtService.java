@@ -1,9 +1,6 @@
 package PNV.DareAndTruth.service;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.crypto.SecretKey;
 
@@ -44,12 +41,13 @@ public class JwtService {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public String createToken(String email, String role, boolean isRefreshToken) {
+    public String createToken(UUID userId, String email, String role, boolean isRefreshToken) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", isRefreshToken ? "refresh" : "access");
 
         if (!isRefreshToken) {
             claims.put("role", role);
+            claims.put("userId", userId);
         }
 
         long expirationTime = isRefreshToken ? refreshTokenValidity : accessTokenValidity;
@@ -73,6 +71,11 @@ public class JwtService {
 
     public String extractEmail(String token) {
         return extractAllClaims(token).getSubject();
+    }
+
+    public UUID extractUserIdFromHeader(HttpServletRequest request) {
+        String token = extractTokenFromHeader(request);
+        return UUID.fromString(extractAllClaims(token).get("userId", String.class));
     }
 
     private Claims extractAllClaims(String token) {
