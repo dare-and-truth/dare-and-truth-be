@@ -2,6 +2,7 @@ package PNV.DareAndTruth.controller;
 
 import java.util.Set;
 
+import PNV.DareAndTruth.dto.response.post.StartDateEndDateOfPostResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -160,6 +161,19 @@ public class PostController {
                 .status(ApiStatus.SUCCESS)
                 .message("User retrieved successfully")
                 .data(post)
+                .build());
+    }
+
+    @GetMapping("date/{hashtag}")
+    public ResponseEntity<AppApiResponse<StartDateEndDateOfPostResponse>> getStartDateAndEndDateByHashtagAndCreatedAt(
+            @PathVariable String hashtag,
+            @RequestParam String createdAt) {
+        StartDateEndDateOfPostResponse date = postService.getStartDateAndEndDateByHashtagAndCreatedAt(hashtag,createdAt);
+        return ResponseEntity.ok(AppApiResponse.<StartDateEndDateOfPostResponse>builder()
+                .code(1000)
+                .status(ApiStatus.SUCCESS)
+                .message("User retrieved successfully")
+                .data(date)
                 .build());
     }
 }

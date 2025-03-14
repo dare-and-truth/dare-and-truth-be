@@ -146,4 +146,12 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
     Optional<Challenge> findByHashtagAndIsActiveTrue(String hashtag);
 
     List<Challenge> findByEndDateAndIsDeletedFalse(LocalDate endDate);
+
+	@Query("SELECT c FROM Challenge c " +
+			"WHERE c.hashtag = :hashtag " +
+			"AND :createdAt BETWEEN c.startDate AND c.endDate " +
+			"AND c.isDeleted = false")
+	Optional<Challenge> findActiveChallengeByHashtagAndCreatedAt(
+			@Param("hashtag") String hashtag,
+			@Param("createdAt") LocalDate createdAt);
 }
