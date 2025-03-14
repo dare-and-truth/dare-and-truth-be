@@ -5,10 +5,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import PNV.DareAndTruth.dto.projection.challenge.ChallengeSummaryProjection;
-import PNV.DareAndTruth.dto.projection.post.PostSummaryProjection;
-import PNV.DareAndTruth.entity.Post;
-import PNV.DareAndTruth.entity.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import PNV.DareAndTruth.dto.projection.score.ScoreSummaryProjection;
 import PNV.DareAndTruth.dto.response.ranking.UserRankingResponse;
 import PNV.DareAndTruth.entity.Challenge;
+import PNV.DareAndTruth.entity.Post;
 import PNV.DareAndTruth.entity.Score;
+import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
 import PNV.DareAndTruth.repository.*;
@@ -127,17 +125,18 @@ public class ScoreService {
         }
     }
 
-
     @Transactional
     public void addLikeScore(UUID feedId, String feedType, String likingUserEmail) {
 
         // Retrieve the user who is liking the feed
-        User likingUser = userRepository.findByEmail(likingUserEmail)
+        User likingUser = userRepository
+                .findByEmail(likingUserEmail)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         // Check if the liking user is not the creator of the feed and add score if not already awarded
         if ("post".equalsIgnoreCase(feedType)) {
-            Post post = postRepository.findPostEntityByIdAndIsDeletedFalse(feedId)
+            Post post = postRepository
+                    .findPostEntityByIdAndIsDeletedFalse(feedId)
                     .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND, HttpStatus.NOT_FOUND));
 
             // Do not award points if the liker is the owner
@@ -146,8 +145,8 @@ public class ScoreService {
             }
 
             // Check if a score of type 3 (like) already exists for this post for the liking user
-            boolean scoreExists = scoreRepository.existsByUser_IdAndScoreTypeAndPost_Id(
-                    likingUser.getId(), 3, post.getId());
+            boolean scoreExists =
+                    scoreRepository.existsByUser_IdAndScoreTypeAndPost_Id(likingUser.getId(), 3, post.getId());
 
             if (!scoreExists) {
                 Score score = Score.builder()
@@ -160,7 +159,8 @@ public class ScoreService {
                 scoreRepository.save(score);
             }
         } else if ("challenge".equalsIgnoreCase(feedType)) {
-            Challenge challenge = challengeRepository.findChallengeEntityByIdAndIsDeletedFalse(feedId)
+            Challenge challenge = challengeRepository
+                    .findChallengeEntityByIdAndIsDeletedFalse(feedId)
                     .orElseThrow(() -> new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
             // Do not award points if the liker is the challenge owner
@@ -184,24 +184,25 @@ public class ScoreService {
         } else {
             throw new AppException(ErrorCode.INVALID_FEED_TYPE, HttpStatus.BAD_REQUEST);
         }
-
     }
 
     @Transactional
     public void addCommentScore(UUID feedId, String feedType, String commentingUserEmail) {
-        User commentingUser = userRepository.findByEmail(commentingUserEmail)
+        User commentingUser = userRepository
+                .findByEmail(commentingUserEmail)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if ("post".equalsIgnoreCase(feedType)) {
-            Post post = postRepository.findPostEntityByIdAndIsDeletedFalse(feedId)
+            Post post = postRepository
+                    .findPostEntityByIdAndIsDeletedFalse(feedId)
                     .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND, HttpStatus.NOT_FOUND));
 
             if (post.getUser().getId().equals(commentingUser.getId())) {
                 return;
             }
 
-            boolean scoreExists = scoreRepository.existsByUser_IdAndScoreTypeAndPost_Id(
-                    commentingUser.getId(), 5, post.getId());
+            boolean scoreExists =
+                    scoreRepository.existsByUser_IdAndScoreTypeAndPost_Id(commentingUser.getId(), 5, post.getId());
             if (!scoreExists) {
                 Score score = Score.builder()
                         .user(commentingUser)
@@ -213,7 +214,8 @@ public class ScoreService {
                 scoreRepository.save(score);
             }
         } else if ("challenge".equalsIgnoreCase(feedType)) {
-            Challenge challenge = challengeRepository.findChallengeEntityByIdAndIsDeletedFalse(feedId)
+            Challenge challenge = challengeRepository
+                    .findChallengeEntityByIdAndIsDeletedFalse(feedId)
                     .orElseThrow(() -> new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.NOT_FOUND));
 
             if (challenge.getUser().getId().equals(commentingUser.getId())) {

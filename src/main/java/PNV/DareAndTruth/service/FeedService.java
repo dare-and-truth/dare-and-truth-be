@@ -149,8 +149,8 @@ public class FeedService {
                         ((Number) row[11]).intValue(), // Like Count
                         ((Number) row[12]).intValue(), // Comment Count
                         (Boolean) row[13], // is_like
-                        (Boolean) row[14]// is_joined
-                ))
+                        (Boolean) row[14] // is_joined
+                        ))
                 .toList();
     }
 
@@ -165,8 +165,10 @@ public class FeedService {
 
         int offset = page * size;
 
-        List<Object[]> challengeResults = feedRepository.getChallengeFeed(hashtag, localStartDate, localEndDate, userId, size, offset);
-        List<Object[]> postResults = feedRepository.getPostFeed(hashtag, startDateTime, endDateTime, userId, size, offset);
+        List<Object[]> challengeResults =
+                feedRepository.getChallengeFeed(hashtag, localStartDate, localEndDate, userId, size, offset);
+        List<Object[]> postResults =
+                feedRepository.getPostFeed(hashtag, startDateTime, endDateTime, userId, size, offset);
 
         List<Object[]> combinedResults = new ArrayList<>();
         combinedResults.addAll(challengeResults);
@@ -174,24 +176,27 @@ public class FeedService {
 
         List<GetFeedResponse> feeds = combinedResults.stream()
                 .map(row -> {
-                        return new GetFeedResponse(
-                                (UUID) row[0], // ID
-                                (String) row[1], // Type (post/challenge)
-                                (String) row[2], // Hashtag
-                                (String) row[3], // Content
-                                (String) row[4], // Media URL
-                                row[5] != null ? row[5].toString() : null, // Start Date (for challenge)
-                                row[6] != null ? row[6].toString() : null, // End Date (for challenge)
-                                ((Timestamp) row[7]).toLocalDateTime(), // Created At
-                                (UUID) row[8], // User ID
-                                (String) row[9], // Username
-                                (String) row[10], // Avatar URL
-                                ((Number) row[11]).intValue(), // Like Count
-                                ((Number) row[12]).intValue(), // Comment Count
-                                (row[13] instanceof Number) ? ((Number) row[13]).intValue() == 1 : (Boolean) row[13], // is_like
-                                (row[14] instanceof Number) ? ((Number) row[14]).intValue() == 1 : (Boolean) row[14]  // is_joined
-                        );
-
+                    return new GetFeedResponse(
+                            (UUID) row[0], // ID
+                            (String) row[1], // Type (post/challenge)
+                            (String) row[2], // Hashtag
+                            (String) row[3], // Content
+                            (String) row[4], // Media URL
+                            row[5] != null ? row[5].toString() : null, // Start Date (for challenge)
+                            row[6] != null ? row[6].toString() : null, // End Date (for challenge)
+                            ((Timestamp) row[7]).toLocalDateTime(), // Created At
+                            (UUID) row[8], // User ID
+                            (String) row[9], // Username
+                            (String) row[10], // Avatar URL
+                            ((Number) row[11]).intValue(), // Like Count
+                            ((Number) row[12]).intValue(), // Comment Count
+                            (row[13] instanceof Number)
+                                    ? ((Number) row[13]).intValue() == 1
+                                    : (Boolean) row[13], // is_like
+                            (row[14] instanceof Number)
+                                    ? ((Number) row[14]).intValue() == 1
+                                    : (Boolean) row[14] // is_joined
+                            );
                 })
                 .filter(Objects::nonNull)
                 .toList();

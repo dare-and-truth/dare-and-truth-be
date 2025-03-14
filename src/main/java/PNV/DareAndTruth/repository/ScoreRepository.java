@@ -30,6 +30,7 @@ public interface ScoreRepository extends JpaRepository<Score, UUID> {
     boolean existsByUserAndChallengeAndScoreType(User user, Challenge challenge, int i);
 
     boolean existsByUser_IdAndScoreTypeAndPost_Id(UUID userId, int scoreType, UUID postId);
+
     boolean existsByUser_IdAndScoreTypeAndChallenge_Id(UUID userId, int scoreType, UUID challengeId);
 
     boolean existsByUserIdAndScoreTypeAndChallengeId(UUID id, int i, UUID id1);

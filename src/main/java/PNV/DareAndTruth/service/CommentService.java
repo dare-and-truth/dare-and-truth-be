@@ -45,9 +45,9 @@ public class CommentService {
         User sender = user.get();
 
         String feedType;
-        if(request.isChallenge()){
+        if (request.isChallenge()) {
             feedType = "challenge";
-        }else {
+        } else {
             feedType = "post";
         }
 

@@ -75,7 +75,7 @@ public enum ErrorCode {
     MESSAGE_NOT_FOUND(1064, "Message is not found"),
     FAIL_TO_CHECK_REQUEST_YOURSELF(1065, "You can not check type of request with yourself"),
     CONTENT_OR_MEDIA_URL_REQUIRE(1066, "Content or media URL is required"),
-    INVALID_FEED_TYPE(1067,"Feed type is invalid"),
+    INVALID_FEED_TYPE(1067, "Feed type is invalid"),
     ;
 
     int code;
