@@ -30,6 +30,8 @@ public class LikeService {
     ChallengeRepository challengeRepository;
     NotificationRepository notificationRepository;
     SimpMessagingTemplate messagingTemplate;
+    ScoreRepository scoreRepository;
+    ScoreService scoreService;
 
     public void likeFeed(LikeRequest request, String userEmail) {
         Optional<User> user = userRepository.findByEmail(userEmail);
@@ -113,6 +115,7 @@ public class LikeService {
             messagingTemplate.convertAndSend(
                     "/topic/notifications/" + notification.getReceiver().getId(), likeNotificationResponse);
         }
+        scoreService.addLikeScore(feedId, feedType, userEmail);
     }
 
     @Transactional

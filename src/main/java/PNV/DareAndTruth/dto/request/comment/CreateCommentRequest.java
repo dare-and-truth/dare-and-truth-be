@@ -28,4 +28,6 @@ public class CreateCommentRequest {
     @NotNull(message = "IS_CHALLENGE_REQUIRED")
     @JsonProperty("isChallenge")
     private boolean isChallenge;
+
+    String feedType;
 }

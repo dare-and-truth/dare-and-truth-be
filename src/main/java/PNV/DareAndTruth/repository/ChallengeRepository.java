@@ -154,4 +154,6 @@ public interface ChallengeRepository extends JpaRepository<Challenge, UUID> {
 	Optional<Challenge> findActiveChallengeByHashtagAndCreatedAt(
 			@Param("hashtag") String hashtag,
 			@Param("createdAt") LocalDate createdAt);
+
+	Optional<Challenge> findChallengeEntityByIdAndIsDeletedFalse(UUID feedId);
 }

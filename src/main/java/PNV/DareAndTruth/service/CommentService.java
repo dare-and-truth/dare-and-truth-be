@@ -29,6 +29,8 @@ public class CommentService {
     ChallengeRepository challengeRepository;
     NotificationRepository notificationRepository;
     SimpMessagingTemplate messagingTemplate;
+    ScoreRepository scoreRepository;
+    ScoreService scoreService;
 
     public void createComment(CreateCommentRequest request, String userEmail) {
         Optional<User> user = userRepository.findByEmail(userEmail);
@@ -41,6 +43,13 @@ public class CommentService {
         CommentNotificationResponse commentNotificationResponse = null; // Initialize as null
 
         User sender = user.get();
+
+        String feedType;
+        if(request.isChallenge()){
+            feedType = "challenge";
+        }else {
+            feedType = "post";
+        }
 
         if (request.isChallenge()) {
             Optional<Challenge> challenge = challengeRepository.findById(UUID.fromString(request.getFeedId()));
@@ -109,10 +118,13 @@ public class CommentService {
         Comment comment = Comment.builder()
                 .user(sender)
                 .feedId(feedId)
+                .feedType(feedType)
                 .content(request.getContent())
                 .mediaUrl(request.getMediaUrl())
                 .build();
         commentRepository.save(comment);
+
+        scoreService.addCommentScore(feedId, feedType, userEmail);
     }
 
     public Set<CommentSummaryProjection> getCommentsByFeedId(String feedId) {

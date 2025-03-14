@@ -16,6 +16,7 @@ import PNV.DareAndTruth.entity.Post;
 public interface PostRepository extends JpaRepository<Post, UUID> {
     Set<PostSummaryProjection> findAllByIsDeletedFalse();
 
+
     Optional<PostSummaryProjection> findByIdAndIsDeletedFalse(UUID id);
 
     // At the time Nhat or anyone fix type when save like, I will add this in to query "AND l.feedType = 'post', in
@@ -31,4 +32,6 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
             @Param("hashtag") String hashtag,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
+
+    Optional<Post> findPostEntityByIdAndIsDeletedFalse(UUID id);
 }
