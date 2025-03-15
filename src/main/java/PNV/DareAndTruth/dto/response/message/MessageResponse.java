@@ -16,6 +16,7 @@ import lombok.*;
 public class MessageResponse {
     String id;
     String content;
+    String mediaUrl;
     UUID senderId;
     String conversationId;
     Instant sentAt;

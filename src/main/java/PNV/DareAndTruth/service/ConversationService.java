@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import PNV.DareAndTruth.dto.response.chat.UnreadMessagesOfAllChatCountResponse;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import PNV.DareAndTruth.dto.response.chat.ChatResponse;
 import PNV.DareAndTruth.dto.response.chat.ConversationResponse;
-import PNV.DareAndTruth.dto.response.chat.MessageResponse;
 import PNV.DareAndTruth.dto.response.user.UserInfo;
 import PNV.DareAndTruth.entity.Conversation;
 import PNV.DareAndTruth.entity.Message;
@@ -126,8 +126,8 @@ public class ConversationService {
             messages = messages.subList(0, limit); // Giữ lại số lượng đúng theo limit
         }
 
-        List<MessageResponse> messageResponses = messages.stream()
-                .map(msg -> new MessageResponse(
+        List<ConversationResponse.MessageResponse> messageResponses = messages.stream()
+                .map(msg -> new ConversationResponse.MessageResponse(
                         msg.getId().toString(), msg.getContent(), msg.getMediaUrl(), msg.getSenderId(), msg.getSentAt()))
                 .toList();
 
@@ -147,5 +147,14 @@ public class ConversationService {
                     .nextMessageId(newNextMessageId != null ? newNextMessageId.toString() : null)
                     .build();
         }
+    }
+
+    public UnreadMessagesOfAllChatCountResponse getTotalUnreadMessages(UUID userId) {
+        List<Conversation> conversations = conversationRepository.findByParticipantsContaining(userId);
+
+        int unreadMessagesCount = conversations.stream()
+                .mapToInt(conversation -> conversation.getUnreadCounts().getOrDefault(userId, 0))
+                .sum();
+        return UnreadMessagesOfAllChatCountResponse.builder().totalUnreadMessagesCount(unreadMessagesCount).build();
     }
 }

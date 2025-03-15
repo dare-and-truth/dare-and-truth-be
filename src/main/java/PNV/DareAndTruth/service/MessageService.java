@@ -84,27 +84,17 @@ public class MessageService {
 
         Message newMessage = messageRepository.save(message);
 
-        MessageResponse messageResponse;
+        MessageResponse messageResponse = MessageResponse.builder()
+                .id(newMessage.getId().toString())
+                .conversationId(newMessage.getConversationId().toString())
+                .senderUsername(sender.getUsername())
+                .senderAvatarUrl(sender.getAvatarUrl())
+                .content(newMessage.getContent())
+                .mediaUrl(newMessage.getMediaUrl())
+                .sentAt(newMessage.getSentAt())
+                .senderId(newMessage.getSenderId())
+                .build();
 
-        if (conversationId != null) {
-            messageResponse = MessageResponse.builder()
-                    .id(newMessage.getId().toString())
-                    .conversationId(conversationId.toString())
-                    .content(newMessage.getContent())
-                    .senderId(newMessage.getSenderId())
-                    .sentAt(newMessage.getSentAt())
-                    .build();
-        } else {
-            messageResponse = MessageResponse.builder()
-                    .id(newMessage.getId().toString())
-                    .conversationId(newMessage.getConversationId().toString())
-                    .senderUsername(sender.getUsername())
-                    .senderAvatarUrl(sender.getAvatarUrl())
-                    .content(newMessage.getContent())
-                    .sentAt(newMessage.getSentAt())
-                    .senderId(newMessage.getSenderId())
-                    .build();
-        }
 
         messagingTemplate.convertAndSend("/topic/messages/" + receiverId, messageResponse);
 
