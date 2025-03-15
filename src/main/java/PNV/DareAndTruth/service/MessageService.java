@@ -2,11 +2,13 @@ package PNV.DareAndTruth.service;
 
 import java.util.*;
 
+import com.mongodb.MongoException;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import PNV.DareAndTruth.dto.request.message.SendMessageRequest;
 import PNV.DareAndTruth.dto.response.message.MessageResponse;
@@ -21,6 +23,7 @@ import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +35,7 @@ public class MessageService {
     UserRepository userRepository;
 
     @Transactional
+    @Retryable(value = MongoException.class, maxAttempts = 5, backoff = @Backoff(delay = 300))
     public void sendMessage(UUID senderId, SendMessageRequest request) {
 
         if (request.getMediaUrl() == null && request.getContent() == null) {
@@ -65,7 +69,8 @@ public class MessageService {
         Conversation conversation = conversationOpt.orElseGet(() -> {
             Conversation newConversation = new Conversation();
             newConversation.setParticipants(Set.of(senderId, receiverId));
-            return conversationRepository.save(newConversation);
+            newConversation.setUnreadCounts(new HashMap<>());
+            return newConversation;
         });
 
         // Tạo tin nhắn
@@ -99,9 +104,6 @@ public class MessageService {
         messagingTemplate.convertAndSend("/topic/messages/" + receiverId, messageResponse);
 
         // update Conversation
-        if (conversation.getUnreadCounts() == null) {
-            conversation.setUnreadCounts(new HashMap<>());
-        }
         conversation.setLastMessage(Conversation.MessagePreview.builder()
                 .content(message.getContent())
                 .senderId(message.getSenderId())
