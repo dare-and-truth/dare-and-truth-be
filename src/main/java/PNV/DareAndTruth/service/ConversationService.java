@@ -27,6 +27,7 @@ import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -156,5 +157,16 @@ public class ConversationService {
                 .mapToInt(conversation -> conversation.getUnreadCounts().getOrDefault(userId, 0))
                 .sum();
         return UnreadMessagesOfAllChatCountResponse.builder().totalUnreadMessagesCount(unreadMessagesCount).build();
+    }
+
+    @Transactional
+    public void markConversationAsRead(ObjectId conversationId, UUID userId) {
+        Optional<Conversation> conversationOpt = conversationRepository.findById(conversationId);
+        if (conversationOpt.isEmpty()) {
+            throw new AppException(ErrorCode.CONVERSATION_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        Conversation conversation = conversationOpt.get();
+        conversation.getUnreadCounts().put(userId, 0);
+        conversationRepository.save(conversation);
     }
 }

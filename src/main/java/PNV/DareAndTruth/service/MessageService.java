@@ -114,27 +114,4 @@ public class MessageService {
         conversation.getUnreadCounts().put(senderId, 0);
         conversationRepository.save(conversation);
     }
-
-    @Transactional
-    public void markMessagesAsRead(ObjectId conversationId, UUID userId) {
-        Optional<Conversation> conversationOpt = conversationRepository.findById(conversationId);
-        if (conversationOpt.isEmpty()) {
-            throw new AppException(ErrorCode.CONVERSATION_NOT_FOUND, HttpStatus.NOT_FOUND);
-        }
-        Conversation conversation = conversationOpt.get();
-        conversation.getUnreadCounts().put(userId, 0);
-        conversationRepository.save(conversation);
-
-        List<Message> unreadMessages = messageRepository.findUnreadMessages(conversationId, userId);
-
-        if (unreadMessages.isEmpty()) return;
-
-        unreadMessages.forEach(message -> {
-            if (message.getReadBy() == null) {
-                message.setReadBy(new HashSet<>()); // Khởi tạo nếu null
-            }
-            message.getReadBy().add(userId.toString());
-        });
-        messageRepository.saveAll(unreadMessages);
-    }
 }

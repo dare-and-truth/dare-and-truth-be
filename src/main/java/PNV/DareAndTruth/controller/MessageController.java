@@ -72,46 +72,4 @@ public class MessageController {
                         .message("Message sent successfully")
                         .build());
     }
-
-    @Operation(
-            summary = "Mark messages as read",
-            description = "Marks all unread messages in a conversation as read by the given user.")
-    @ApiResponses(
-            value = {
-                @ApiResponse(
-                        responseCode = "200",
-                        description = "Messages marked as read successfully",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        value =
-                                                                "{\"code\": 1000, \"status\": \"success\", \"message\": \"Messages marked as read successfully\"}"))),
-                @ApiResponse(
-                        responseCode = "404",
-                        description = "Conversation not found",
-                        content =
-                                @Content(
-                                        mediaType = "application/json",
-                                        examples =
-                                                @ExampleObject(
-                                                        value =
-                                                                "{\"code\": 1018, \"status\": \"fail\", \"message\": \"Conversation not found\"}")))
-            })
-    @PutMapping("/{conversationId}/mark-read")
-    public ResponseEntity<AppApiResponse<Void>> markMessagesAsRead(
-            @PathVariable String conversationId, HttpServletRequest httpServletRequest) {
-
-        // Lấy userId từ token trong header
-        UUID userId = jwtService.extractUserIdFromHeader(httpServletRequest);
-
-        messageService.markMessagesAsRead(new ObjectId(conversationId), userId);
-
-        return ResponseEntity.ok(AppApiResponse.<Void>builder()
-                .code(1000)
-                .status(ApiStatus.SUCCESS)
-                .message("Messages marked as read successfully")
-                .build());
-    }
 }
