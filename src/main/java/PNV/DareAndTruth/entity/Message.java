@@ -40,7 +40,4 @@ public class Message {
     @CreatedDate
     @Field(name = "sent_at")
     Instant sentAt;
-
-    @Field(name = "read_by")
-    Set<String> readBy;
 }

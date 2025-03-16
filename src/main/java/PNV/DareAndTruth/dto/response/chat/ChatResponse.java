@@ -15,6 +15,6 @@ import lombok.Setter;
 public class ChatResponse {
     private String conversationId;
     private UserInfo otherUser;
-    private List<MessageResponse> messages;
+    private List<ConversationResponse.MessageResponse> messages;
     private String nextMessageId;
 }

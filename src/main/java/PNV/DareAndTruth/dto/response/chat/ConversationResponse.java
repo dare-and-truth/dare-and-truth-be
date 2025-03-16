@@ -2,6 +2,7 @@ package PNV.DareAndTruth.dto.response.chat;
 
 import java.time.Instant;
 import java.util.Set;
+import java.util.UUID;
 
 import PNV.DareAndTruth.dto.response.user.UserInfo;
 import PNV.DareAndTruth.entity.Conversation;
@@ -21,4 +22,16 @@ public class ConversationResponse {
     Conversation.MessagePreview lastMessage;
     int unreadMessages;
     Instant updatedAt;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    public static class MessageResponse {
+        String id;
+        String content;
+        String mediaUrl;
+        UUID senderId;
+        Instant sentAt;
+    }
 }

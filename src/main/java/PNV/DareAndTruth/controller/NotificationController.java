@@ -1,5 +1,7 @@
 package PNV.DareAndTruth.controller;
 
+import PNV.DareAndTruth.dto.response.notification.UnreadNotificationCountResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -22,13 +24,13 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/notifications")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class NotificationController {
-    private static final Logger log = LoggerFactory.getLogger(NotificationController.class);
-
     NotificationService notificationService;
     JwtService jwtService;
 
@@ -90,15 +92,16 @@ public class NotificationController {
                                                             "{\"code\": 1000, \"status\": \"success\", \"message\": \"Retrieved unread notifications count successfully\"}")
                                         }))
             })
-    @GetMapping("/user/{receiverId}/unread-count")
-    public ResponseEntity<AppApiResponse<Long>> getUnreadNotificationsCount(@PathVariable String receiverId) {
-        Long unreadCount = notificationService.countUnreadNotifications(receiverId);
+    @GetMapping("/unread/count")
+    public ResponseEntity<AppApiResponse<UnreadNotificationCountResponse>> getUnreadNotificationsCount(HttpServletRequest httpServletRequest) {
+        UUID userId = jwtService.extractUserIdFromHeader(httpServletRequest);
+        UnreadNotificationCountResponse unreadNotificationCountResponse = notificationService.countUnreadNotifications(userId);
 
-        return ResponseEntity.ok(AppApiResponse.<Long>builder()
+        return ResponseEntity.ok(AppApiResponse.<UnreadNotificationCountResponse>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
                 .message("Retrieved unread notifications count successfully")
-                .data(unreadCount)
+                .data(unreadNotificationCountResponse)
                 .build());
     }
 
