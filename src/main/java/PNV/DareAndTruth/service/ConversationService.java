@@ -118,7 +118,8 @@ public class ConversationService {
                     .getSentAt();
 
             Pageable pageable = PageRequest.of(0, limit + 1, Sort.by(Sort.Direction.DESC, "sentAt"));
-            messages = messageRepository.findByConversationIdAndSentAtLessThan(conversation.getId(), lastSentAt, pageable);
+            messages =
+                    messageRepository.findByConversationIdAndSentAtLessThan(conversation.getId(), lastSentAt, pageable);
         }
 
         // Kiểm tra xem có còn tin nhắn để tải không

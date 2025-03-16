@@ -31,4 +31,6 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
             @Param("hashtag") String hashtag,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
+
+    Optional<Post> findPostEntityByIdAndIsDeletedFalse(UUID id);
 }

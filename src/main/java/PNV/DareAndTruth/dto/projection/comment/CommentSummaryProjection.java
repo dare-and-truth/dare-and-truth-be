@@ -1,5 +1,7 @@
 package PNV.DareAndTruth.dto.projection.comment;
 
+import PNV.DareAndTruth.entity.Comment;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -13,6 +15,8 @@ public interface CommentSummaryProjection {
     LocalDateTime getCreatedAt();
 
     User getUser();
+
+    String getParentCommentId();
 
     interface User {
         String getUsername();

@@ -31,7 +31,12 @@ public class Score extends BaseEntity {
 
     /**
      * The type of score, indicating the source or reason for the points:
-     * 1 = Ranking(1st:100,2nd:70,3rd:50,other:30, 2 = Daily challenge completion(posted:10), 3 = Daily Login(5days:20,10days:50,25days:70,50days:100,), 4 = Number of participants in a challenge(>=1peo: 10, >=10peo: 30, >=100peo 50, >=10000peo: 100), etc.
+     * 1 = Ranking(1st:100,2nd:70,3rd:50,other:30,
+     * 2 = Daily challenge completion(posted:10),
+     * 3 = Like: 1 point for a like,
+     * 4 = Number of participants in a challenge(>=1peo: 10, >=10peo: 30, >=100peo 50, >=10000peo: 100),
+     * 5 = Comment: 2 point for first comment,
+     * etc.
      */
     @Column(name = "score_type", nullable = false)
     int scoreType;
@@ -40,10 +45,15 @@ public class Score extends BaseEntity {
     @CreatedDate
     LocalDateTime createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_id")
     @ToString.Exclude
     Challenge challenge;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    @ToString.Exclude
+    Post post;
 
     @Override
     public boolean equals(Object o) {

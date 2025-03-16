@@ -18,6 +18,7 @@ import PNV.DareAndTruth.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,8 @@ public class CommentService {
     ChallengeRepository challengeRepository;
     NotificationRepository notificationRepository;
     SimpMessagingTemplate messagingTemplate;
+    ScoreRepository scoreRepository;
+    ScoreService scoreService;
 
     public void createComment(CreateCommentRequest request, String userEmail) {
         Optional<User> user = userRepository.findByEmail(userEmail);
@@ -37,10 +40,11 @@ public class CommentService {
         }
 
         UUID feedId;
-        Notification notification = null; // Initialize as null
-        CommentNotificationResponse commentNotificationResponse = null; // Initialize as null
+        Notification notification = null;
+        CommentNotificationResponse commentNotificationResponse = null;
 
         User sender = user.get();
+        String feedType = request.isChallenge() ? "challenge" : "post";
 
         if (request.isChallenge()) {
             Optional<Challenge> challenge = challengeRepository.findById(UUID.fromString(request.getFeedId()));
@@ -51,7 +55,7 @@ public class CommentService {
             feedId = challenge.get().getId();
             User receiver = challenge.get().getUser();
 
-            if (sender.getId() != receiver.getId()) {
+            if (!sender.getId().equals(receiver.getId())) {
                 notification = Notification.builder()
                         .sender(sender)
                         .receiver(receiver)
@@ -59,6 +63,7 @@ public class CommentService {
                         .type("comment-challenge")
                         .content(request.getContent())
                         .build();
+
                 commentNotificationResponse = CommentNotificationResponse.builder()
                         .type("comment-challenge")
                         .senderId(sender.getId())
@@ -78,7 +83,7 @@ public class CommentService {
             feedId = post.get().getId();
             User receiver = post.get().getUser();
 
-            if (sender.getId() != receiver.getId()) {
+            if (!sender.getId().equals(receiver.getId())) {
                 notification = Notification.builder()
                         .sender(sender)
                         .receiver(receiver)
@@ -86,6 +91,7 @@ public class CommentService {
                         .type("comment-post")
                         .content(request.getContent())
                         .build();
+
                 commentNotificationResponse = CommentNotificationResponse.builder()
                         .type("comment-post")
                         .senderId(sender.getId())
@@ -98,21 +104,24 @@ public class CommentService {
             }
         }
 
-        // Save notification and send via WebSocket if it exists
         if (notification != null) {
             notificationRepository.save(notification);
             messagingTemplate.convertAndSend(
                     "/topic/notifications/" + notification.getReceiver().getId(), commentNotificationResponse);
         }
 
-        // Create and save the comment
         Comment comment = Comment.builder()
                 .user(sender)
                 .feedId(feedId)
+                .feedType(feedType)
                 .content(request.getContent())
                 .mediaUrl(request.getMediaUrl())
+                .parentComment(request.getParentCommentId())
                 .build();
         commentRepository.save(comment);
+
+        // Cập nhật điểm số
+        scoreService.addCommentScore(feedId, feedType, userEmail);
     }
 
     public Set<CommentSummaryProjection> getCommentsByFeedId(String feedId) {
@@ -124,6 +133,63 @@ public class CommentService {
             throw new AppException(ErrorCode.FEED_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
         // retrieve comments by feedId
-        return commentRepository.findAllByFeedIdOrderByCreatedAtDesc(feedUUID);
+        return commentRepository.findAllByFeedIdAndParentCommentIsNullOrderByCreatedAtDesc(feedUUID);
+    }
+
+    public Set<CommentSummaryProjection> getRepliesByCommentId(String commentId) {
+        UUID commentUUID;
+        try {
+            commentUUID = UUID.fromString(commentId);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.COMMENT_ID_INVALID, HttpStatus.BAD_REQUEST);
+        }
+
+        return commentRepository.findAllByParentCommentIdOrderByCreatedAtAsc(commentUUID);
+    }
+
+    @Transactional
+    public void deleteComment(String commentId, String userEmail) {
+        UUID commentUUID;
+        try {
+            commentUUID = UUID.fromString(commentId);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.COMMENT_ID_INVALID, HttpStatus.BAD_REQUEST);
+        }
+
+        Comment comment = commentRepository.findById(commentUUID)
+                .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST));
+
+        if (!comment.getUser().getId().equals(user.getId())) {
+            throw new AppException(ErrorCode.PERMISSION_DENIED, HttpStatus.BAD_REQUEST);
+        }
+
+        commentRepository.delete(comment);
+    }
+
+    @Transactional
+    public void updateComment(String commentId, String newContent, String userEmail) {
+        UUID commentUUID;
+        try {
+            commentUUID = UUID.fromString(commentId);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(ErrorCode.COMMENT_ID_INVALID, HttpStatus.BAD_REQUEST);
+        }
+
+        Comment comment = commentRepository.findById(commentUUID)
+                .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND, HttpStatus.NOT_FOUND));
+
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST));
+
+        // Kiểm tra quyền cập nhật
+        if (!comment.getUser().getId().equals(user.getId())) {
+            throw new AppException(ErrorCode.PERMISSION_DENIED, HttpStatus.BAD_REQUEST);
+        }
+
+        comment.setContent(newContent);
+        commentRepository.save(comment);
     }
 }

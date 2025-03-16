@@ -1,5 +1,6 @@
 package PNV.DareAndTruth.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import PNV.DareAndTruth.dto.projection.post.PostSummaryProjection;
 import PNV.DareAndTruth.dto.request.post.CreatePostRequest;
+import PNV.DareAndTruth.dto.response.post.StartDateEndDateOfPostResponse;
 import PNV.DareAndTruth.entity.Challenge;
 import PNV.DareAndTruth.entity.Post;
 import PNV.DareAndTruth.entity.Score;
@@ -92,5 +94,29 @@ public class PostService {
         return postRepository
                 .findByIdAndIsDeletedFalse(postId)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND, HttpStatus.NOT_FOUND));
+    }
+
+    public StartDateEndDateOfPostResponse getStartDateAndEndDateByHashtagAndCreatedAt(
+            String hashtag, String createdAtStr) {
+        // Parse the createdAt parameter as a LocalDateTime, then extract the date part
+        LocalDate createdAt;
+        try {
+            LocalDateTime ldt = LocalDateTime.parse(createdAtStr);
+            createdAt = ldt.toLocalDate();
+        } catch (Exception e) {
+            throw new AppException(ErrorCode.INVALID_DATE_FORMAT, HttpStatus.BAD_REQUEST);
+        }
+
+        // Retrieve the challenge where the createdAt falls between startDate and endDate
+        Optional<Challenge> challengeOpt =
+                challengeRepository.findActiveChallengeByHashtagAndCreatedAt(hashtag, createdAt);
+        if (challengeOpt.isEmpty()) {
+            throw new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+
+        Challenge challenge = challengeOpt.get();
+        // Build and return the response DTO
+        return new StartDateEndDateOfPostResponse(
+                challenge.getStartDate().toString(), challenge.getEndDate().toString());
     }
 }
