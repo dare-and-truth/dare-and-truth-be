@@ -1,6 +1,8 @@
 package PNV.DareAndTruth.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -37,6 +39,14 @@ public class Comment extends BaseEntity {
     @Column(name = "media_url")
     String mediaUrl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_comment_id") // Comment cha (nếu có)
+    Comment parentComment;
+
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> replies = new ArrayList<>(); // Danh sách comment con
+
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     LocalDateTime createdAt;
@@ -51,11 +61,12 @@ public class Comment extends BaseEntity {
                 && Objects.equals(feedId, comment.feedId)
                 && Objects.equals(content, comment.content)
                 && Objects.equals(mediaUrl, comment.mediaUrl)
+                && Objects.equals(parentComment, comment.parentComment)
                 && Objects.equals(createdAt, comment.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), user, feedId, content, mediaUrl, createdAt);
+        return Objects.hash(super.hashCode(), user, feedId, content, mediaUrl, parentComment, createdAt);
     }
 }
