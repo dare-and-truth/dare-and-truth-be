@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import PNV.DareAndTruth.dto.response.chat.UnreadMessagesOfAllChatCountResponse;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import PNV.DareAndTruth.dto.response.chat.ChatResponse;
 import PNV.DareAndTruth.dto.response.chat.ConversationResponse;
-import PNV.DareAndTruth.dto.response.chat.MessageResponse;
 import PNV.DareAndTruth.dto.response.user.UserInfo;
 import PNV.DareAndTruth.entity.Conversation;
 import PNV.DareAndTruth.entity.Message;
@@ -27,6 +27,7 @@ import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -127,13 +128,9 @@ public class ConversationService {
             messages = messages.subList(0, limit); // Giữ lại số lượng đúng theo limit
         }
 
-        List<MessageResponse> messageResponses = messages.stream()
-                .map(msg -> new MessageResponse(
-                        msg.getId().toString(),
-                        msg.getContent(),
-                        msg.getMediaUrl(),
-                        msg.getSenderId(),
-                        msg.getSentAt()))
+        List<ConversationResponse.MessageResponse> messageResponses = messages.stream()
+                .map(msg -> new ConversationResponse.MessageResponse(
+                        msg.getId().toString(), msg.getContent(), msg.getMediaUrl(), msg.getSenderId(), msg.getSentAt()))
                 .toList();
 
         if (nextMessageId == null) {
@@ -152,5 +149,25 @@ public class ConversationService {
                     .nextMessageId(newNextMessageId != null ? newNextMessageId.toString() : null)
                     .build();
         }
+    }
+
+    public UnreadMessagesOfAllChatCountResponse getTotalUnreadMessages(UUID userId) {
+        List<Conversation> conversations = conversationRepository.findByParticipantsContaining(userId);
+
+        int unreadMessagesCount = conversations.stream()
+                .mapToInt(conversation -> conversation.getUnreadCounts().getOrDefault(userId, 0))
+                .sum();
+        return UnreadMessagesOfAllChatCountResponse.builder().totalUnreadMessagesCount(unreadMessagesCount).build();
+    }
+
+    @Transactional
+    public void markConversationAsRead(ObjectId conversationId, UUID userId) {
+        Optional<Conversation> conversationOpt = conversationRepository.findById(conversationId);
+        if (conversationOpt.isEmpty()) {
+            throw new AppException(ErrorCode.CONVERSATION_NOT_FOUND, HttpStatus.NOT_FOUND);
+        }
+        Conversation conversation = conversationOpt.get();
+        conversation.getUnreadCounts().put(userId, 0);
+        conversationRepository.save(conversation);
     }
 }

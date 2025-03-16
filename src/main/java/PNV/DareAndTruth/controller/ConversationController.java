@@ -3,6 +3,7 @@ package PNV.DareAndTruth.controller;
 import java.util.List;
 import java.util.UUID;
 
+import PNV.DareAndTruth.dto.response.chat.UnreadMessagesOfAllChatCountResponse;
 import jakarta.servlet.http.HttpServletRequest;
 
 import org.bson.types.ObjectId;
@@ -197,4 +198,104 @@ public class ConversationController {
                         .message("Chat retrieved successfully")
                         .build());
     }
+
+	@Operation(
+			summary = "Get total unread messages",
+			description = "Returns the total count of unread messages across all conversations for the authenticated user."
+	)
+	@ApiResponses(
+			value = {
+					@ApiResponse(
+							responseCode = "200",
+							description = "Successfully retrieved the unread messages count",
+							content = @Content(
+									mediaType = "application/json",
+									examples = @ExampleObject(
+											value = """
+                                                {
+                                                    "code": 1000,
+                                                    "status": "success",
+                                                    "data": { "unreadMessagesCount": 15 },
+                                                    "message": "Unread messages count retrieved successfully"
+                                                }
+                                                """
+									)
+							)
+					),
+					@ApiResponse(
+							responseCode = "401",
+							description = "User is not authenticated",
+							content = @Content(
+									mediaType = "application/json",
+									examples = @ExampleObject(
+											value = """
+                                                {
+                                                    "code": 1001,
+                                                    "status": "fail",
+                                                    "message": "Unauthorized"
+                                                }
+                                                """
+									)
+							)
+					)
+			}
+	)
+	@GetMapping("/unread-messages/count")
+	public ResponseEntity<AppApiResponse<UnreadMessagesOfAllChatCountResponse>> getUnreadMessagesCount(
+			HttpServletRequest httpServletRequest) {
+		UUID userId = jwtService.extractUserIdFromHeader(httpServletRequest);
+		UnreadMessagesOfAllChatCountResponse unreadCount = conversationService.getTotalUnreadMessages(userId);
+
+		return ResponseEntity.ok(
+				AppApiResponse.<UnreadMessagesOfAllChatCountResponse>builder()
+						.code(1000)
+						.status(ApiStatus.SUCCESS)
+						.data(unreadCount)
+						.message("Unread messages count retrieved successfully")
+						.build()
+		);
+	}
+
+
+	@Operation(
+			summary = "Mark conversation as read",
+			description = "Marks all unread messages in a conversation as read by the given user.")
+	@ApiResponses(
+			value = {
+					@ApiResponse(
+							responseCode = "200",
+							description = "Conversation marked as read successfully",
+							content =
+							@Content(
+									mediaType = "application/json",
+									examples =
+									@ExampleObject(
+											value =
+													"{\"code\": 1000, \"status\": \"success\", \"message\": \"Conversation marked as read successfully\"}"))),
+					@ApiResponse(
+							responseCode = "404",
+							description = "Conversation not found",
+							content =
+							@Content(
+									mediaType = "application/json",
+									examples =
+									@ExampleObject(
+											value =
+													"{\"code\": 1018, \"status\": \"fail\", \"message\": \"Conversation not found\"}")))
+			})
+	@PutMapping("/{conversationId}/mark-read")
+	public ResponseEntity<AppApiResponse<Void>> markConversationAsRead(
+			@PathVariable String conversationId, HttpServletRequest httpServletRequest) {
+
+		// Lấy userId từ token trong header
+		UUID userId = jwtService.extractUserIdFromHeader(httpServletRequest);
+
+		conversationService.markConversationAsRead(new ObjectId(conversationId), userId);
+
+		return ResponseEntity.ok(AppApiResponse.<Void>builder()
+				.code(1000)
+				.status(ApiStatus.SUCCESS)
+				.message("Conversation marked as read successfully")
+				.build());
+	}
 }

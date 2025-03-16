@@ -17,7 +17,4 @@ public interface MessageRepository extends MongoRepository<Message, ObjectId> {
     // Lấy tin nhắn cũ hơn tin nhắn có `lastMessageId`
     @Query("{ 'conversationId': ?0, 'sentAt': { $lt: ?1 } }")
     List<Message> findByConversationIdAndSentAtLessThan(ObjectId conversationId, Instant lastSentAt, Pageable pageable);
-
-    @Query("{ 'conversationId': ?0, 'readBy': { $ne: ?1 } }")
-    List<Message> findUnreadMessages(ObjectId conversationId, UUID userId);
 }

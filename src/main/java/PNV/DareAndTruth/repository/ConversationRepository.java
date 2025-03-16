@@ -15,4 +15,6 @@ public interface ConversationRepository extends MongoRepository<Conversation, Ob
 
     @Query("{'participants': {$all: ?0}}")
     Optional<Conversation> findByParticipants(Set<UUID> participants);
+
+    List<Conversation> findByParticipantsContaining(UUID userId);
 }

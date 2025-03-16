@@ -2,6 +2,7 @@ package PNV.DareAndTruth.service;
 
 import java.util.UUID;
 
+import PNV.DareAndTruth.dto.response.notification.UnreadNotificationCountResponse;
 import jakarta.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
@@ -49,8 +50,9 @@ public class NotificationService {
     }
 
     // Đếm số lượng thông báo chưa đọc
-    public Long countUnreadNotifications(String receiverId) {
-        return notificationRepository.countByReceiverIdAndIsReadFalse(UUID.fromString(receiverId));
+    public UnreadNotificationCountResponse countUnreadNotifications(UUID userId) {
+        long unreadNotificationCount = notificationRepository.countByReceiverIdAndIsReadFalse(userId);
+        return UnreadNotificationCountResponse.builder().totalUnreadNotificationCount(unreadNotificationCount).build();
     }
 
     // Đánh dấu thông báo là đã đọc
