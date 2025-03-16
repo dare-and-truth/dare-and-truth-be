@@ -1,9 +1,8 @@
 package PNV.DareAndTruth.service;
 
 import java.sql.Timestamp;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.util.*;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -114,7 +113,7 @@ public class FeedService {
         return feedRepository.findFeedByIdAndType(UUID.fromString(id), type, userId);
     }
 
-    public List<GetFeedResponse> getFeedLovedByUserId(String userId) {
+    public List<GetFeedResponse> getFeedLovedByUserId(String userId, int page, int size) {
         UUID userUUID;
         try {
             userUUID = UUID.fromString(userId);
@@ -127,7 +126,11 @@ public class FeedService {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
 
-        List<Object[]> results = feedRepository.getFeedsLovedByUser(userUUID);
+        // Tính toán offset từ page và size
+        int offset = page * size;
+
+        // Gọi repository với phân trang
+        List<Object[]> results = feedRepository.getFeedsLovedByUser(userUUID, size, offset);
 
         // Chuyển đổi kết quả từ query thành danh sách GetFeedResponse
         return results.stream()
@@ -149,5 +152,61 @@ public class FeedService {
                         (Boolean) row[14] // is_joined
                         ))
                 .toList();
+    }
+
+    public Map<String, Object> getFeedDetailByHashtagAndDate(
+            String hashtag, String startDate, String endDate, int page, int size, UUID userId) {
+
+        LocalDate localStartDate = LocalDate.parse(startDate);
+        LocalDate localEndDate = LocalDate.parse(endDate);
+
+        Timestamp startDateTime = Timestamp.valueOf(localStartDate.atStartOfDay());
+        Timestamp endDateTime = Timestamp.valueOf(localEndDate.atTime(23, 59, 59));
+
+        int offset = page * size;
+
+        List<Object[]> challengeResults =
+                feedRepository.getChallengeFeed(hashtag, localStartDate, localEndDate, userId, size, offset);
+        List<Object[]> postResults =
+                feedRepository.getPostFeed(hashtag, startDateTime, endDateTime, userId, size, offset);
+
+        List<Object[]> combinedResults = new ArrayList<>();
+        combinedResults.addAll(challengeResults);
+        combinedResults.addAll(postResults);
+
+        List<GetFeedResponse> feeds = combinedResults.stream()
+                .map(row -> {
+                    return new GetFeedResponse(
+                            (UUID) row[0], // ID
+                            (String) row[1], // Type (post/challenge)
+                            (String) row[2], // Hashtag
+                            (String) row[3], // Content
+                            (String) row[4], // Media URL
+                            row[5] != null ? row[5].toString() : null, // Start Date (for challenge)
+                            row[6] != null ? row[6].toString() : null, // End Date (for challenge)
+                            ((Timestamp) row[7]).toLocalDateTime(), // Created At
+                            (UUID) row[8], // User ID
+                            (String) row[9], // Username
+                            (String) row[10], // Avatar URL
+                            ((Number) row[11]).intValue(), // Like Count
+                            ((Number) row[12]).intValue(), // Comment Count
+                            (row[13] instanceof Number)
+                                    ? ((Number) row[13]).intValue() == 1
+                                    : (Boolean) row[13], // is_like
+                            (row[14] instanceof Number)
+                                    ? ((Number) row[14]).intValue() == 1
+                                    : (Boolean) row[14] // is_joined
+                            );
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
+        Long totalPosts = (postResults.isEmpty()) ? 0L : (long) postResults.size();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("feeds", feeds);
+        response.put("totalPosts", totalPosts);
+
+        return response;
     }
 }
