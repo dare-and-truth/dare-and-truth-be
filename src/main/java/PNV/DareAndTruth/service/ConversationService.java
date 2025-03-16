@@ -5,16 +5,17 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import PNV.DareAndTruth.dto.response.chat.UnreadMessagesOfAllChatCountResponse;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import PNV.DareAndTruth.dto.response.chat.ChatResponse;
 import PNV.DareAndTruth.dto.response.chat.ConversationResponse;
+import PNV.DareAndTruth.dto.response.chat.UnreadMessagesOfAllChatCountResponse;
 import PNV.DareAndTruth.dto.response.user.UserInfo;
 import PNV.DareAndTruth.entity.Conversation;
 import PNV.DareAndTruth.entity.Message;
@@ -27,7 +28,6 @@ import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -118,7 +118,8 @@ public class ConversationService {
                     .getSentAt();
 
             Pageable pageable = PageRequest.of(0, limit + 1, Sort.by(Sort.Direction.DESC, "sentAt"));
-            messages = messageRepository.findByConversationIdAndSentAtLessThan(conversation.getId(), lastSentAt, pageable);
+            messages =
+                    messageRepository.findByConversationIdAndSentAtLessThan(conversation.getId(), lastSentAt, pageable);
         }
 
         // Kiểm tra xem có còn tin nhắn để tải không
@@ -129,7 +130,11 @@ public class ConversationService {
 
         List<ConversationResponse.MessageResponse> messageResponses = messages.stream()
                 .map(msg -> new ConversationResponse.MessageResponse(
-                        msg.getId().toString(), msg.getContent(), msg.getMediaUrl(), msg.getSenderId(), msg.getSentAt()))
+                        msg.getId().toString(),
+                        msg.getContent(),
+                        msg.getMediaUrl(),
+                        msg.getSenderId(),
+                        msg.getSentAt()))
                 .toList();
 
         if (nextMessageId == null) {
@@ -156,7 +161,9 @@ public class ConversationService {
         int unreadMessagesCount = conversations.stream()
                 .mapToInt(conversation -> conversation.getUnreadCounts().getOrDefault(userId, 0))
                 .sum();
-        return UnreadMessagesOfAllChatCountResponse.builder().totalUnreadMessagesCount(unreadMessagesCount).build();
+        return UnreadMessagesOfAllChatCountResponse.builder()
+                .totalUnreadMessagesCount(unreadMessagesCount)
+                .build();
     }
 
     @Transactional

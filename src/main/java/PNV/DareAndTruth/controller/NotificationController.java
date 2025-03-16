@@ -1,9 +1,9 @@
 package PNV.DareAndTruth.controller;
 
-import PNV.DareAndTruth.dto.response.notification.UnreadNotificationCountResponse;
+import java.util.UUID;
+
 import jakarta.servlet.http.HttpServletRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
 import PNV.DareAndTruth.dto.response.notification.NotificationResponse;
+import PNV.DareAndTruth.dto.response.notification.UnreadNotificationCountResponse;
 import PNV.DareAndTruth.service.JwtService;
 import PNV.DareAndTruth.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,8 +24,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/notifications")
@@ -93,9 +92,11 @@ public class NotificationController {
                                         }))
             })
     @GetMapping("/unread/count")
-    public ResponseEntity<AppApiResponse<UnreadNotificationCountResponse>> getUnreadNotificationsCount(HttpServletRequest httpServletRequest) {
+    public ResponseEntity<AppApiResponse<UnreadNotificationCountResponse>> getUnreadNotificationsCount(
+            HttpServletRequest httpServletRequest) {
         UUID userId = jwtService.extractUserIdFromHeader(httpServletRequest);
-        UnreadNotificationCountResponse unreadNotificationCountResponse = notificationService.countUnreadNotifications(userId);
+        UnreadNotificationCountResponse unreadNotificationCountResponse =
+                notificationService.countUnreadNotifications(userId);
 
         return ResponseEntity.ok(AppApiResponse.<UnreadNotificationCountResponse>builder()
                 .code(1000)

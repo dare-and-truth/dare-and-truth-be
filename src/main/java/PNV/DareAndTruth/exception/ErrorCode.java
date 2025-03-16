@@ -74,8 +74,7 @@ public enum ErrorCode {
     CONVERSATION_NOT_FOUND(1063, "Conversation is not found"),
     MESSAGE_NOT_FOUND(1064, "Message is not found"),
     FAIL_TO_CHECK_REQUEST_YOURSELF(1065, "You can not check type of request with yourself"),
-    CONTENT_OR_MEDIA_URL_REQUIRE(1066, "Content or media URL is required")
-    ;
+    CONTENT_OR_MEDIA_URL_REQUIRE(1066, "Content or media URL is required");
 
     int code;
     String message;
