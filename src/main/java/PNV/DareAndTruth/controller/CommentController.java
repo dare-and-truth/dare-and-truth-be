@@ -1,8 +1,10 @@
 package PNV.DareAndTruth.controller;
 
+import java.util.List;
 import java.util.Set;
 
 import PNV.DareAndTruth.dto.request.comment.UpdateCommentRequest;
+import PNV.DareAndTruth.dto.response.comment.CommentSummaryResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -110,10 +112,11 @@ public class CommentController {
                         content = @Content(mediaType = "application/json"))
             })
     @GetMapping("/feed/{feedId}")
-    public ResponseEntity<AppApiResponse<Set<CommentSummaryProjection>>> getCommentsByFeedId(
-            @PathVariable String feedId) {
-        Set<CommentSummaryProjection> comments = commentService.getCommentsByFeedId(feedId);
-        return ResponseEntity.ok(AppApiResponse.<Set<CommentSummaryProjection>>builder()
+    public ResponseEntity<AppApiResponse<List<CommentSummaryResponse>>> getCommentsByFeedId(
+            @PathVariable String feedId,
+            @RequestParam String feedUserId) {
+        List<CommentSummaryResponse> comments = commentService.getCommentsByFeedId(feedId,feedUserId);
+        return ResponseEntity.ok(AppApiResponse.<List<CommentSummaryResponse>>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
                 .message("Comments retrieved successfully")
@@ -163,9 +166,9 @@ public class CommentController {
                 }
         )
         @GetMapping("/{commentId}/replies")
-        public ResponseEntity<AppApiResponse<Set<CommentSummaryProjection>>> getReplies(@PathVariable String commentId) {
-            Set<CommentSummaryProjection> replies = commentService.getRepliesByCommentId(commentId);
-            return ResponseEntity.ok(AppApiResponse.<Set<CommentSummaryProjection>>builder()
+        public ResponseEntity<AppApiResponse<List<CommentSummaryResponse>>> getReplies(@PathVariable String commentId) {
+            List<CommentSummaryResponse> replies = commentService.getRepliesByCommentId(commentId);
+            return ResponseEntity.ok(AppApiResponse.<List<CommentSummaryResponse>>builder()
                     .code(1000)
                     .status(ApiStatus.SUCCESS)
                     .message("Comment reply retrieved successfully")

@@ -78,6 +78,7 @@ public enum ErrorCode {
     INVALID_FEED_TYPE(1067, "Feed type is invalid"),
     COMMENT_ID_INVALID(1068,"comment id is in valid"),
     COMMENT_NOT_FOUND(1069,"Comment not found"),
+    FEED_NOT_FOUND(1070,"Feed is not found"),
     ;
 
     int code;

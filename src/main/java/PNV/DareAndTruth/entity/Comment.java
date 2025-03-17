@@ -51,6 +51,9 @@ public class Comment extends BaseEntity {
     @Column(name = "created_at", updatable = false)
     LocalDateTime createdAt;
 
+    @Column(name = "level")
+    int level;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

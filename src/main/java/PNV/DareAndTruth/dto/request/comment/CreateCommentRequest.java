@@ -33,4 +33,6 @@ public class CreateCommentRequest {
     private boolean isChallenge;
 
     String feedType;
+
+    int level;
 }

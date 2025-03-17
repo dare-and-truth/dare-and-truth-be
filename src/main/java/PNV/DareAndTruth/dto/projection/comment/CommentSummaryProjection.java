@@ -16,7 +16,7 @@ public interface CommentSummaryProjection {
 
     User getUser();
 
-    String getParentCommentId();
+    Comment getParentComment();
 
     interface User {
         String getUsername();
@@ -24,5 +24,10 @@ public interface CommentSummaryProjection {
         UUID getId();
 
         String getAvatarUrl();
+    }
+    int getLevel();
+
+    interface ParentComment{
+        UUID getId();
     }
 }
