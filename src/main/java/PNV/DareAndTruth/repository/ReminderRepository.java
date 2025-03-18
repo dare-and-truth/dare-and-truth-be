@@ -67,4 +67,6 @@ public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
             @Param("hashtag") String hashtag,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
+
+    List<Reminder> findByEndDateGreaterThanEqual(LocalDate endDate);
 }

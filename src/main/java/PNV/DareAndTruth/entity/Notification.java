@@ -22,7 +22,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Notification extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_id", nullable = false)
+    @JoinColumn(name = "sender_id")
     User sender;
 
     @ManyToOne(fetch = FetchType.LAZY)

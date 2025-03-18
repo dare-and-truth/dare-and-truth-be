@@ -1,7 +1,9 @@
 package PNV.DareAndTruth.repository;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
+import PNV.DareAndTruth.entity.Reminder;
 import jakarta.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
@@ -20,4 +22,6 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
     @Transactional
     @Modifying
     void deleteByRequestId(UUID requestId);
+
+    boolean existsByReminderAndCreatedAtBetween(Reminder reminder, LocalDateTime start, LocalDateTime end);
 }
