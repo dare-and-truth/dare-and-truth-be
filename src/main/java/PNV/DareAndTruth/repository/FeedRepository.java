@@ -51,7 +51,7 @@ public interface FeedRepository extends JpaRepository<Post, UUID> {
 						AND f.start_date = r.start_date
 						AND f.end_date = r.end_date
 						AND r.user_id = :currentUserId
-					ORDER BY f.id DESC
+					ORDER BY f.created_at DESC
 					LIMIT :limit OFFSET :offset
 					""",
             nativeQuery = true)
@@ -96,7 +96,7 @@ public interface FeedRepository extends JpaRepository<Post, UUID> {
 						AND r.user_id = :currentUserId
 					WHERE f.type = :type
 					AND f.user_id = :currentUserId
-					ORDER BY f.id DESC
+					ORDER BY f.created_at DESC
 					LIMIT :limit OFFSET :offset
 					""",
             nativeQuery = true)
