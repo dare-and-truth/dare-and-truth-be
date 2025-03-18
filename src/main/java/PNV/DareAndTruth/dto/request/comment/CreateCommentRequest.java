@@ -1,6 +1,5 @@
 package PNV.DareAndTruth.dto.request.comment;
 
-import PNV.DareAndTruth.entity.Comment;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -21,7 +20,7 @@ public class CreateCommentRequest {
     @UUID(message = "FEED_ID_INVALID")
     String feedId;
 
-    Comment parentCommentId;
+    String parentCommentId;
 
     @NotBlank(message = "CONTENT_REQUIRED")
     String content;

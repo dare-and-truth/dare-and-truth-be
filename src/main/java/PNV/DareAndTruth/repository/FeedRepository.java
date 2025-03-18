@@ -266,6 +266,4 @@ public interface FeedRepository extends JpaRepository<Post, UUID> {
             @Param("userId") UUID userId,
             @Param("size") int size,
             @Param("offset") int offset);
-
-
 }

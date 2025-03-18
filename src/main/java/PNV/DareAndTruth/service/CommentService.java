@@ -3,15 +3,16 @@ package PNV.DareAndTruth.service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import PNV.DareAndTruth.dto.response.comment.CommentSummaryResponse;
-import PNV.DareAndTruth.dto.response.user.UserInfo;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import PNV.DareAndTruth.dto.projection.comment.CommentSummaryProjection;
 import PNV.DareAndTruth.dto.request.comment.CreateCommentRequest;
+import PNV.DareAndTruth.dto.response.comment.CommentSummaryResponse;
 import PNV.DareAndTruth.dto.response.notification.CommentNotificationResponse;
+import PNV.DareAndTruth.dto.response.user.UserInfo;
 import PNV.DareAndTruth.entity.*;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
@@ -19,7 +20,6 @@ import PNV.DareAndTruth.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -42,10 +42,10 @@ public class CommentService {
 
         Comment parentComment = null;
         if (request.getParentCommentId() != null) {
-            parentComment = commentRepository.findById(UUID.fromString(String.valueOf(request.getParentCommentId())))
+            parentComment = commentRepository
+                    .findById(UUID.fromString(String.valueOf(request.getParentCommentId())))
                     .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND, HttpStatus.BAD_REQUEST));
         }
-
 
         UUID feedId;
         Notification notification = null;
@@ -145,30 +145,37 @@ public class CommentService {
         }
 
         // Lấy danh sách comment đã được sắp xếp
-        List<CommentSummaryProjection> comments = new ArrayList<>(commentRepository.findAllByFeedIdAndParentCommentIsNullOrderByFeedUserFirst(feedUUID, feedUserUUID));
-        Set<UUID> commentIds = comments.stream().map(CommentSummaryProjection::getId).collect(Collectors.toSet());
+        List<CommentSummaryProjection> comments = new ArrayList<>(
+                commentRepository.findAllByFeedIdAndParentCommentIsNullOrderByFeedUserFirst(feedUUID, feedUserUUID));
+        Set<UUID> commentIds =
+                comments.stream().map(CommentSummaryProjection::getId).collect(Collectors.toSet());
 
         // Đếm số lượng replies
         Map<UUID, Long> replyCounts = commentIds.isEmpty()
                 ? Map.of()
-                : commentRepository.countRepliesForComments(commentIds)
-                .stream().collect(Collectors.toMap(row -> UUID.fromString(row[0].toString()), row -> Long.parseLong(row[1].toString())));
+                : commentRepository.countRepliesForComments(commentIds).stream()
+                        .collect(Collectors.toMap(
+                                row -> UUID.fromString(row[0].toString()), row -> Long.parseLong(row[1].toString())));
 
         // Chuyển đổi projection thành DTO
-        return comments.stream().map(comment -> new CommentSummaryResponse(
-                comment.getId(),
-                comment.getContent(),
-                comment.getMediaUrl(),
-                comment.getCreatedAt(),
-                (comment.getUser() != null) ? new UserInfo(
-                        comment.getUser().getId(),
-                        comment.getUser().getUsername(),
-                        comment.getUser().getAvatarUrl()
-                ) : null,
-                comment.getParentComment() != null ? comment.getParentComment().getId().toString() : null,
-                replyCounts.getOrDefault(comment.getId(), 0L).intValue(),
-                comment.getLevel()
-        )).collect(Collectors.toList());
+        return comments.stream()
+                .map(comment -> new CommentSummaryResponse(
+                        comment.getId(),
+                        comment.getContent(),
+                        comment.getMediaUrl(),
+                        comment.getCreatedAt(),
+                        (comment.getUser() != null)
+                                ? new UserInfo(
+                                        comment.getUser().getId(),
+                                        comment.getUser().getUsername(),
+                                        comment.getUser().getAvatarUrl())
+                                : null,
+                        comment.getParentComment() != null
+                                ? comment.getParentComment().getId().toString()
+                                : null,
+                        replyCounts.getOrDefault(comment.getId(), 0L).intValue(),
+                        comment.getLevel()))
+                .collect(Collectors.toList());
     }
 
     public List<CommentSummaryResponse> getRepliesByCommentId(String commentId) {
@@ -180,35 +187,42 @@ public class CommentService {
         }
 
         // Lấy danh sách replies
-        Set<CommentSummaryProjection> replies = commentRepository.findAllByParentComment_IdOrderByCreatedAtAsc(commentUUID);
-        Set<UUID> replyIds = replies.stream().map(CommentSummaryProjection::getId).collect(Collectors.toSet());
+        List<CommentSummaryProjection> replies =
+                commentRepository.findAllByParentComment_IdOrderByCreatedAtAsc(commentUUID);
+        Set<UUID> replyIds =
+                replies.stream().map(CommentSummaryProjection::getId).collect(Collectors.toSet());
 
         // Đếm số lượng replies con cho mỗi reply
         Map<UUID, Long> replyCounts;
         if (!replyIds.isEmpty()) {
             List<Object[]> replyData = commentRepository.countRepliesForComments(replyIds);
-            replyCounts = replyData.stream().collect(Collectors.toMap(
-                    row -> (UUID) row[0],  // Ép kiểu UUID cho parentCommentId
-                    row -> (Long) row[1]   // Ép kiểu Long cho số lượng replies
-            ));
+            replyCounts = replyData.stream()
+                    .collect(Collectors.toMap(
+                            row -> (UUID) row[0], // Ép kiểu UUID cho parentCommentId
+                            row -> (Long) row[1] // Ép kiểu Long cho số lượng replies
+                            ));
         } else {
             replyCounts = Map.of();
         }
 
-        return replies.stream().map(reply -> new CommentSummaryResponse(
-                reply.getId(),
-                reply.getContent(),
-                reply.getMediaUrl(),
-                reply.getCreatedAt(),
-                (reply.getUser() != null) ? new UserInfo(
-                        reply.getUser().getId(),
-                        reply.getUser().getUsername(),
-                        reply.getUser().getAvatarUrl()
-                ) : null,
-                reply.getParentComment() != null ? reply.getParentComment().getId().toString() : null,
-                replyCounts.getOrDefault(reply.getId(), 0L).intValue(),
-                reply.getLevel()
-        )).collect(Collectors.toList());
+        return replies.stream()
+                .map(reply -> new CommentSummaryResponse(
+                        reply.getId(),
+                        reply.getContent(),
+                        reply.getMediaUrl(),
+                        reply.getCreatedAt(),
+                        (reply.getUser() != null)
+                                ? new UserInfo(
+                                        reply.getUser().getId(),
+                                        reply.getUser().getUsername(),
+                                        reply.getUser().getAvatarUrl())
+                                : null,
+                        reply.getParentComment() != null
+                                ? reply.getParentComment().getId().toString()
+                                : null,
+                        replyCounts.getOrDefault(reply.getId(), 0L).intValue(),
+                        reply.getLevel()))
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -220,10 +234,12 @@ public class CommentService {
             throw new AppException(ErrorCode.COMMENT_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
 
-        Comment comment = commentRepository.findById(commentUUID)
+        Comment comment = commentRepository
+                .findById(commentUUID)
                 .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        User user = userRepository.findByEmail(userEmail)
+        User user = userRepository
+                .findByEmail(userEmail)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST));
 
         if (!comment.getUser().getId().equals(user.getId())) {
@@ -242,10 +258,12 @@ public class CommentService {
             throw new AppException(ErrorCode.COMMENT_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
 
-        Comment comment = commentRepository.findById(commentUUID)
+        Comment comment = commentRepository
+                .findById(commentUUID)
                 .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        User user = userRepository.findByEmail(userEmail)
+        User user = userRepository
+                .findByEmail(userEmail)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST));
 
         if (!comment.getUser().getId().equals(user.getId())) {
@@ -264,7 +282,8 @@ public class CommentService {
             throw new AppException(ErrorCode.COMMENT_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
 
-        CommentSummaryProjection comment = commentRepository.findCommentById(commentUUID)
+        CommentSummaryProjection comment = commentRepository
+                .findCommentById(commentUUID)
                 .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         return new CommentSummaryResponse(
@@ -272,15 +291,16 @@ public class CommentService {
                 comment.getContent(),
                 comment.getMediaUrl(),
                 comment.getCreatedAt(),
-                (comment.getUser() != null) ? new UserInfo(
-                        comment.getUser().getId(),
-                        comment.getUser().getUsername(),
-                        comment.getUser().getAvatarUrl()
-                ) : null,
-                comment.getParentComment() != null ? comment.getParentComment().getId().toString() : null,
+                (comment.getUser() != null)
+                        ? new UserInfo(
+                                comment.getUser().getId(),
+                                comment.getUser().getUsername(),
+                                comment.getUser().getAvatarUrl())
+                        : null,
+                comment.getParentComment() != null
+                        ? comment.getParentComment().getId().toString()
+                        : null,
                 0,
-                comment.getLevel()
-        );
+                comment.getLevel());
     }
-
 }

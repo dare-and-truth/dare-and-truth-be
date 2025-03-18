@@ -46,7 +46,6 @@ public class Comment extends BaseEntity {
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> replies = new ArrayList<>(); // Danh sách comment con
 
-
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     LocalDateTime createdAt;

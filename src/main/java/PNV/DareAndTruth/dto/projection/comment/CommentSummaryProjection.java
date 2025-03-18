@@ -1,9 +1,9 @@
 package PNV.DareAndTruth.dto.projection.comment;
 
-import PNV.DareAndTruth.entity.Comment;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import PNV.DareAndTruth.entity.Comment;
 
 public interface CommentSummaryProjection {
     UUID getId();
@@ -25,9 +25,10 @@ public interface CommentSummaryProjection {
 
         String getAvatarUrl();
     }
+
     int getLevel();
 
-    interface ParentComment{
+    interface ParentComment {
         UUID getId();
     }
 }

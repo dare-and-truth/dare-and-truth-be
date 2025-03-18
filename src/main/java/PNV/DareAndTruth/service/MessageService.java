@@ -71,7 +71,7 @@ public class MessageService {
             Conversation newConversation = new Conversation();
             newConversation.setParticipants(Set.of(senderId, receiverId));
             newConversation.setUnreadCounts(new HashMap<>());
-            return newConversation;
+            return conversationRepository.save(newConversation);
         });
 
         // Tạo tin nhắn
