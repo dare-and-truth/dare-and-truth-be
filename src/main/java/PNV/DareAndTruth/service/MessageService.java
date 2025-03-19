@@ -2,13 +2,15 @@ package PNV.DareAndTruth.service;
 
 import java.util.*;
 
-import com.mongodb.MongoException;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.mongodb.MongoException;
 
 import PNV.DareAndTruth.dto.request.message.SendMessageRequest;
 import PNV.DareAndTruth.dto.response.message.MessageResponse;
@@ -23,7 +25,6 @@ import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -70,7 +71,7 @@ public class MessageService {
             Conversation newConversation = new Conversation();
             newConversation.setParticipants(Set.of(senderId, receiverId));
             newConversation.setUnreadCounts(new HashMap<>());
-            return newConversation;
+            return conversationRepository.save(newConversation);
         });
 
         // Tạo tin nhắn
@@ -99,7 +100,6 @@ public class MessageService {
                 .sentAt(newMessage.getSentAt())
                 .senderId(newMessage.getSenderId())
                 .build();
-
 
         messagingTemplate.convertAndSend("/topic/messages/" + receiverId, messageResponse);
 
