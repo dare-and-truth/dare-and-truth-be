@@ -32,7 +32,7 @@ public class Notification extends BaseEntity {
     @Column(name = "type", nullable = false)
     String type;
 
-    @Column(name = "content")
+    @Column(name = "content", columnDefinition = "TEXT")
     String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
