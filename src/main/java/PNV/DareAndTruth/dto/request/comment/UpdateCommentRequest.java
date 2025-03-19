@@ -11,6 +11,5 @@ import lombok.Setter;
 public class UpdateCommentRequest {
 
     @Schema(description = "New content of the comment", example = "This is an updated comment")
-    @NotBlank(message = "Content cannot be blank")
     private String content;
 }

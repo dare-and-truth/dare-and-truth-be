@@ -30,7 +30,7 @@ public class Comment extends BaseEntity {
     @NotNull
     UUID feedId;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", columnDefinition = "TEXT")
     String content;
 
     @Column(name = "feed_type") // "post" or "challenge"

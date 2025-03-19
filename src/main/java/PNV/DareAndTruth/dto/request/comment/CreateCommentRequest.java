@@ -22,7 +22,6 @@ public class CreateCommentRequest {
 
     String parentCommentId;
 
-    @NotBlank(message = "CONTENT_REQUIRED")
     String content;
 
     String mediaUrl;
