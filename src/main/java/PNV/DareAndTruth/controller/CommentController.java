@@ -2,7 +2,6 @@ package PNV.DareAndTruth.controller;
 
 import java.util.Set;
 
-import PNV.DareAndTruth.dto.request.comment.UpdateCommentRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import PNV.DareAndTruth.dto.projection.comment.CommentSummaryProjection;
 import PNV.DareAndTruth.dto.request.comment.CreateCommentRequest;
+import PNV.DareAndTruth.dto.request.comment.UpdateCommentRequest;
 import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
 import PNV.DareAndTruth.service.CommentService;
@@ -121,94 +121,89 @@ public class CommentController {
                 .build());
     }
 
-        @Operation(summary = "Get replies of a comment", description = "Retrieve a list of replies to a specific comment by its ID")
-        @ApiResponses(
-                value = {
-                        @ApiResponse(
-                                responseCode = "200",
-                                description = "Replies retrieved successfully",
-                                content =
+    @Operation(
+            summary = "Get replies of a comment",
+            description = "Retrieve a list of replies to a specific comment by its ID")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Replies retrieved successfully",
+                        content =
                                 @Content(
                                         mediaType = "application/json",
                                         examples =
-                                        @ExampleObject(
-                                                value =
-                                                        """
-                                            {
-                                            "code": 1000,
-                                            "status": "success",
-                                            "message": "Comment reply retrieved successfully",
-                                            "data": [
-                                                {
-                                                "id": "7d76e0be-e529-48aa-b4a5-6ca3b43e7717",
-                                                "content": "I agree with you!",
-                                                "mediaUrl": null,
-                                                "createdAt": "2025-02-22T16:00:00.000Z",
-                                                "user": {
-                                                    "id": "3d76e0be-e529-48aa-b4a5-6ca3b43e7717",
-                                                    "username": "User123"
-                                                }
-                                                }
-                                            ]
-                                            }
-                                            """))),
-                        @ApiResponse(
-                                responseCode = "404",
-                                description = "Comment not found",
-                                content = @Content(mediaType = "application/json")),
-                        @ApiResponse(
-                                responseCode = "500",
-                                description = "Internal server error",
-                                content = @Content(mediaType = "application/json"))
-                }
-        )
-        @GetMapping("/{commentId}/replies")
-        public ResponseEntity<AppApiResponse<Set<CommentSummaryProjection>>> getReplies(@PathVariable String commentId) {
-            Set<CommentSummaryProjection> replies = commentService.getRepliesByCommentId(commentId);
-            return ResponseEntity.ok(AppApiResponse.<Set<CommentSummaryProjection>>builder()
-                    .code(1000)
-                    .status(ApiStatus.SUCCESS)
-                    .message("Comment reply retrieved successfully")
-                    .data(replies)
-                    .build());
-        }
+                                                @ExampleObject(
+                                                        value =
+                                                                """
+											{
+											"code": 1000,
+											"status": "success",
+											"message": "Comment reply retrieved successfully",
+											"data": [
+												{
+												"id": "7d76e0be-e529-48aa-b4a5-6ca3b43e7717",
+												"content": "I agree with you!",
+												"mediaUrl": null,
+												"createdAt": "2025-02-22T16:00:00.000Z",
+												"user": {
+													"id": "3d76e0be-e529-48aa-b4a5-6ca3b43e7717",
+													"username": "User123"
+												}
+												}
+											]
+											}
+											"""))),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Comment not found",
+                        content = @Content(mediaType = "application/json")),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal server error",
+                        content = @Content(mediaType = "application/json"))
+            })
+    @GetMapping("/{commentId}/replies")
+    public ResponseEntity<AppApiResponse<Set<CommentSummaryProjection>>> getReplies(@PathVariable String commentId) {
+        Set<CommentSummaryProjection> replies = commentService.getRepliesByCommentId(commentId);
+        return ResponseEntity.ok(AppApiResponse.<Set<CommentSummaryProjection>>builder()
+                .code(1000)
+                .status(ApiStatus.SUCCESS)
+                .message("Comment reply retrieved successfully")
+                .data(replies)
+                .build());
+    }
 
     @Operation(summary = "Update a comment", description = "Update an existing comment by its ID")
     @ApiResponses(
             value = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "Comment updated successfully",
-                            content =
-                            @Content(
-                                    mediaType = "application/json",
-                                    examples = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Comment updated successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
                                             @ExampleObject(
                                                     value =
                                                             "{\"code\": 1000, \"status\": \"success\", \"message\": \"Comment updated successfully\"}")
-                                    })),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Invalid input provided",
-                            content =
-                            @Content(
-                                    mediaType = "application/json")),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Comment not found",
-                            content =
-                            @Content(
-                                    mediaType = "application/json")),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Unauthorized to update this comment",
-                            content =
-                            @Content(
-                                    mediaType = "application/json")),
-                    @ApiResponse(
-                            responseCode = "500",
-                            description = "Internal server error",
-                            content = @Content(mediaType = "application/json"))
+                                        })),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Invalid input provided",
+                        content = @Content(mediaType = "application/json")),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Comment not found",
+                        content = @Content(mediaType = "application/json")),
+                @ApiResponse(
+                        responseCode = "403",
+                        description = "Unauthorized to update this comment",
+                        content = @Content(mediaType = "application/json")),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal server error",
+                        content = @Content(mediaType = "application/json"))
             })
     @PutMapping("/{commentId}")
     public ResponseEntity<AppApiResponse<Void>> updateComment(
@@ -229,30 +224,23 @@ public class CommentController {
     @Operation(summary = "Delete a comment", description = "Delete a comment by its ID")
     @ApiResponses(
             value = {
-                    @ApiResponse(
-                            responseCode = "204",
-                            description = "Comment deleted successfully"),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "Comment not found",
-                            content =
-                            @Content(
-                                    mediaType = "application/json")),
-                    @ApiResponse(
-                            responseCode = "403",
-                            description = "Unauthorized to delete this comment",
-                            content =
-                            @Content(
-                                    mediaType = "application/json")),
-                    @ApiResponse(
-                            responseCode = "500",
-                            description = "Internal server error",
-                            content = @Content(mediaType = "application/json"))
+                @ApiResponse(responseCode = "204", description = "Comment deleted successfully"),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Comment not found",
+                        content = @Content(mediaType = "application/json")),
+                @ApiResponse(
+                        responseCode = "403",
+                        description = "Unauthorized to delete this comment",
+                        content = @Content(mediaType = "application/json")),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal server error",
+                        content = @Content(mediaType = "application/json"))
             })
     @DeleteMapping("/{commentId}")
     public ResponseEntity<AppApiResponse<Void>> deleteComment(
-            @PathVariable String commentId,
-            HttpServletRequest httpServletRequest) {
+            @PathVariable String commentId, HttpServletRequest httpServletRequest) {
         String token = jwtService.extractTokenFromHeader(httpServletRequest);
         String email = jwtService.extractEmail(token);
 

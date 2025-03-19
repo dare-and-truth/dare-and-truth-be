@@ -1,6 +1,5 @@
 package PNV.DareAndTruth.dto.request.comment;
 
-import PNV.DareAndTruth.entity.Comment;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -8,6 +7,7 @@ import org.hibernate.validator.constraints.UUID;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import PNV.DareAndTruth.entity.Comment;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

@@ -113,6 +113,10 @@ public class UserService {
             existingUser.setAvatarUrl(request.getAvatarUrl());
         }
 
+        if (request.getFcmToken() != null) {
+            existingUser.setFcmToken(request.getFcmToken());
+        }
+
         userMapper.mapUserFromUpdateUserRequest(existingUser, request);
         log.info("Updated avatarUrl in DB: {}", existingUser.getAvatarUrl());
         userRepository.save(existingUser);

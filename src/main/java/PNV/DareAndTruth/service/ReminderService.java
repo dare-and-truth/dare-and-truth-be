@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +26,7 @@ import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -66,10 +66,11 @@ public class ReminderService {
 
         // Nếu Reminder có thông báo trong ngày, lập lịch ngay
         LocalDate today = LocalDate.now();
-        LocalTime triggerTime = reminder.getReminderTime() != null ? reminder.getReminderTime() : reminder.getStartTime();
+        LocalTime triggerTime =
+                reminder.getReminderTime() != null ? reminder.getReminderTime() : reminder.getStartTime();
 
         if (triggerTime != null && triggerTime.isAfter(LocalTime.now())) {
-        log.info("Reminder Time: {}", triggerTime);
+            log.info("Reminder Time: {}", triggerTime);
             LocalDateTime nextTime = LocalDateTime.of(today, triggerTime);
             if (nextTime.isAfter(LocalDateTime.now())) {
                 reminderNotificationService.scheduleReminderNotification(savedReminder, nextTime);

@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import PNV.DareAndTruth.dto.projection.comment.CommentSummaryProjection;
 import PNV.DareAndTruth.dto.request.comment.CreateCommentRequest;
@@ -18,7 +19,6 @@ import PNV.DareAndTruth.repository.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -156,10 +156,12 @@ public class CommentService {
             throw new AppException(ErrorCode.COMMENT_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
 
-        Comment comment = commentRepository.findById(commentUUID)
+        Comment comment = commentRepository
+                .findById(commentUUID)
                 .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        User user = userRepository.findByEmail(userEmail)
+        User user = userRepository
+                .findByEmail(userEmail)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST));
 
         if (!comment.getUser().getId().equals(user.getId())) {
@@ -178,10 +180,12 @@ public class CommentService {
             throw new AppException(ErrorCode.COMMENT_ID_INVALID, HttpStatus.BAD_REQUEST);
         }
 
-        Comment comment = commentRepository.findById(commentUUID)
+        Comment comment = commentRepository
+                .findById(commentUUID)
                 .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND, HttpStatus.NOT_FOUND));
 
-        User user = userRepository.findByEmail(userEmail)
+        User user = userRepository
+                .findByEmail(userEmail)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST));
 
         // Kiểm tra quyền cập nhật

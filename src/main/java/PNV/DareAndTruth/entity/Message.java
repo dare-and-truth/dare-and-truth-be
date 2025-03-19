@@ -1,7 +1,6 @@
 package PNV.DareAndTruth.entity;
 
 import java.time.Instant;
-import java.util.Set;
 import java.util.UUID;
 
 import jakarta.persistence.Id;
