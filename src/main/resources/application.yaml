@@ -18,7 +18,14 @@ spring:
 
 logging:
   level:
-    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+    org:
+      springframework.data.mongodb.core.MongoTemplate: DEBUG
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
 
 server:
   port: 8080
@@ -34,6 +41,7 @@ openapi:
     server: ${BE_URL:http://localhost:8080}
 
 app:
+  timezone=Asia/Ho_Chi_Minh:
   jwt:
     secret: ${JWT_SECRET:5gZHYsLGeUB7TvtT9AbxlgaNXyUaykNzDgdK00yX5SPDXrNeCGBYNrngUym3ykRn}
     access-token-expiration-ms: ${JWT_ACCESS_EXPIRATION:3600000}

@@ -1,5 +1,6 @@
 package PNV.DareAndTruth.repository;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import jakarta.transaction.Transactional;
@@ -10,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 
 import PNV.DareAndTruth.entity.Notification;
+import PNV.DareAndTruth.entity.Reminder;
 
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
     Page<Notification> findByReceiverId(UUID receiverId, Pageable pageable);
@@ -20,4 +22,6 @@ public interface NotificationRepository extends JpaRepository<Notification, UUID
     @Transactional
     @Modifying
     void deleteByRequestId(UUID requestId);
+
+    boolean existsByReminderAndCreatedAtBetween(Reminder reminder, LocalDateTime start, LocalDateTime end);
 }

@@ -2,6 +2,7 @@ package PNV.DareAndTruth.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
@@ -25,14 +26,17 @@ import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ReminderService {
     UserRepository userRepository;
     ReminderRepository reminderRepository;
     ReminderMapper reminderMapper;
+    ReminderNotificationService reminderNotificationService;
 
     private User getUserByEmail(String userEmail) {
         return userRepository
@@ -57,7 +61,21 @@ public class ReminderService {
         }
 
         Reminder reminder = reminderMapper.toReminder(request, user);
-        reminderRepository.save(reminder);
+
+        Reminder savedReminder = reminderRepository.save(reminder);
+
+        // Nếu Reminder có thông báo trong ngày, lập lịch ngay
+        LocalDate today = LocalDate.now();
+        LocalTime triggerTime =
+                reminder.getReminderTime() != null ? reminder.getReminderTime() : reminder.getStartTime();
+
+        if (triggerTime != null && triggerTime.isAfter(LocalTime.now())) {
+            log.info("Reminder Time: {}", triggerTime);
+            LocalDateTime nextTime = LocalDateTime.of(today, triggerTime);
+            if (nextTime.isAfter(LocalDateTime.now())) {
+                reminderNotificationService.scheduleReminderNotification(savedReminder, nextTime);
+            }
+        }
     }
 
     public List<ReminderSummaryProjection> getRemindersByDayAndUserId(String dateStr, String userEmail) {

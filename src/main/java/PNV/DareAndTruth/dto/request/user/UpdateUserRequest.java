@@ -23,4 +23,6 @@ public class UpdateUserRequest {
     String avatarUrl;
 
     Boolean isActive;
+
+    String fcmToken;
 }

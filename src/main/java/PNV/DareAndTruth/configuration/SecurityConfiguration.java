@@ -57,7 +57,7 @@ public class SecurityConfiguration {
                                 "/auth/sign-in",
                                 "/auth/refresh-token",
                                 "/swagger-ui/**",
-                                "v3/**",
+                                "/v3/**",
                                 "/ws/**")
                         .permitAll()
                         .requestMatchers("/admin/**", "/users")
