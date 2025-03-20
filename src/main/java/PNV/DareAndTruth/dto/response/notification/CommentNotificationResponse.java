@@ -21,6 +21,7 @@ public class CommentNotificationResponse {
     UUID postId;
     String hashtag;
     String commentContent;
+    UUID parentCommentId;
     UUID challengeId;
     LocalDateTime createdAt;
 }

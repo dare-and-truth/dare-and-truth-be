@@ -52,6 +52,10 @@ public class Notification extends BaseEntity {
     @OnDelete(action = OnDeleteAction.CASCADE)
     Request request;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "comment_id")
+    Comment comment;
+
     @Column(name = "is_read", columnDefinition = "boolean default false")
     @Builder.Default
     Boolean isRead = false;
@@ -72,11 +76,12 @@ public class Notification extends BaseEntity {
                 && Objects.equals(post, notification.post)
                 && Objects.equals(reminder, notification.reminder)
                 && Objects.equals(isRead, notification.isRead)
-                && Objects.equals(challenge, notification.challenge);
+                && Objects.equals(challenge, notification.challenge)
+                && Objects.equals(comment, notification.comment);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), sender, receiver, type, post, reminder, isRead, challenge);
+        return Objects.hash(super.hashCode(), sender, receiver, type, post, reminder, isRead, challenge,comment);
     }
 }
