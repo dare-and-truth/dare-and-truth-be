@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
 import PNV.DareAndTruth.dto.response.notification.NotificationResponse;
 import PNV.DareAndTruth.dto.response.notification.UnreadNotificationCountResponse;
 import PNV.DareAndTruth.entity.Notification;
+import PNV.DareAndTruth.entity.User;
 import PNV.DareAndTruth.exception.AppException;
 import PNV.DareAndTruth.exception.ErrorCode;
 import PNV.DareAndTruth.mapper.NotificationMapper;
 import PNV.DareAndTruth.repository.NotificationRepository;
+import PNV.DareAndTruth.repository.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -28,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 public class NotificationService {
     NotificationRepository notificationRepository;
     NotificationMapper notificationMapper;
+    UserRepository userRepository;
 
     public Page<NotificationResponse> getNotificationsForUser(String receiverId, Pageable pageable) {
         Page<Notification> notifications =
@@ -66,5 +69,13 @@ public class NotificationService {
                 .findById(UUID.fromString(notificationId))
                 .orElseThrow(() -> new AppException(ErrorCode.NOTIFICATION_NOT_FOUND, HttpStatus.BAD_REQUEST));
         notification.setIsRead(true);
+    }
+
+    public void updateFcmToken(UUID userId, String token) {
+        User user = userRepository
+                .findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.NOT_FOUND));
+        if (user.getFcmToken() == null) user.setFcmToken(token);
+        userRepository.save(user);
     }
 }

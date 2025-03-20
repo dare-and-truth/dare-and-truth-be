@@ -30,7 +30,7 @@ public class Comment extends BaseEntity {
     @NotNull
     UUID feedId;
 
-    @Column(name = "content", nullable = false)
+    @Column(name = "content", columnDefinition = "TEXT")
     String content;
 
     @Column(name = "feed_type") // "post" or "challenge"
@@ -49,6 +49,9 @@ public class Comment extends BaseEntity {
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     LocalDateTime createdAt;
+
+    @Column(name = "level")
+    int level;
 
     @Override
     public boolean equals(Object o) {

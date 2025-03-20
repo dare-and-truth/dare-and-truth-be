@@ -34,7 +34,7 @@ public class Reminder extends BaseEntity {
     @Column(name = "end_date", nullable = false)
     LocalDate endDate;
 
-    @Column(name = "reminder_content", nullable = false)
+    @Column(name = "reminder_content", nullable = false, columnDefinition = "TEXT")
     String reminderContent;
 
     @Column(name = "reminder_time")

@@ -71,7 +71,7 @@ public class ReminderNotificationService {
                         .setToken(fcmToken)
                         .build();
 
-                String response = firebaseMessaging.send(message);
+                firebaseMessaging.send(message);
             } else {
                 log.warn("⚠️ User ID: {} has no FCM token", receiver.getId());
             }

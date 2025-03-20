@@ -14,8 +14,6 @@ import PNV.DareAndTruth.dto.response.ApiStatus;
 import PNV.DareAndTruth.dto.response.AppApiResponse;
 import PNV.DareAndTruth.dto.response.notification.NotificationResponse;
 import PNV.DareAndTruth.dto.response.notification.UnreadNotificationCountResponse;
-import PNV.DareAndTruth.entity.User;
-import PNV.DareAndTruth.repository.UserRepository;
 import PNV.DareAndTruth.service.JwtService;
 import PNV.DareAndTruth.service.NotificationService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +32,6 @@ import lombok.experimental.FieldDefaults;
 public class NotificationController {
     NotificationService notificationService;
     JwtService jwtService;
-    UserRepository userRepository;
 
     @Operation(
             summary = "Get user notifications",
@@ -146,16 +143,40 @@ public class NotificationController {
                 .build());
     }
 
+    @Operation(summary = "Update fcm token to push notification", description = "Update fcm token to push notification")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Update token successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
+                                            @ExampleObject(
+                                                    value =
+                                                            "{\"code\": 1000, \"status\": \"success\", \"message\": \"Update fcm token successfully\"}")
+                                        })),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Failed to update fcm token",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
+                                            @ExampleObject(
+                                                    value =
+                                                            "{\"code\": 1042, \"status\": \"fail\", \"message\": \"User not found\"}")
+                                        }))
+            })
     @PostMapping("/update-fcm-token/{token}")
     public ResponseEntity<AppApiResponse<Void>> updateFcmToken(@PathVariable String token, HttpServletRequest request) {
         UUID userId = jwtService.extractUserIdFromHeader(request);
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-        if (user.getFcmToken() == null) user.setFcmToken(token);
-        userRepository.save(user);
+        notificationService.updateFcmToken(userId, token);
         return ResponseEntity.ok(AppApiResponse.<Void>builder()
                 .code(1000)
                 .status(ApiStatus.SUCCESS)
-                .message("Marked notification as read")
+                .message("Update fcm token successfully")
                 .build());
     }
 }
