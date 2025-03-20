@@ -142,4 +142,41 @@ public class NotificationController {
                 .message("Marked notification as read")
                 .build());
     }
+
+    @Operation(summary = "Update fcm token to push notification", description = "Update fcm token to push notification")
+    @ApiResponses(
+            value = {
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "Update token successfully",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
+                                            @ExampleObject(
+                                                    value =
+                                                            "{\"code\": 1000, \"status\": \"success\", \"message\": \"Update fcm token successfully\"}")
+                                        })),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Failed to update fcm token",
+                        content =
+                                @Content(
+                                        mediaType = "application/json",
+                                        examples = {
+                                            @ExampleObject(
+                                                    value =
+                                                            "{\"code\": 1042, \"status\": \"fail\", \"message\": \"User not found\"}")
+                                        }))
+            })
+    @PostMapping("/update-fcm-token/{token}")
+    public ResponseEntity<AppApiResponse<Void>> updateFcmToken(@PathVariable String token, HttpServletRequest request) {
+        UUID userId = jwtService.extractUserIdFromHeader(request);
+        notificationService.updateFcmToken(userId, token);
+        return ResponseEntity.ok(AppApiResponse.<Void>builder()
+                .code(1000)
+                .status(ApiStatus.SUCCESS)
+                .message("Update fcm token successfully")
+                .build());
+    }
 }

@@ -32,6 +32,9 @@ public class User extends BaseEntityAudit {
     @Column(name = "password", nullable = false)
     String password;
 
+    @Column(name = "fcm_token")
+    String fcmToken;
+
     @Column(name = "is_admin")
     Boolean isAdmin;
 

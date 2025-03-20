@@ -11,8 +11,6 @@ import PNV.DareAndTruth.entity.Comment;
 
 public interface CommentRepository extends JpaRepository<Comment, UUID> {
 
-    Set<CommentSummaryProjection> findAllByFeedIdAndParentCommentIsNullOrderByCreatedAtDesc(UUID feedId);
-
     List<CommentSummaryProjection> findAllByParentComment_IdOrderByCreatedAtAsc(UUID parentCommentId);
 
     @Query(
