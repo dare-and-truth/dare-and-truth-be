@@ -101,8 +101,7 @@ public class CommentService {
                 notificationType = (request.isChallenge() ? "comment-challenge" : "comment-post");
             }
 
-            String hashtag = (challenge != null) ? challenge.getHashtag()
-                    : post.getHashtag();
+            String hashtag = (challenge != null) ? challenge.getHashtag() : post.getHashtag();
 
             Notification notification = Notification.builder()
                     .sender(sender)
@@ -133,7 +132,6 @@ public class CommentService {
         // Cập nhật điểm số
         scoreService.addCommentScore(feedId, feedType, userEmail);
     }
-
 
     public List<CommentSummaryResponse> getCommentsByFeedId(String feedId, String feedUserId) {
         UUID feedUUID;

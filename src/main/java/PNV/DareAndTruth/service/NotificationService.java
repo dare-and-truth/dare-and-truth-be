@@ -48,7 +48,7 @@ public class NotificationService {
                 dto.setRelatedEntity(notificationMapper.mapReminderToDTO(notification.getReminder()));
             } else if (notification.getRequest() != null) {
                 dto.setRelatedEntity(notificationMapper.mapRequestToDTO(notification.getRequest()));
-            } else if (notification.getComment() != null){
+            } else if (notification.getComment() != null) {
                 dto.setRelatedEntity(notificationMapper.mapCommentToCommentDTO(notification.getComment()));
             }
 

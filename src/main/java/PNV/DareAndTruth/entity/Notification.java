@@ -82,6 +82,6 @@ public class Notification extends BaseEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), sender, receiver, type, post, reminder, isRead, challenge,comment);
+        return Objects.hash(super.hashCode(), sender, receiver, type, post, reminder, isRead, challenge, comment);
     }
 }
