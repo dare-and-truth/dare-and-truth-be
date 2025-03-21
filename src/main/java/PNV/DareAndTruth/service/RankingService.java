@@ -23,6 +23,7 @@ public class RankingService {
     PostRepository postRepository;
     ChallengeRepository challengeRepository;
     UserRepository userRepository;
+    ReminderRepository reminderRepository;
 
     public List<UserRankingResponse> getRankingOfChallenge(String challengeId) {
         UUID currentChallengeId = UUID.fromString(challengeId);
@@ -35,26 +36,44 @@ public class RankingService {
         LocalDate startDate = challenge.getStartDate();
         LocalDate endDate = challenge.getEndDate();
 
+        // 1. Lấy danh sách user có bài post và tổng số like từ PostRepository
         List<Object[]> rankingData = postRepository.getPostByHashtagAndDate(hashtag, startDate, endDate);
 
-        List<UserRankingResponse> rankings = rankingData.stream()
-                .map(row -> new UserRankingResponse(
-                        (UUID) row[0], // userId
-                        (String) row[1], // username
-                        (String) row[2], // avatarUrl
-                        row[3] != null ? ((Number) row[3]).intValue() : 0, // totalLikes
-                        0 // rank
-                        ))
-                .sorted(Comparator.comparingInt(UserRankingResponse::getTotalLikes)
-                        .reversed())
-                .collect(Collectors.toList());
+        // 2. Lưu vào Map (userId -> UserRankingResponse)
+        Map<UUID, UserRankingResponse> rankingMap = new HashMap<>();
+        for (Object[] row : rankingData) {
+            UUID userId = (UUID) row[0];
+            String username = (String) row[1];
+            String avatarUrl = (String) row[2];
+            int totalLikes = row[3] != null ? ((Number) row[3]).intValue() : 0;
 
+            rankingMap.put(userId, new UserRankingResponse(userId, username, avatarUrl, totalLikes, 0));
+        }
+
+        // 3. Lấy danh sách user từ Reminder (có thể chưa có post)
+        List<UUID> reminderUserIds = reminderRepository.findUserIdsByHashtagAndDateRange(hashtag, startDate, endDate);
+
+        for (UUID userId : reminderUserIds) {
+            if (!rankingMap.containsKey(userId)) { // Nếu user chưa có trong ranking (chưa post)
+                var user = userRepository.findById(userId).orElse(null);
+                if (user != null) {
+                    rankingMap.put(userId, new UserRankingResponse(userId, user.getUsername(), user.getAvatarUrl(), 0, 0));
+                }
+            }
+        }
+
+        // 4. Chuyển Map -> List, sắp xếp theo tổng like giảm dần
+        List<UserRankingResponse> rankings = new ArrayList<>(rankingMap.values());
+        rankings.sort(Comparator.comparingInt(UserRankingResponse::getTotalLikes).reversed());
+
+        // 5. Gán thứ hạng
         for (int i = 0; i < rankings.size(); i++) {
             rankings.get(i).setRank(i + 1);
         }
 
         return rankings;
     }
+
 
     public List<UserRankingWithScoreResponse> getRankingOfServer() {
         List<Object[]> userScores = userRepository.getAllUsersWithScores();

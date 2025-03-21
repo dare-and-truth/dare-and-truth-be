@@ -55,4 +55,11 @@ public class NotificationResponse {
     public static class RequestDTO {
         UUID id;
     }
+
+    @Getter
+    @Setter
+    public static class CommentDTO {
+        UUID id;
+        String hashtag;
+    }
 }

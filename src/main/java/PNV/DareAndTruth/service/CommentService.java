@@ -1,5 +1,6 @@
 package PNV.DareAndTruth.service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,84 +41,37 @@ public class CommentService {
             throw new AppException(ErrorCode.USER_NOT_FOUND, HttpStatus.BAD_REQUEST);
         }
 
+        User sender = user.get();
+        UUID feedId;
+        String feedType = request.isChallenge() ? "challenge" : "post";
+        Challenge challenge = null;
+        Post post = null;
+
+        // Xác định bài đăng hoặc thử thách
+        if (request.isChallenge()) {
+            Optional<Challenge> challengeOpt = challengeRepository.findById(UUID.fromString(request.getFeedId()));
+            if (challengeOpt.isEmpty()) {
+                throw new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.BAD_REQUEST);
+            }
+            challenge = challengeOpt.get();
+            feedId = challenge.getId();
+        } else {
+            Optional<Post> postOpt = postRepository.findById(UUID.fromString(request.getFeedId()));
+            if (postOpt.isEmpty()) {
+                throw new AppException(ErrorCode.POST_NOT_FOUND, HttpStatus.BAD_REQUEST);
+            }
+            post = postOpt.get();
+            feedId = post.getId();
+        }
+
         Comment parentComment = null;
         if (request.getParentCommentId() != null) {
             parentComment = commentRepository
-                    .findById(UUID.fromString(String.valueOf(request.getParentCommentId())))
+                    .findById(UUID.fromString(request.getParentCommentId()))
                     .orElseThrow(() -> new AppException(ErrorCode.COMMENT_NOT_FOUND, HttpStatus.BAD_REQUEST));
         }
 
-        UUID feedId;
-        Notification notification = null;
-        CommentNotificationResponse commentNotificationResponse = null;
-
-        User sender = user.get();
-        String feedType = request.isChallenge() ? "challenge" : "post";
-
-        if (request.isChallenge()) {
-            Optional<Challenge> challenge = challengeRepository.findById(UUID.fromString(request.getFeedId()));
-            if (challenge.isEmpty()) {
-                throw new AppException(ErrorCode.CHALLENGE_NOT_FOUND, HttpStatus.BAD_REQUEST);
-            }
-
-            feedId = challenge.get().getId();
-            User receiver = challenge.get().getUser();
-
-            if (!sender.getId().equals(receiver.getId())) {
-                notification = Notification.builder()
-                        .sender(sender)
-                        .receiver(receiver)
-                        .challenge(challenge.get())
-                        .type("comment-challenge")
-                        .content(request.getContent())
-                        .build();
-
-                commentNotificationResponse = CommentNotificationResponse.builder()
-                        .type("comment-challenge")
-                        .senderId(sender.getId())
-                        .senderName(sender.getUsername())
-                        .senderAvatarUrl(sender.getAvatarUrl())
-                        .challengeId(feedId)
-                        .hashtag(challenge.get().getHashtag())
-                        .commentContent(request.getContent())
-                        .build();
-            }
-        } else {
-            Optional<Post> post = postRepository.findById(UUID.fromString(request.getFeedId()));
-            if (post.isEmpty()) {
-                throw new AppException(ErrorCode.POST_NOT_FOUND, HttpStatus.BAD_REQUEST);
-            }
-
-            feedId = post.get().getId();
-            User receiver = post.get().getUser();
-
-            if (!sender.getId().equals(receiver.getId())) {
-                notification = Notification.builder()
-                        .sender(sender)
-                        .receiver(receiver)
-                        .post(post.get())
-                        .type("comment-post")
-                        .content(request.getContent())
-                        .build();
-
-                commentNotificationResponse = CommentNotificationResponse.builder()
-                        .type("comment-post")
-                        .senderId(sender.getId())
-                        .senderName(sender.getUsername())
-                        .senderAvatarUrl(sender.getAvatarUrl())
-                        .postId(feedId)
-                        .hashtag(post.get().getHashtag())
-                        .commentContent(request.getContent())
-                        .build();
-            }
-        }
-
-        if (notification != null) {
-            notificationRepository.save(notification);
-            messagingTemplate.convertAndSend(
-                    "/topic/notifications/" + notification.getReceiver().getId(), commentNotificationResponse);
-        }
-
+        // Tạo comment hoặc reply comment duy nhất
         Comment comment = Comment.builder()
                 .user(sender)
                 .feedId(feedId)
@@ -128,6 +82,52 @@ public class CommentService {
                 .level(request.getLevel())
                 .build();
         commentRepository.save(comment);
+
+        // Gửi thông báo nếu cần
+        User receiver;
+        if ((parentComment != null)) {
+            receiver = parentComment.getUser();
+        } else {
+            if (challenge == null) receiver = post.getUser();
+            else receiver = challenge.getUser();
+        }
+
+        if (!sender.getId().equals(receiver.getId())) {
+            String notificationType;
+            if ((parentComment != null)) {
+                if ("challenge".equals(parentComment.getFeedType())) notificationType = "reply-comment-challenge";
+                else notificationType = "reply-comment-post";
+            } else {
+                notificationType = (request.isChallenge() ? "comment-challenge" : "comment-post");
+            }
+
+            String hashtag = (challenge != null) ? challenge.getHashtag() : post.getHashtag();
+
+            Notification notification = Notification.builder()
+                    .sender(sender)
+                    .receiver(receiver)
+                    .type(notificationType)
+                    .content(request.getContent())
+                    .comment(parentComment)
+                    .post(post)
+                    .challenge(challenge)
+                    .build();
+            notificationRepository.save(notification);
+
+            CommentNotificationResponse commentNotificationResponse = CommentNotificationResponse.builder()
+                    .type(notificationType)
+                    .senderId(sender.getId())
+                    .senderName(sender.getUsername())
+                    .senderAvatarUrl(sender.getAvatarUrl())
+                    .postId("reply-comment-post".equals(notificationType) ? feedId : null)
+                    .challengeId("reply-comment-challenge".equals(notificationType) ? feedId : null)
+                    .hashtag(hashtag)
+                    .parentCommentId(parentComment != null ? parentComment.getId() : null)
+                    .commentContent(request.getContent())
+                    .createdAt(LocalDateTime.now())
+                    .build();
+            messagingTemplate.convertAndSend("/topic/notifications/" + receiver.getId(), commentNotificationResponse);
+        }
 
         // Cập nhật điểm số
         scoreService.addCommentScore(feedId, feedType, userEmail);

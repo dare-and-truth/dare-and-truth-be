@@ -69,4 +69,7 @@ public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
             @Param("endDate") LocalDate endDate);
 
     List<Reminder> findByEndDateGreaterThanEqual(LocalDate endDate);
+
+    @Query("SELECT DISTINCT r.user.id FROM Reminder r WHERE r.hashtag = :hashtag AND r.startDate = :startDate AND r.endDate = :endDate")
+    List<UUID> findUserIdsByHashtagAndDateRange(@Param("hashtag") String hashtag, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 }

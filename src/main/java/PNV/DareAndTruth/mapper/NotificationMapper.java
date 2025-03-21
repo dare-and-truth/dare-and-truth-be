@@ -76,4 +76,16 @@ public interface NotificationMapper {
         reminderDTO.setContent(reminder.getReminderContent());
         return reminderDTO;
     }
+
+    @Named("mapCommentToCommentDTO")
+    @Mapping(source = "id", target = "id")
+    @Mapping(source = "hashtag", target = "hashtag")
+    default NotificationResponse.CommentDTO mapCommentToCommentDTO(Comment comment) {
+        if (comment == null) {
+            return null;
+        }
+        NotificationResponse.CommentDTO commentDTO = new NotificationResponse.CommentDTO();
+        commentDTO.setId(comment.getFeedId());
+        return commentDTO;
+    }
 }

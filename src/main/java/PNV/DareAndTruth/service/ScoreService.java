@@ -146,11 +146,11 @@ public class ScoreService {
 
             // Check if a score of type 3 (like) already exists for this post for the liking user
             boolean scoreExists =
-                    scoreRepository.existsByUser_IdAndScoreTypeAndPost_Id(likingUser.getId(), 3, post.getId());
+                    scoreRepository.existsByUser_IdAndScoreTypeAndPost_Id(post.getUser().getId(), 3, post.getId());
 
             if (!scoreExists) {
                 Score score = Score.builder()
-                        .user(likingUser)
+                        .user(post.getUser())
                         .scoreReceived(1)
                         .scoreType(3)
                         .post(post)
@@ -169,11 +169,11 @@ public class ScoreService {
             }
 
             boolean scoreExists = scoreRepository.existsByUser_IdAndScoreTypeAndChallenge_Id(
-                    likingUser.getId(), 3, challenge.getId());
+                    challenge.getUser().getId(), 3, challenge.getId());
 
             if (!scoreExists) {
                 Score score = Score.builder()
-                        .user(likingUser)
+                        .user(challenge.getUser())
                         .scoreReceived(1)
                         .scoreType(3)
                         .challenge(challenge)
@@ -202,10 +202,10 @@ public class ScoreService {
             }
 
             boolean scoreExists =
-                    scoreRepository.existsByUser_IdAndScoreTypeAndPost_Id(commentingUser.getId(), 5, post.getId());
+                    scoreRepository.existsByUser_IdAndScoreTypeAndPost_Id(post.getUser().getId(), 5, post.getId());
             if (!scoreExists) {
                 Score score = Score.builder()
-                        .user(commentingUser)
+                        .user(post.getUser())
                         .scoreReceived(2)
                         .scoreType(5)
                         .post(post)
@@ -223,10 +223,10 @@ public class ScoreService {
             }
 
             boolean scoreExists = scoreRepository.existsByUser_IdAndScoreTypeAndChallenge_Id(
-                    commentingUser.getId(), 5, challenge.getId());
+                    challenge.getUser().getId(), 5, challenge.getId());
             if (!scoreExists) {
                 Score score = Score.builder()
-                        .user(commentingUser)
+                        .user(challenge.getUser())
                         .scoreReceived(2)
                         .scoreType(5)
                         .challenge(challenge)

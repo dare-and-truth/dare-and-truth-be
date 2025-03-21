@@ -71,7 +71,7 @@ public class ReminderService {
 
         if (triggerTime != null && triggerTime.isAfter(LocalTime.now())) {
             log.info("Reminder Time: {}", triggerTime);
-            LocalDateTime nextTime = LocalDateTime.of(today, triggerTime);
+            LocalDateTime nextTime = LocalDateTime.of(today, triggerTime).minusMinutes(10);
             if (nextTime.isAfter(LocalDateTime.now())) {
                 reminderNotificationService.scheduleReminderNotification(savedReminder, nextTime);
             }

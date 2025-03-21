@@ -44,7 +44,7 @@ public class ReminderNotificationService {
                     reminder.getReminderTime() != null ? reminder.getReminderTime() : reminder.getStartTime();
             if (triggerTime == null) continue;
 
-            LocalDateTime nextTime = LocalDateTime.of(today, triggerTime);
+            LocalDateTime nextTime = LocalDateTime.of(today, triggerTime).minusMinutes(10);
             if (nextTime.isAfter(LocalDateTime.now())) {
                 scheduleReminderNotification(reminder, nextTime);
             }
