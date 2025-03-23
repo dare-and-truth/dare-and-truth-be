@@ -34,6 +34,7 @@ public class CommentService {
     SimpMessagingTemplate messagingTemplate;
     ScoreRepository scoreRepository;
     ScoreService scoreService;
+    ReminderRepository reminderRepository;
 
     public void createComment(CreateCommentRequest request, String userEmail) {
         Optional<User> user = userRepository.findByEmail(userEmail);
@@ -119,8 +120,15 @@ public class CommentService {
                     .senderId(sender.getId())
                     .senderName(sender.getUsername())
                     .senderAvatarUrl(sender.getAvatarUrl())
-                    .postId("reply-comment-post".equals(notificationType) ? feedId : null)
-                    .challengeId("reply-comment-challenge".equals(notificationType) ? feedId : null)
+                    .postId(
+                            "reply-comment-post".equals(notificationType) || "comment-post".equals(notificationType)
+                                    ? feedId
+                                    : null)
+                    .challengeId(
+                            "reply-comment-challenge".equals(notificationType)
+                                            || "comment-challenge".equals(notificationType)
+                                    ? feedId
+                                    : null)
                     .hashtag(hashtag)
                     .parentCommentId(parentComment != null ? parentComment.getId() : null)
                     .commentContent(request.getContent())
@@ -129,6 +137,39 @@ public class CommentService {
             messagingTemplate.convertAndSend("/topic/notifications/" + receiver.getId(), commentNotificationResponse);
         }
 
+        if (request.isChallenge() && parentComment == null && sender.getId().equals(receiver.getId())) {
+            // Lấy danh sách userId của những người đã tham gia challenge
+            assert challenge != null;
+            List<UUID> participantUserIds = reminderRepository.findUserIdsByHashtagAndDateRange(
+                    challenge.getHashtag(), challenge.getStartDate(), challenge.getEndDate());
+
+            // Gửi thông báo đến từng người tham gia
+            for (UUID participantId : participantUserIds) {
+                if (!participantId.equals(sender.getId())) { // Không gửi thông báo cho chính người comment
+                    Notification challengeNotification = Notification.builder()
+                            .sender(sender)
+                            .receiver(userRepository.findById(participantId).orElse(null))
+                            .type("author-comment-challenge")
+                            .content(request.getContent())
+                            .challenge(challenge)
+                            .build();
+                    notificationRepository.save(challengeNotification);
+
+                    CommentNotificationResponse notificationResponse = CommentNotificationResponse.builder()
+                            .type("author-comment-challenge") // Thay đổi type
+                            .senderId(sender.getId())
+                            .senderName(sender.getUsername())
+                            .senderAvatarUrl(sender.getAvatarUrl())
+                            .challengeId(feedId)
+                            .hashtag(challenge.getHashtag())
+                            .commentContent(request.getContent())
+                            .createdAt(LocalDateTime.now())
+                            .build();
+
+                    messagingTemplate.convertAndSend("/topic/notifications/" + participantId, notificationResponse);
+                }
+            }
+        }
         // Cập nhật điểm số
         scoreService.addCommentScore(feedId, feedType, userEmail);
     }

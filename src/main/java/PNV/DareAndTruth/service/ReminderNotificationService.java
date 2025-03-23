@@ -40,11 +40,10 @@ public class ReminderNotificationService {
         List<Reminder> reminders = reminderRepository.findByEndDateGreaterThanEqual(today);
 
         for (Reminder reminder : reminders) {
-            LocalTime triggerTime =
-                    reminder.getReminderTime() != null ? reminder.getReminderTime() : reminder.getStartTime();
+            LocalTime triggerTime = reminder.getReminderTime();
             if (triggerTime == null) continue;
 
-            LocalDateTime nextTime = LocalDateTime.of(today, triggerTime).minusMinutes(10);
+            LocalDateTime nextTime = LocalDateTime.of(today, triggerTime);
             if (nextTime.isAfter(LocalDateTime.now())) {
                 scheduleReminderNotification(reminder, nextTime);
             }

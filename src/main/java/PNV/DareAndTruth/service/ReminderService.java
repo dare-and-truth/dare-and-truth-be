@@ -66,12 +66,11 @@ public class ReminderService {
 
         // Nếu Reminder có thông báo trong ngày, lập lịch ngay
         LocalDate today = LocalDate.now();
-        LocalTime triggerTime =
-                reminder.getReminderTime() != null ? reminder.getReminderTime() : reminder.getStartTime();
+        LocalTime triggerTime = reminder.getReminderTime();
 
         if (triggerTime != null && triggerTime.isAfter(LocalTime.now())) {
             log.info("Reminder Time: {}", triggerTime);
-            LocalDateTime nextTime = LocalDateTime.of(today, triggerTime).minusMinutes(10);
+            LocalDateTime nextTime = LocalDateTime.of(today, triggerTime);
             if (nextTime.isAfter(LocalDateTime.now())) {
                 reminderNotificationService.scheduleReminderNotification(savedReminder, nextTime);
             }
@@ -105,7 +104,19 @@ public class ReminderService {
         }
 
         reminderMapper.updateReminderFromRequest(reminder, request);
-        reminderRepository.save(reminder);
+        Reminder savedReminder = reminderRepository.save(reminder);
+
+        // Nếu Reminder có thông báo trong ngày, lập lịch ngay
+        LocalDate today = LocalDate.now();
+        LocalTime triggerTime = reminder.getReminderTime();
+
+        if (triggerTime != null && triggerTime.isAfter(LocalTime.now())) {
+            log.info("Reminder Time: {}", triggerTime);
+            LocalDateTime nextTime = LocalDateTime.of(today, triggerTime);
+            if (nextTime.isAfter(LocalDateTime.now())) {
+                reminderNotificationService.scheduleReminderNotification(savedReminder, nextTime);
+            }
+        }
     }
 
     public void deleteReminder(UUID reminderId, String userEmail) {

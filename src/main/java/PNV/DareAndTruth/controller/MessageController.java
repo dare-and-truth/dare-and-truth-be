@@ -57,17 +57,18 @@ public class MessageController {
                                                                 "{\"code\": 1017, \"status\": \"fail\", \"message\": \"Content cannot be empty\"}")))
             })
     @PostMapping("/send")
-    public ResponseEntity<AppApiResponse<Void>> sendMessage(
+    public ResponseEntity<AppApiResponse<String>> sendMessage(
             @Valid @RequestBody SendMessageRequest request, HttpServletRequest httpServletRequest) {
         // Lấy token từ header
         UUID senderId = jwtService.extractUserIdFromHeader(httpServletRequest);
 
-        messageService.sendMessage(senderId, request);
+        String thisConversationId = messageService.sendMessage(senderId, request);
 
         return ResponseEntity.status(201)
-                .body(AppApiResponse.<Void>builder()
+                .body(AppApiResponse.<String>builder()
                         .code(1000)
                         .status(ApiStatus.SUCCESS)
+                        .data(thisConversationId)
                         .message("Message sent successfully")
                         .build());
     }

@@ -31,7 +31,8 @@ public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
     @Query("SELECT r.id AS id, r.title AS title, r.hashtag AS hashtag, r.startDate AS startDate, r.endDate AS endDate, "
             + "r.reminderContent AS reminderContent, r.reminderTime AS reminderTime, r.startTime AS startTime, r.endTime AS endTime, "
             + "r.user.id AS userId "
-            + "FROM Reminder r WHERE r.user = :user AND :date BETWEEN r.startDate AND r.endDate")
+            + "FROM Reminder r WHERE r.user = :user AND :date BETWEEN r.startDate AND r.endDate "
+            + "ORDER BY r.reminderTime ASC")
     List<ReminderSummaryProjection> findByUserAndDate(User user, LocalDate date);
 
     @Query(
@@ -70,6 +71,10 @@ public interface ReminderRepository extends JpaRepository<Reminder, UUID> {
 
     List<Reminder> findByEndDateGreaterThanEqual(LocalDate endDate);
 
-    @Query("SELECT DISTINCT r.user.id FROM Reminder r WHERE r.hashtag = :hashtag AND r.startDate = :startDate AND r.endDate = :endDate")
-    List<UUID> findUserIdsByHashtagAndDateRange(@Param("hashtag") String hashtag, @Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+    @Query(
+            "SELECT DISTINCT r.user.id FROM Reminder r WHERE r.hashtag = :hashtag AND r.startDate = :startDate AND r.endDate = :endDate")
+    List<UUID> findUserIdsByHashtagAndDateRange(
+            @Param("hashtag") String hashtag,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 }

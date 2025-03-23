@@ -37,7 +37,7 @@ public class MessageService {
 
     @Transactional
     @Retryable(value = MongoException.class, maxAttempts = 5, backoff = @Backoff(delay = 300))
-    public void sendMessage(UUID senderId, SendMessageRequest request) {
+    public String sendMessage(UUID senderId, SendMessageRequest request) {
 
         if (request.getMediaUrl() == null && request.getContent() == null) {
             throw new AppException(ErrorCode.CONTENT_OR_MEDIA_URL_REQUIRE, HttpStatus.BAD_REQUEST);
@@ -115,5 +115,6 @@ public class MessageService {
         // Set read for the sender
         conversation.getUnreadCounts().put(senderId, 0);
         conversationRepository.save(conversation);
+        return conversation.getId().toString();
     }
 }

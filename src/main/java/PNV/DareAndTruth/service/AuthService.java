@@ -44,11 +44,11 @@ public class AuthService {
 
     public Map<String, Object> validateUserCredentials(SigninRequest request) {
         User user = userRepository
-                .findByEmail(request.getEmail())
+                .findByEmailAndIsDeletedFalseAndIsActiveTrue(request.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.EMAIL_NOT_FOUND, HttpStatus.NOT_FOUND));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new AppException(ErrorCode.PASSWORD_INCORRECT, HttpStatus.UNAUTHORIZED);
+            throw new AppException(ErrorCode.PASSWORD_INCORRECT, HttpStatus.BAD_REQUEST);
         }
 
         String role = Boolean.TRUE.equals(user.getIsAdmin()) ? "admin" : "user";

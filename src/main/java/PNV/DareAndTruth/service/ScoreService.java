@@ -145,8 +145,8 @@ public class ScoreService {
             }
 
             // Check if a score of type 3 (like) already exists for this post for the liking user
-            boolean scoreExists =
-                    scoreRepository.existsByUser_IdAndScoreTypeAndPost_Id(post.getUser().getId(), 3, post.getId());
+            boolean scoreExists = scoreRepository.existsByUser_IdAndScoreTypeAndPost_Id(
+                    post.getUser().getId(), 3, post.getId());
 
             if (!scoreExists) {
                 Score score = Score.builder()
@@ -201,8 +201,8 @@ public class ScoreService {
                 return;
             }
 
-            boolean scoreExists =
-                    scoreRepository.existsByUser_IdAndScoreTypeAndPost_Id(post.getUser().getId(), 5, post.getId());
+            boolean scoreExists = scoreRepository.existsByUser_IdAndScoreTypeAndPost_Id(
+                    post.getUser().getId(), 5, post.getId());
             if (!scoreExists) {
                 Score score = Score.builder()
                         .user(post.getUser())

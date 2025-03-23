@@ -57,14 +57,16 @@ public class RankingService {
             if (!rankingMap.containsKey(userId)) { // Nếu user chưa có trong ranking (chưa post)
                 var user = userRepository.findById(userId).orElse(null);
                 if (user != null) {
-                    rankingMap.put(userId, new UserRankingResponse(userId, user.getUsername(), user.getAvatarUrl(), 0, 0));
+                    rankingMap.put(
+                            userId, new UserRankingResponse(userId, user.getUsername(), user.getAvatarUrl(), 0, 0));
                 }
             }
         }
 
         // 4. Chuyển Map -> List, sắp xếp theo tổng like giảm dần
         List<UserRankingResponse> rankings = new ArrayList<>(rankingMap.values());
-        rankings.sort(Comparator.comparingInt(UserRankingResponse::getTotalLikes).reversed());
+        rankings.sort(
+                Comparator.comparingInt(UserRankingResponse::getTotalLikes).reversed());
 
         // 5. Gán thứ hạng
         for (int i = 0; i < rankings.size(); i++) {
@@ -73,7 +75,6 @@ public class RankingService {
 
         return rankings;
     }
-
 
     public List<UserRankingWithScoreResponse> getRankingOfServer() {
         List<Object[]> userScores = userRepository.getAllUsersWithScores();
